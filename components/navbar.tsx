@@ -6,6 +6,7 @@ import Link from "next/link"
 import { twMerge } from "tailwind-merge"
 
 import { Button } from "./ui/button"
+import { ModeToggle } from "./mode-toggle"
 
 const font = Poppins({ weight: "600", subsets: ["latin"] })
 
@@ -23,6 +24,7 @@ export function Navbar() {
         <Button variant="premium" size="sm">
           Upgrade <Sparkles className="w-4 h-4 fill-white text-white" />
         </Button>
+        <ModeToggle />
         Avatar
       </div>
     </div>
