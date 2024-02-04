@@ -1,5 +1,5 @@
 export interface IMessage {
-  companionid: string | null
+  companionid: string
   content: string
   createdat: string
   id: string

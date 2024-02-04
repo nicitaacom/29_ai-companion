@@ -1,7 +1,6 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { Categories } from "@/components/categories"
 import { SearchInput } from "@/components/search-input"
-import { ICategoryDB } from "@/app/interfaces/ICategoryDB"
 
 export default async function Home() {
   const { data: categories_data, error: categories_error } = await supabaseAdmin.from("category").select("*")

@@ -26,39 +26,39 @@ export interface Database {
       }
       companion: {
         Row: {
-          categoryid: string | null
+          categoryid: string
           createdat: string
-          description: string | null
+          description: string
           id: string
-          instructions: string | null
-          name: string | null
-          seed: string | null
+          instructions: string
+          name: string
+          seed: string
           src: string
           updatedat: string
           userid: string
           username: string
         }
         Insert: {
-          categoryid?: string | null
+          categoryid: string
           createdat?: string
-          description?: string | null
+          description: string
           id?: string
-          instructions?: string | null
-          name?: string | null
-          seed?: string | null
+          instructions: string
+          name: string
+          seed: string
           src: string
           updatedat?: string
           userid: string
           username: string
         }
         Update: {
-          categoryid?: string | null
+          categoryid?: string
           createdat?: string
-          description?: string | null
+          description?: string
           id?: string
-          instructions?: string | null
-          name?: string | null
-          seed?: string | null
+          instructions?: string
+          name?: string
+          seed?: string
           src?: string
           updatedat?: string
           userid?: string
@@ -83,7 +83,7 @@ export interface Database {
       }
       message: {
         Row: {
-          companionid: string | null
+          companionId: string
           content: string
           createdat: string
           id: string
@@ -92,7 +92,7 @@ export interface Database {
           userid: string
         }
         Insert: {
-          companionid?: string | null
+          companionId: string
           content: string
           createdat?: string
           id?: string
@@ -101,7 +101,7 @@ export interface Database {
           userid: string
         }
         Update: {
-          companionid?: string | null
+          companionId?: string
           content?: string
           createdat?: string
           id?: string
@@ -112,14 +112,14 @@ export interface Database {
         Relationships: [
           {
             foreignKeyName: "fk_companion"
-            columns: ["companionid"]
+            columns: ["companionId"]
             isOneToOne: false
             referencedRelation: "companion"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "message_companionid_fkey"
-            columns: ["companionid"]
+            foreignKeyName: "message_companionId_fkey"
+            columns: ["companionId"]
             isOneToOne: false
             referencedRelation: "companion"
             referencedColumns: ["id"]
