@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "update-types": "pnpx supabase gen types typescript --project-id vahemcbozzowgcadavfm > app/interfaces/types_db.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
