@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+### 2.8 - supabase setup
 
-## Getting Started
+<details>
+<summary>1. category</summary>
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```sql
+create table
+  public.category (
+    id uuid not null default uuid_generate_v4 (),
+    name character varying(255) not null,
+    constraint category_pkey primary key (id)
+  ) tablespace pg_default;
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+</details>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+<details>
+<summary>2. companion</summary>
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```sql
+create table
+  public.companion (
+    id uuid not null default uuid_generate_v4 (),
+    user_id character varying(255) not null,
+    username character varying(255) not null,
+    src character varying(255) not null,
+    name text not null,
+    description text not null,
+    instructions text not null,
+    seed text not null,
+    createdat timestamp with time zone not null default timezone ('UTC'::text, now()),
+    updatedat timestamp with time zone not null default timezone ('UTC'::text, now()),
+    categoryid uuid not null,
+    constraint companion_pkey primary key (id),
+    constraint companion_categoryid_fkey foreign key (categoryid) references category (id) on update cascade on delete cascade
+  ) tablespace pg_default;
+```
 
-## Learn More
+</details>
 
-To learn more about Next.js, take a look at the following resources:
+<details>
+<summary>3. message</summary>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sql
+create table
+  public.message (
+    id uuid not null default uuid_generate_v4 (),
+    role public.role not null,
+    content text not null,
+    createdat timestamp with time zone not null default timezone ('UTC'::text, now()),
+    updatedat timestamp with time zone not null default timezone ('UTC'::text, now()),
+    "companionId" uuid not null,
+    userid character varying(255) not null,
+    constraint message_pkey primary key (id)
+  ) tablespace pg_default;
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+</details>
 
-## Deploy on Vercel
+<details>
+<summary>4. users</summary>
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sql
+create table
+  public.users (
+    id uuid not null,
+    created_at timestamp with time zone not null default now(),
+    email text not null,
+    avatar_url text null,
+    providers text[] not null default '{}'::text[],
+    role text[] not null default '{USER}'::text[],
+    constraint users_duplicate_pkey primary key (id),
+    constraint users_id_fkey foreign key (id) references auth.users (id) on update cascade on delete cascade
+  ) tablespace pg_default;
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```
+
+</details>
+
+<details>
+<summary>5. user_subscription</summary>
+
+```sql
+create table
+  public.user_subscription (
+    id uuid not null default uuid_generate_v4 (),
+    user_id character varying(255) not null,
+    stripe_customerid character varying(255) null,
+    stripe_subscriptionid character varying(255) null,
+    stripe_price_id character varying(255) null,
+    stripe_current_period_end timestamp with time zone null,
+    constraint usersubscription_pkey primary key (id),
+    constraint usersubscription_stripecustomerid_key unique (stripe_customerid),
+    constraint usersubscription_stripesubscriptionid_key unique (stripe_subscriptionid),
+    constraint usersubscription_userid_key unique (user_id)
+  ) tablespace pg_default;
+```
+
+</details>

@@ -1,6 +1,7 @@
 "use client"
 
 import * as z from "zod"
+import axios from "axios"
 import { ICategoryDB } from "@/app/interfaces/ICategoryDB"
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { useForm } from "react-hook-form"
@@ -14,6 +15,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Wand2 } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
+import { useRouter } from "next/navigation"
 
 interface CompanionFormProps {
   initialData: ICompanionDB | null
@@ -58,6 +61,9 @@ const formSchema = z.object({
 })
 
 export function CompanionForm({ initialData, categories }: CompanionFormProps) {
+  const router = useRouter()
+  const { toast } = useToast()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
@@ -73,7 +79,21 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
   const isLoading = form.formState.isSubmitting
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values)
+    try {
+      if (initialData) {
+        // Update companion functionality
+        await axios.patch(`/api/companion/${initialData.id}`, values)
+      } else {
+        // Create companion functionality
+        await axios.post(`/api/companion/`, values)
+      }
+      toast({ description: "Success" })
+
+      router.refresh() // refresh all server components
+      router.push("/")
+    } catch (error) {
+      toast({ variant: "destructive", description: "Something went wrong" })
+    }
   }
 
   return (

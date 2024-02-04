@@ -35,7 +35,7 @@ export interface Database {
           seed: string
           src: string
           updatedat: string
-          userid: string
+          user_id: string
           username: string
         }
         Insert: {
@@ -48,7 +48,7 @@ export interface Database {
           seed: string
           src: string
           updatedat?: string
-          userid: string
+          user_id: string
           username: string
         }
         Update: {
@@ -61,19 +61,12 @@ export interface Database {
           seed?: string
           src?: string
           updatedat?: string
-          userid?: string
+          user_id?: string
           username?: string
         }
         Relationships: [
           {
             foreignKeyName: "companion_categoryid_fkey"
-            columns: ["categoryid"]
-            isOneToOne: false
-            referencedRelation: "category"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_category"
             columns: ["categoryid"]
             isOneToOne: false
             referencedRelation: "category"
@@ -109,19 +102,39 @@ export interface Database {
           updatedat?: string
           userid?: string
         }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          id: string
+          providers: string[]
+          role: string[]
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          id: string
+          providers?: string[]
+          role?: string[]
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          providers?: string[]
+          role?: string[]
+        }
         Relationships: [
           {
-            foreignKeyName: "fk_companion"
-            columns: ["companionId"]
-            isOneToOne: false
-            referencedRelation: "companion"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "message_companionId_fkey"
-            columns: ["companionId"]
-            isOneToOne: false
-            referencedRelation: "companion"
+            foreignKeyName: "users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
             referencedColumns: ["id"]
           }
         ]
