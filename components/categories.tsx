@@ -14,10 +14,10 @@ export function Categories({ data }: CategoriesProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const category = searchParams.get("categoryId")
+  const categoryId = searchParams.get("categoryId")
 
   const onClick = (id: string | undefined) => {
-    const query = { category: id }
+    const query = { categoryId: id }
 
     const url = qs.stringifyUrl({ url: window.location.href, query }, { skipNull: true })
 
@@ -29,6 +29,7 @@ export function Categories({ data }: CategoriesProps) {
       <button
         className={twMerge(
           "flex items-center text-center text-xs md:text-sm px-2 md:px-4 py-2 md:py-3 rounded-md bg-primary/10 hover:opacity-75 transition",
+          !categoryId ? "bg-primary/25" : "bg-primary/10",
         )}
         onClick={() => onClick(undefined)}>
         Newest
@@ -37,6 +38,7 @@ export function Categories({ data }: CategoriesProps) {
         <button
           className={twMerge(
             "flex items-center text-center text-xs md:text-sm px-2 md:px-4 py-2 md:py-3 rounded-md bg-primary/10 hover:opacity-75 transition",
+            item.id === categoryId ? "bg-primary/25" : "bg-primary/10",
           )}
           onClick={() => onClick(item.id)}
           key={item.id}>
