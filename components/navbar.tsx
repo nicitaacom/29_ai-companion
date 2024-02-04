@@ -7,7 +7,6 @@ import { Button } from "./ui/button"
 import { ModeToggle } from "./mode-toggle"
 import { MobileSidebar } from "./mobile-sidebar"
 import { AuthModal } from "@/app/(auth)/AuthModal"
-import supabaseClient from "@/lib/supabase/supabaseClient"
 import { cookies } from "next/headers"
 
 const font = Poppins({ weight: "600", subsets: ["latin"] })

@@ -26,48 +26,48 @@ export interface Database {
       }
       companion: {
         Row: {
-          categoryid: string
-          createdat: string
+          category_id: string
+          created_at: string
           description: string
           id: string
           instructions: string
           name: string
           seed: string
           src: string
-          updatedat: string
+          updated_at: string
           user_id: string
           username: string
         }
         Insert: {
-          categoryid: string
-          createdat?: string
+          category_id: string
+          created_at?: string
           description: string
           id?: string
           instructions: string
           name: string
           seed: string
           src: string
-          updatedat?: string
+          updated_at?: string
           user_id: string
           username: string
         }
         Update: {
-          categoryid?: string
-          createdat?: string
+          category_id?: string
+          created_at?: string
           description?: string
           id?: string
           instructions?: string
           name?: string
           seed?: string
           src?: string
-          updatedat?: string
+          updated_at?: string
           user_id?: string
           username?: string
         }
         Relationships: [
           {
-            foreignKeyName: "companion_categoryid_fkey"
-            columns: ["categoryid"]
+            foreignKeyName: "companion_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "category"
             referencedColumns: ["id"]
@@ -76,31 +76,58 @@ export interface Database {
       }
       message: {
         Row: {
-          companionId: string
+          companion_id: string
           content: string
-          createdat: string
+          created_at: string
           id: string
           role: Database["public"]["Enums"]["role"]
-          updatedat: string
-          userid: string
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          companionId: string
+          companion_id: string
           content: string
-          createdat?: string
+          created_at?: string
           id?: string
           role: Database["public"]["Enums"]["role"]
-          updatedat?: string
-          userid: string
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          companionId?: string
+          companion_id?: string
           content?: string
-          createdat?: string
+          created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["role"]
-          updatedat?: string
-          userid?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_subscription: {
+        Row: {
+          id: string
+          stripe_current_period_end: string | null
+          stripe_customerid: string | null
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          stripe_current_period_end?: string | null
+          stripe_customerid?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          stripe_current_period_end?: string | null
+          stripe_customerid?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -138,33 +165,6 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
-      }
-      usersubscription: {
-        Row: {
-          id: string
-          stripecurrentperiodend: string | null
-          stripecustomerid: string | null
-          stripepriceid: string | null
-          stripesubscriptionid: string | null
-          userid: string
-        }
-        Insert: {
-          id?: string
-          stripecurrentperiodend?: string | null
-          stripecustomerid?: string | null
-          stripepriceid?: string | null
-          stripesubscriptionid?: string | null
-          userid: string
-        }
-        Update: {
-          id?: string
-          stripecurrentperiodend?: string | null
-          stripecustomerid?: string | null
-          stripepriceid?: string | null
-          stripesubscriptionid?: string | null
-          userid?: string
-        }
-        Relationships: []
       }
     }
     Views: {

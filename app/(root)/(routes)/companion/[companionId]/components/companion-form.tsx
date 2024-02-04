@@ -55,7 +55,7 @@ const formSchema = z.object({
   src: z.string().min(1, {
     message: "Image is required",
   }),
-  categoryId: z.string().min(1, {
+  category_id: z.string().min(1, {
     message: "Category is required",
   }),
 })
@@ -72,7 +72,7 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
       instructions: "",
       seed: "",
       src: "",
-      categoryId: undefined,
+      category_id: undefined,
     },
   })
 
@@ -148,7 +148,7 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
               )}
             />
             <FormField
-              name="categoryId"
+              name="category_id"
               control={form.control}
               render={({ field }) => (
                 <FormItem>

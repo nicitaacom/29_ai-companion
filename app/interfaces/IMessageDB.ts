@@ -1,9 +1,9 @@
 export interface IMessage {
-  companionid: string
+  companion_id: string
   content: string
-  createdat: string
+  created_at: string
   id: string
   role: string
-  updatedat: string
-  userid: string
+  updated_at: string
+  user_id: string
 }
