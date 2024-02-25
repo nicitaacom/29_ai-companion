@@ -28,11 +28,7 @@ jobs:
         run: bun i
 
       - name: Start Next.js app
-        run: bun dev -p 3029 &
-
-      - name: Wait for app to start
-        run: npx wait-on http://localhost:3029
-        timeout-minutes: 5
+        run: bun dev
 
       - name: Run Cypress tests
         run: bun cypress:run
