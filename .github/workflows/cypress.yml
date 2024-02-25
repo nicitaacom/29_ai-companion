@@ -26,11 +26,11 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run local (development) server
-        run: pnpm dev
-
       - name: Cypress run
         uses: cypress-io/github-action@v6
+        with:
+          build: pnpm run build
+          start: pnpm dev
       # after the test run completes
       # store videos and any screenshots
       # NOTE: screenshots will be generated only if E2E test failed
