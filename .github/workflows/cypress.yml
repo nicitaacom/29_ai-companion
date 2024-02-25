@@ -12,12 +12,12 @@ jobs:
     name: Run Cypress Tests
     runs-on: ubuntu-latest
     env:
-      NEXT_PRODUCTION_URL: ${{ vars.NEXT_PRODUCTION_URL }}
-      NEXT_DEVELOPMENT_URL: ${{ vars.NEXT_DEVELOPMENT_URL }}
-      NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PRODUCTION_URL: "29-ai-companion.vercel.app"
+      NEXT_DEVELOPMENT_URL: "http://localhost:3029"
+      NEXT_PUBLIC_SUPABASE_URL: "https://vahemcbozzowgcadavfm.supabase.co"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhaGVtY2Jvenpvd2djYWRhdmZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY5Nzc4MDIsImV4cCI6MjAyMjU1MzgwMn0.NbhCKZEig0m6arLOR7RvljTOmO0pPiPLKmkjzn89AFE"
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "dndlcofnb"
 
     steps:
       - name: Checkout
@@ -42,8 +42,11 @@ jobs:
         run: pnpm i
 
       - name: Print env
-        run: echo "${{env.NEXT_DEVELOPMENT_URL}}"
-          echo "${{env.SUPABASE_SERVICE_ROLE_KEY}}"
+        run: development url "${{env.NEXT_DEVELOPMENT_URL}}"
+          supabase url ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          anon key ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          service role key "${{env.SUPABASE_SERVICE_ROLE_KEY}}"
+          cloudinary name ${{env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
@@ -56,7 +59,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
-          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
       # after the test run completes
       # store videos and any screenshots
       # NOTE: screenshots will be generated only if E2E test failed
