@@ -24,13 +24,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-        # To make CI faster
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm
-          key: node-modules-deps${{hashFiles('**/pnpm-lock.yaml')}}
-
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       # https://github.com/cypress-io/github-action
@@ -42,12 +35,20 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
+      # To make CI faster
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm
+          key: node-modules-deps${{hashFiles('**/pnpm-lock.yaml')}}
+
       - name: Print env
-        run: development url "${{env.NEXT_DEVELOPMENT_URL}}"
-          supabase url ${{ env.NEXT_PUBLIC_SUPABASE_URL }}
-          anon key ${{ env.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          service role key ${{env.SUPABASE_SERVICE_ROLE_KEY}}
-          cloudinary name ${{env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
+        run: |
+          echo "development url $NEXT_DEVELOPMENT_URL"
+          echo "supabase url $NEXT_PUBLIC_SUPABASE_URL"
+          echo "anon key $NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          echo "service role key $SUPABASE_SERVICE_ROLE_KEY"
+          echo "cloudinary name $NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME"
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
