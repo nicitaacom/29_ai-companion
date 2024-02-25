@@ -79,6 +79,7 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
   const isLoading = form.formState.isSubmitting
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log(82, "initialData - ", initialData)
     try {
       if (initialData) {
         // Update companion functionality
@@ -155,31 +156,34 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
             <FormField
               name="category_id"
               control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isLoading}>
-                    <FormControl>
-                      <SelectTrigger className="bg-background">
-                        <SelectValue defaultValue={field.value} placeholder="Select a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {categories.map(category => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>Select a category for your AI</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                console.log(159, "field - ", field)
+                return (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}>
+                      <FormControl>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue defaultValue={field.value} placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories.map(category => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>Select a category for your AI</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )
+              }}
             />
           </div>
           <div className="space-y-2 w-full">

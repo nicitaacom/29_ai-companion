@@ -14,7 +14,6 @@ export default async function RootPage({ searchParams }: RootPageProps) {
   // 1. Fetch categories
   const { data: categories_data, error: categories_error } = await supabaseAdmin.from("category").select("*")
   if (categories_error) console.log(6, "categories_error - ", categories_error)
-  console.log(17, "searchParams - ", searchParams.categoryId)
 
   let companions
   if (searchParams.categoryId) {
@@ -38,12 +37,12 @@ export default async function RootPage({ searchParams }: RootPageProps) {
     ? await Promise.all(
         companions.map(async companion => {
           const { data: messages, error: messagesError } = await supabaseAdmin
-            .from("message")
+            .from("messages")
             .select("id")
             .eq("companion_id", companion.id)
 
           if (messagesError) {
-            console.error("Error fetching messages:", messagesError)
+            console.error(45, "Error fetching messages:", messagesError)
           }
 
           return messages ? messages.length : 0

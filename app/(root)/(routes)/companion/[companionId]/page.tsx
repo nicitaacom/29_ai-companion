@@ -1,5 +1,7 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { CompanionForm } from "./components/companion-form"
+import supabaseServer from "@/lib/supabase/supabaseServer"
+import { redirect } from "next/navigation"
 
 interface CompanionIdPageProps {
   params: {
@@ -10,7 +12,20 @@ interface CompanionIdPageProps {
 export default async function CompanionIdPage({ params }: CompanionIdPageProps) {
   // TODO - check subscription
 
-  const companion = await supabaseAdmin.from("companion").select().eq("id", params.companionId).single()
+  const {
+    data: { user },
+  } = await supabaseServer().auth.getUser()
+
+  if (!user || !user.id || !user.email) {
+    redirect("/")
+  }
+
+  const companion = await supabaseAdmin
+    .from("companion")
+    .select()
+    .eq("id", params.companionId)
+    .eq("user_id", user.id)
+    .single()
 
   const categories = await supabaseAdmin.from("category").select()
 

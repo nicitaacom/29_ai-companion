@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       category: {
@@ -48,7 +48,7 @@ export interface Database {
           seed: string
           src: string
           updated_at?: string
-          user_id: string
+          user_id?: string
           username: string
         }
         Update: {
@@ -71,10 +71,17 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "category"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_companion_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           }
         ]
       }
-      message: {
+      messages: {
         Row: {
           companion_id: string
           content: string

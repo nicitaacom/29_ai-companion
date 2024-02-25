@@ -24,21 +24,22 @@ export function Companions({ data, messages }: CompanionsProps) {
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 pb-10">
       {data.map(item => (
         <Card className="bg-primary/10 rounded-xl cursor-pointer hover:opacity-75 transition border-0" key={item.id}>
-          <Link href={`/chat/${item.id}`} />
-          <CardHeader className="flex justify-center items-center text-center text-muted-foreground">
-            <div className="relative w-32 h-32">
-              <Image className="rounded-xl object-cover" alt="Companion" src={item.src} fill />
-            </div>
-            <p className="font-bold">{item.name}</p>
-            <p className="text-sm">{item.description}</p>
-          </CardHeader>
-          <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
-            <p className="lowercase">@{item.username.split("@")[0]}</p>
-            <div className="flex items-center">
-              <MessagesSquare className="w-3 h-3 mr-1" />
-              {messages}
-            </div>
-          </CardFooter>
+          <Link href={`/chat/${item.id}`}>
+            <CardHeader className="flex justify-center items-center text-center text-muted-foreground">
+              <div className="relative w-32 h-32">
+                <Image className="rounded-xl object-cover" alt="Companion" src={item.src} fill />
+              </div>
+              <p className="font-bold">{item.name}</p>
+              <p className="text-sm">{item.description}</p>
+            </CardHeader>
+            <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
+              <p className="lowercase">@{item.username.split("@")[0]}</p>
+              <div className="flex items-center">
+                <MessagesSquare className="w-3 h-3 mr-1" />
+                {messages}
+              </div>
+            </CardFooter>
+          </Link>
         </Card>
       ))}
     </div>
