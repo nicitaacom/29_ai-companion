@@ -14,13 +14,24 @@ export default async function RootPage({ searchParams }: RootPageProps) {
   // 1. Fetch categories
   const { data: categories_data, error: categories_error } = await supabaseAdmin.from("category").select("*")
   if (categories_error) console.log(6, "categories_error - ", categories_error)
+  console.log(17, "searchParams - ", searchParams.categoryId)
 
-  // 2. Fetch Companions
-  const { data: companions, error: companions_error } = await supabaseAdmin
-    .from("companion")
-    .select()
-    .eq("category_id", searchParams.categoryId) // if searchParams.categoryId - select *
-    .order("created_at", { ascending: false })
+  let companions
+  if (searchParams.categoryId) {
+    // 2. Fetch Companions
+    const { data: companions_response, error: companions_error } = await supabaseAdmin
+      .from("companion")
+      .select()
+      .eq("category_id", searchParams.categoryId) // if searchParams.categoryId - select *
+      .order("created_at", { ascending: false })
+    companions = companions_response
+  } else {
+    const { data: companions_response, error: companions_error } = await supabaseAdmin
+      .from("companion")
+      .select()
+      .order("created_at", { ascending: false })
+    companions = companions_response
+  }
 
   // 3. Fetch Message Count for Each Companion
   const companionsWithMessageCount = companions

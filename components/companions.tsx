@@ -1,7 +1,8 @@
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import Image from "next/image"
-import { Card, CardHeader } from "./ui/card"
+import { Card, CardFooter, CardHeader } from "./ui/card"
 import Link from "next/link"
+import { MessagesSquare } from "lucide-react"
 
 interface CompanionsProps {
   data: ICompanionDB[]
@@ -9,7 +10,6 @@ interface CompanionsProps {
 }
 
 export function Companions({ data, messages }: CompanionsProps) {
-  console.log(10, "data - ", data)
   if (data?.length === 0) {
     return (
       <div className="pt-10 flex flex-col justify-center items-center space-y-3">
@@ -29,7 +29,16 @@ export function Companions({ data, messages }: CompanionsProps) {
             <div className="relative w-32 h-32">
               <Image className="rounded-xl object-cover" alt="Companion" src={item.src} fill />
             </div>
+            <p className="font-bold">{item.name}</p>
+            <p className="text-sm">{item.description}</p>
           </CardHeader>
+          <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
+            <p className="lowercase">@{item.username.split("@")[0]}</p>
+            <div className="flex items-center">
+              <MessagesSquare className="w-3 h-3 mr-1" />
+              {messages}
+            </div>
+          </CardFooter>
         </Card>
       ))}
     </div>
