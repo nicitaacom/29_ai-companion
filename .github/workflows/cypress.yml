@@ -18,6 +18,11 @@ jobs:
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       # https://github.com/cypress-io/github-action
+
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Cypress run
         uses: cypress-io/github-action@v5
       # after the test run completes
