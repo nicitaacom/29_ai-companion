@@ -23,6 +23,9 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
+      - name: Run local (development) server
+        run: pnpm dev
+
       - name: Cypress run
         uses: cypress-io/github-action@v5
       # after the test run completes
