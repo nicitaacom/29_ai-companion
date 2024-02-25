@@ -9,6 +9,15 @@ declare global {
       SUPABASE_SERVICE_ROLE_KEY: string
 
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: string
+
+      PINECONE_INDEX: string
+      PINECONE_ENVIRONMENT: string
+      PINECONE_API_KEY: string
+
+      UPSTASH_REDIS_REST_URL: string
+      UPSTASH_REDIS_REST_TOKEN: string
+
+      OPENAI_KEY: string
     }
   }
 }
