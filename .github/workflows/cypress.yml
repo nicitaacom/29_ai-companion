@@ -17,7 +17,7 @@ jobs:
       NEXT_DEVELOPMENT_URL: "http://localhost:3029"
       NEXT_PUBLIC_SUPABASE_URL: "https://vahemcbozzowgcadavfm.supabase.co"
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhaGVtY2Jvenpvd2djYWRhdmZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY5Nzc4MDIsImV4cCI6MjAyMjU1MzgwMn0.NbhCKZEig0m6arLOR7RvljTOmO0pPiPLKmkjzn89AFE"
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "dndlcofnb"
 
     steps:
