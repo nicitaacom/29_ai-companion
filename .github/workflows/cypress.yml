@@ -11,6 +11,12 @@ jobs:
   run-cypress-tests:
     name: Run Cypress Tests
     runs-on: ubuntu-latest
+    env:
+      NEXT_PRODUCTION_URL: ${{ vars.NEXT_PRODUCTION_URL }}
+      NEXT_DEVELOPMENT_URL: ${{ vars.NEXT_DEVELOPMENT_URL }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ vars.SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
       - name: Checkout
