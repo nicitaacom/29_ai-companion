@@ -29,12 +29,12 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          build: pnpm run build
+          build: pnpm build
           start: pnpm dev
         env:
           NEXT_PRODUCTION_URL: "29-ai-companion.vercel.app"
           NEXT_DEVELOPMENT_URL: "http://localhost:3029"
-          NEXT_PUBLIC_SUPABASE_URL: "random-url"
+          NEXT_PUBLIC_SUPABASE_URL: "https://vahemcbozzowgcadavfm.supabase.co"
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "random-anon-key"
           SUPABASE_SERVICE_ROLE_KEY: "random-service-role-key"
       # after the test run completes
