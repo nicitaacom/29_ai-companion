@@ -31,6 +31,12 @@ jobs:
         with:
           build: pnpm run build
           start: pnpm dev
+        env:
+          NEXT_PRODUCTION_URL: "29-ai-companion.vercel.app"
+          NEXT_DEVELOPMENT_URL: "http://localhost:3029"
+          NEXT_PUBLIC_SUPABASE_URL: "random-url"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "random-anon-key"
+          SUPABASE_SERVICE_ROLE_KEY: "random-service-role-key"
       # after the test run completes
       # store videos and any screenshots
       # NOTE: screenshots will be generated only if E2E test failed
