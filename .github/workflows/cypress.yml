@@ -11,6 +11,7 @@ jobs:
   run-cypress-tests:
     name: Run Cypress Tests
     runs-on: ubuntu-latest
+    environment: NEXT_PRODUCTION_URL
     env:
       NEXT_PRODUCTION_URL: "29-ai-companion.vercel.app"
       NEXT_DEVELOPMENT_URL: "http://localhost:3029"
@@ -54,10 +55,10 @@ jobs:
           build: pnpm build
           start: pnpm dev
         env:
-          NEXT_PRODUCTION_URL: ${{ secrets.NEXT_PRODUCTION_URL }}
-          NEXT_DEVELOPMENT_URL: ${{ secrets.NEXT_DEVELOPMENT_URL }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PRODUCTION_URL: ${{ env.NEXT_PRODUCTION_URL }}
+          NEXT_DEVELOPMENT_URL: ${{ env.NEXT_DEVELOPMENT_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ env.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
       # after the test run completes
