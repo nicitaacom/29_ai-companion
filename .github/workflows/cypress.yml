@@ -16,11 +16,20 @@ jobs:
       NEXT_DEVELOPMENT_URL: ${{ vars.NEXT_DEVELOPMENT_URL }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+        # To make CI faster
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm
+          key: node-modules-deps${{hashFiles('**/pnpm-lock.yaml')}}
+
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       # https://github.com/cypress-io/github-action
@@ -32,6 +41,10 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
+      - name: Print env
+        run: echo "${{env.NEXT_DEVELOPMENT_URL}}"
+          echo "${{env.SUPABASE_SERVICE_ROLE_KEY}}"
+
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
@@ -42,7 +55,8 @@ jobs:
           NEXT_DEVELOPMENT_URL: ${{ secrets.NEXT_DEVELOPMENT_URL }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:
       # after the test run completes
       # store videos and any screenshots
       # NOTE: screenshots will be generated only if E2E test failed
