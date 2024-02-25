@@ -43,9 +43,9 @@ jobs:
 
       - name: Print env
         run: development url "${{env.NEXT_DEVELOPMENT_URL}}"
-          supabase url ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          anon key ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          service role key "${{env.SUPABASE_SERVICE_ROLE_KEY}}"
+          supabase url ${{ env.NEXT_PUBLIC_SUPABASE_URL }}
+          anon key ${{ env.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          service role key ${{env.SUPABASE_SERVICE_ROLE_KEY}}
           cloudinary name ${{env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
 
       - name: Cypress run
