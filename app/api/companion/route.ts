@@ -1,16 +1,18 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
-import { cookies } from "next/headers"
+import supabaseServer from "@/lib/supabase/supabaseServer"
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
-  const { src, name, description, instructions, seed, categoryId } = await req.json()
+  const { src, name, description, instructions, seed, category_id } = await req.json()
 
-  const auth = cookies().get("sb-vahemcbozzowgcadavfm-auth-token")
+  const {
+    data: { user },
+  } = await supabaseServer().auth.getUser()
 
-  if (!auth?.value) {
+  if (!user || !user.id || !user.email) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
-  if (!src || !name || !description || !instructions || !seed || !categoryId) {
+  if (!src || !name || !description || !instructions || !seed || !category_id) {
     return new NextResponse("Missing required fields", { status: 400 })
   }
 
@@ -18,9 +20,9 @@ export async function POST(req: Request) {
     // TODO - check for subscription
     // TODO - replace with actuall user id and username
     const companion = await supabaseAdmin.from("companion").insert({
-      category_id: categoryId,
-      user_id: "e832568a-c1cc-45a7-8386-9de84d6967d3",
-      username: "icpcsenondaryemail",
+      category_id: category_id,
+      user_id: user.id,
+      username: user.email,
       src,
       name,
       description,
@@ -30,7 +32,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json(companion)
   } catch (error) {
-    console.log("[COMPANION_POST]", error)
-    return new NextResponse("Internal error", { status: 500 })
+    if (error instanceof Error) {
+      console.log("[COMPANION_POST]", error.message)
+      return new NextResponse("Internal error", { status: 500 })
+    }
   }
 }

@@ -97,3 +97,20 @@ create table
 ```
 
 </details>
+
+Commands:
+
+You may ask ChatGPT how to do something
+
+`select * from cron.job;` - select all pg_cron jobs
+`SELECT cron.unschedule(1);` - delete pg_cron job with id 1
+
+```sql
+SELECT cron.schedule(
+    'delete_category_rows_daily', -- name of the cron job
+    '0 0 * * *', -- every day at midnight
+    $$
+    DELETE FROM public.category;
+    $$
+);
+```

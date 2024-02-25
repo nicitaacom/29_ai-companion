@@ -7,14 +7,14 @@ import { Button } from "./ui/button"
 import { ModeToggle } from "./mode-toggle"
 import { MobileSidebar } from "./mobile-sidebar"
 import { AuthModal } from "@/app/(auth)/AuthModal"
-import { cookies } from "next/headers"
+import supabaseServer from "@/lib/supabase/supabaseServer"
 
 const font = Poppins({ weight: "600", subsets: ["latin"] })
 
 export async function Navbar() {
-  // to fix this issue - https://github.com/supabase/supabase/issues/6764
-  // if I supabase.auth.getUser() - it doesn't work
-  const auth = cookies().get("sb-vahemcbozzowgcadavfm-auth-token")
+  const {
+    data: { user },
+  } = await supabaseServer().auth.getUser()
 
   return (
     <div className="fixed w-full z-50 flex justify-between items-center py-2 px-4 border-b border-primary/10 bg-secondary h-16">
@@ -30,7 +30,7 @@ export async function Navbar() {
           Upgrade <Sparkles className="w-4 h-4 fill-white text-white" />
         </Button>
         <ModeToggle />
-        <AuthModal auth={auth?.value || undefined} />
+        <AuthModal user={user || null} />
       </div>
     </div>
   )

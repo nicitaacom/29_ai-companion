@@ -2,7 +2,7 @@ const { createClient } = require("@supabase/supabase-js")
 
 const supabaseAdmin = createClient(
   "https://vahemcbozzowgcadavfm.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhaGVtY2Jvenpvd2djYWRhdmZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY5Nzc4MDIsImV4cCI6MjAyMjU1MzgwMn0.NbhCKZEig0m6arLOR7RvljTOmO0pPiPLKmkjzn89AFE",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhaGVtY2Jvenpvd2djYWRhdmZtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwNjk3NzgwMiwiZXhwIjoyMDIyNTUzODAyfQ.Dxt3F6o61Q-0_U5IrYG3nQEbO0HkY21vQK444RXhVoM",
 )
 
 async function main() {

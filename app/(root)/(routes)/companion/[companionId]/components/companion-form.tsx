@@ -1,7 +1,7 @@
 "use client"
 
 import * as z from "zod"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { ICategoryDB } from "@/app/interfaces/ICategoryDB"
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { useForm } from "react-hook-form"
@@ -92,7 +92,12 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
       router.refresh() // refresh all server components
       router.push("/")
     } catch (error) {
-      toast({ variant: "destructive", description: "Something went wrong" })
+      if (error instanceof AxiosError) {
+        console.log(error.response?.data)
+        toast({ variant: "destructive", description: error.response?.data })
+      } else {
+        toast({ variant: "destructive", description: "Something went wrong" })
+      }
     }
   }
 

@@ -36,6 +36,7 @@ export function UserNotAuthenticatedContent() {
   function displayResponseMessage(message: React.ReactNode) {
     setResponseMessage(message)
   }
+
   const {
     handleSubmit,
     register,
