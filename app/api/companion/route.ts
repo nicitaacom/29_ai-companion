@@ -9,20 +9,22 @@ export async function POST(req: Request) {
     data: { user },
   } = await supabaseServer().auth.getUser()
 
+  // Check is user authenticated
   if (!user || !user.id || !user.email) {
-    return new NextResponse("Unauthorized", { status: 401 })
+    return new NextResponse("Unauthenticated", { status: 401 })
   }
+  // Chec is all required data passesed to this API route
   if (!src || !name || !description || !instructions || !seed || !category_id) {
     return new NextResponse("Missing required fields", { status: 400 })
   }
 
   try {
     // TODO - check for subscription
-    // TODO - replace with actuall user id and username
+    // Insert companion in 'companion' table
     const companion = await supabaseAdmin.from("companion").insert({
       category_id: category_id,
-      user_id: user.id,
-      username: user.email,
+      user_id: user.id, // user_id - its owner_id (companion owner/creator)
+      username: user.email.split("@")[0],
       src,
       name,
       description,

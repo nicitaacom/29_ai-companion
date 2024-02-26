@@ -157,7 +157,6 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
               name="category_id"
               control={form.control}
               render={({ field }) => {
-                console.log(159, "field - ", field)
                 return (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
