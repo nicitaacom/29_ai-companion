@@ -20,7 +20,7 @@ export async function Navbar({ isPro }: { isPro: boolean }) {
       className="fixed w-full z-50 flex justify-between items-center py-2 px-4 border-b border-primary/10 bg-secondary h-16"
       data-test="cypress-navbar">
       <div className="flex items-center">
-        <MobileSidebar />
+        <MobileSidebar isPro={isPro} />
         <Link href="/" />
         <h1 className={twMerge("hidden md:block text-xl md:text-3xl font-bold text-primary", font.className)}>
           companion.ai
