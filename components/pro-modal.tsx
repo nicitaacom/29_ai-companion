@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { useUser } from "@/app/hooks/useUser"
+import { checkSubscription } from "@/lib/subscription"
 
 export const ProModal = () => {
   const proModal = useProModal()
@@ -21,14 +22,24 @@ export const ProModal = () => {
     setIsMounted(true)
   }, [])
 
+  useEffect(() => {
+    async function checkIsPro() {
+      const isPro = await checkSubscription()
+      if (isPro) {
+        proModal.onClose()
+      }
+    }
+    checkIsPro()
+  }, [proModal, user])
+
   const onSubscribe = async () => {
     try {
       setIsLoading(true)
-      console.log(27, "user - ", user)
       if (!user) {
         document.getElementById("closeDialog")?.click()
         return
       }
+
       const response = await axios.get("/api/stripe")
 
       window.location.href = response.data.url
