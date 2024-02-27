@@ -1,8 +1,6 @@
 import supabaseServer from "@/lib/supabase/supabaseServer"
 import { redirect } from "next/navigation"
 import { ChatClient } from "./components/client"
-import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
-import { IMessage } from "@/app/interfaces/IMessageDB"
 
 interface ChatIdPageProps {
   params: { chatId: string }
