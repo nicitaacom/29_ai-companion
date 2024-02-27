@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "update-types": "pnpx supabase gen types typescript --project-id vahemcbozzowgcadavfm > app/interfaces/types_db.ts"
+    "update-types": "pnpx supabase gen types typescript --project-id vahemcbozzowgcadavfm > app/interfaces/types_db.ts",
+    "cypress-dev": "pnpx cypress open --config watchForFileChanges=false",
+    "cypress-prod": "pnpx cypress open --config watchForFileChanges=false  --config-file prod.config.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -41,6 +43,7 @@
     "react-hook-form": "^7.50.0",
     "react-spinners": "^0.13.8",
     "replicate": "^0.27.1",
+    "stripe": "^14.18.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4",

@@ -37,7 +37,7 @@ export function SearchInput() {
   }, [debouncedValue, router, categoryId])
 
   return (
-    <div className="relative">
+    <div className="relative" data-test="search-input">
       <Search className="absolute w-4 h-4 top-3 left-4 text-muted-foreground" />
       <Input className="pl-10 bg-primary/10" value={value} onChange={onChange} placeholder="Search..." />
     </div>

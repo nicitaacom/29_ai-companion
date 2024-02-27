@@ -20,6 +20,9 @@ declare global {
       OPENAI_KEY: string
 
       REPLICATE_API_TOKEN: string
+
+      STRIPE_WEBHOOK_SECRET: string
+      STRIPE_API_KEY: string
     }
   }
 }

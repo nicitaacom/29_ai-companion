@@ -1,3 +1,4 @@
+import { checkSubscription } from "@/lib/subscription"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 import { NextResponse } from "next/server"
@@ -18,8 +19,12 @@ export async function POST(req: Request) {
     return new NextResponse("Missing required fields", { status: 400 })
   }
 
+  const isPro = await checkSubscription()
+
+  if (!isPro) {
+    return new NextResponse("Pro subscription required", { status: 403 })
+  }
   try {
-    // TODO - check for subscription
     // Insert companion in 'companion' table
     const companion = await supabaseAdmin.from("companion").insert({
       category_id: category_id,

@@ -4,6 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { twMerge } from "tailwind-merge"
 import { Toaster } from "@/components/ui/toaster"
+import { ProModal } from "@/components/pro-modal"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={twMerge("bg-secondary", inter.className)}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ProModal />
           {children}
           <Toaster />
         </ThemeProvider>

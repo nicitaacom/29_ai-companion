@@ -1,3 +1,4 @@
+import { checkSubscription } from "@/lib/subscription"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 import { NextResponse } from "next/server"
@@ -25,8 +26,11 @@ export async function PATCH(req: Request, { params }: { params: { companionId: s
   }
 
   try {
-    // TODO - check for subscription
+    const isPro = await checkSubscription()
 
+    if (!isPro) {
+      return new NextResponse("Pro subscription required", { status: 403 })
+    }
     // Update companion that equals params.companionId and user.id (owner_id) who created that companion
     // so only owner of that companion may update its own companion
     const companion = await supabaseAdmin

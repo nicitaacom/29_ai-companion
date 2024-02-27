@@ -1,17 +1,16 @@
-import { Sparkles } from "lucide-react"
 import { Poppins } from "next/font/google"
 import Link from "next/link"
 import { twMerge } from "tailwind-merge"
 
-import { Button } from "./ui/button"
 import { ModeToggle } from "./mode-toggle"
 import { MobileSidebar } from "./mobile-sidebar"
 import { AuthModal } from "@/app/(auth)/AuthModal"
 import supabaseServer from "@/lib/supabase/supabaseServer"
+import { UpgradeButton } from "./upgrade-button"
 
 const font = Poppins({ weight: "600", subsets: ["latin"] })
 
-export async function Navbar() {
+export async function Navbar({ isPro }: { isPro: boolean }) {
   const {
     data: { user },
   } = await supabaseServer().auth.getUser()
@@ -19,7 +18,7 @@ export async function Navbar() {
   return (
     <nav
       className="fixed w-full z-50 flex justify-between items-center py-2 px-4 border-b border-primary/10 bg-secondary h-16"
-      data-testid="cypress-navbar">
+      data-test="cypress-navbar">
       <div className="flex items-center">
         <MobileSidebar />
         <Link href="/" />
@@ -28,9 +27,7 @@ export async function Navbar() {
         </h1>
       </div>
       <div className="flex items-center gap-x-3">
-        <Button variant="premium" size="sm">
-          Upgrade <Sparkles className="w-4 h-4 fill-white text-white" />
-        </Button>
+        {!isPro && <UpgradeButton />}
         <ModeToggle />
         <AuthModal user={user || null} />
       </div>

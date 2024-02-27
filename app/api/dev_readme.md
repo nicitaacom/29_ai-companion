@@ -7,6 +7,8 @@
   - Usage for chat/[chatId] route
   - Usage for companion/[companionId] route
   - Usage for companion route
+  - Usage for stripe route
+  - Usage for webhook route
 
 <br/>
 <br/>
@@ -43,3 +45,14 @@ So users see their own messages with companion
 1. Check is user authenticated
 2. Check is all required fields passed to this API route
 3. Insert new companion in 'companion' table
+
+### Usage for stripe route
+
+I use this route to show info about current info subscription if user already have subscription
+Also If user haven't active subscription - I redirect user to checkout page where user may pay 9$ for subscription
+
+### Usage for webhook
+
+I use this webhook to insert or update data based on webhook `event.type`
+If user subscribe first time I insert user subscription in database
+If user subscribe not first time I update user subscription in database

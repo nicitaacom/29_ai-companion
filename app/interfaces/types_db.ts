@@ -115,7 +115,7 @@ export type Database = {
         Row: {
           id: string
           stripe_current_period_end: string | null
-          stripe_customerid: string | null
+          stripe_customer_id: string | null
           stripe_price_id: string | null
           stripe_subscription_id: string | null
           user_id: string
@@ -123,7 +123,7 @@ export type Database = {
         Insert: {
           id?: string
           stripe_current_period_end?: string | null
-          stripe_customerid?: string | null
+          stripe_customer_id?: string | null
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null
           user_id: string
@@ -131,7 +131,7 @@ export type Database = {
         Update: {
           id?: string
           stripe_current_period_end?: string | null
-          stripe_customerid?: string | null
+          stripe_customer_id?: string | null
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null
           user_id?: string

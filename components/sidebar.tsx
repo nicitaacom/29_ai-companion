@@ -1,12 +1,14 @@
 "use client"
 
+import { useProModal } from "@/app/hooks/use-pro-modal"
 import { Home, Plus, Settings } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { twMerge } from "tailwind-merge"
 
-export function Sidebar() {
+export function Sidebar({ isPro }: { isPro: boolean }) {
   const pathname = usePathname()
   const router = useRouter()
+  const proModal = useProModal()
 
   const routes = [
     {
@@ -19,7 +21,7 @@ export function Sidebar() {
       icon: Plus,
       href: "/companion/new",
       label: "Create",
-      pro: false,
+      pro: true,
     },
     {
       icon: Settings,
@@ -30,13 +32,14 @@ export function Sidebar() {
   ]
 
   const onNavigate = (url: string, pro: boolean) => {
-    // TODO - check if PRO
-
+    if (pro && !isPro) {
+      return proModal.onOpen()
+    }
     return router.push(url)
   }
 
   return (
-    <div className="space-y-4 flex flex-col h-full text-primary bg-secondary">
+    <div className="space-y-4 flex flex-col h-full text-primary bg-secondary" data-test="sidebar">
       <div className="p-3 flex flex-1 justify-center">
         <div className="space-y-2">
           {routes.map(route => (
