@@ -1,8 +1,7 @@
 import { defineConfig } from "cypress"
-import env from "cypress.env.json"
 
 export default defineConfig({
-  env: env,
+  env: { ...process.env },
   e2e: {
     setupNodeEvents(on, config) {
       // implement node event listeners here
