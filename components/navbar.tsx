@@ -21,10 +21,11 @@ export async function Navbar({ isPro }: { isPro: boolean }) {
       data-test="cypress-navbar">
       <div className="flex items-center">
         <MobileSidebar isPro={isPro} />
-        <Link href="/" />
-        <h1 className={twMerge("hidden md:block text-xl md:text-3xl font-bold text-primary", font.className)}>
-          companion.ai
-        </h1>
+        <Link href="/">
+          <h1 className={twMerge("hidden md:block text-xl md:text-3xl font-bold text-primary", font.className)}>
+            companion.ai
+          </h1>
+        </Link>
       </div>
       <div className="flex items-center gap-x-3">
         {!isPro && <UpgradeButton />}

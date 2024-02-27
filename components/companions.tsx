@@ -29,7 +29,7 @@ export function Companions({ data, messages }: CompanionsProps) {
           <Link href={`/chat/${item.id}`}>
             <CardHeader className="flex justify-center items-center text-center text-muted-foreground">
               <div className="relative w-32 h-32">
-                <Image className="rounded-xl object-cover" alt="Companion" src={item.src} fill />
+                <Image className="rounded-xl object-cover" alt="Companion" src={item.src} width={256} height={256} />
               </div>
               <p className="font-bold">{item.name}</p>
               <p className="text-sm">{item.description}</p>
