@@ -1,8 +1,10 @@
 import supabaseClient from "@/lib/supabase/supabaseClient"
 import { User } from "@supabase/supabase-js"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export const useUser = () => {
+  const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   useEffect(() => {
     async function fetchUser() {
@@ -18,6 +20,6 @@ export const useUser = () => {
       }
     }
     fetchUser()
-  }, [])
+  }, [router])
   return { user }
 }

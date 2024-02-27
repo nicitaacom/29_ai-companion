@@ -2,6 +2,7 @@ import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { CompanionForm } from "./components/companion-form"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 import { redirect } from "next/navigation"
+import { checkSubscription } from "@/lib/subscription"
 
 interface CompanionIdPageProps {
   params: {
@@ -10,7 +11,10 @@ interface CompanionIdPageProps {
 }
 
 export default async function CompanionIdPage({ params }: CompanionIdPageProps) {
-  // TODO - check subscription
+  const isPro = await checkSubscription()
+  if (!isPro) {
+    redirect("/")
+  }
 
   const {
     data: { user },

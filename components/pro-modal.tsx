@@ -8,12 +8,14 @@ import { useProModal } from "@/app/hooks/use-pro-modal"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
+import { useUser } from "@/app/hooks/useUser"
 
 export const ProModal = () => {
   const proModal = useProModal()
   const [isMounted, setIsMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const { user } = useUser()
 
   useEffect(() => {
     setIsMounted(true)
@@ -22,6 +24,11 @@ export const ProModal = () => {
   const onSubscribe = async () => {
     try {
       setIsLoading(true)
+      console.log(27, "user - ", user)
+      if (!user) {
+        document.getElementById("closeDialog")?.click()
+        return
+      }
       const response = await axios.get("/api/stripe")
 
       window.location.href = response.data.url
