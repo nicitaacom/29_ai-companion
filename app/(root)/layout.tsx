@@ -1,9 +1,13 @@
 import { Navbar } from "@/components/navbar"
 import { Sidebar } from "@/components/sidebar"
 import { checkSubscription } from "@/lib/subscription"
+import supabaseServer from "@/lib/supabase/supabaseServer"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const isPro = await checkSubscription()
+  const {
+    data: { user },
+  } = await supabaseServer().auth.getUser()
+  const isPro = await checkSubscription({ user: user })
 
   return (
     <div className="h-full">

@@ -24,7 +24,7 @@ export const ProModal = () => {
 
   useEffect(() => {
     async function checkIsPro() {
-      const isPro = await checkSubscription()
+      const isPro = await checkSubscription({ user: user })
       if (isPro) {
         proModal.onClose()
       }

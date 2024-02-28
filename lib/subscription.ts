@@ -1,17 +1,14 @@
-import supabaseAdmin from "./supabase/supabaseAdmin"
-import supabaseServer from "./supabase/supabaseServer"
+import { User } from "@supabase/supabase-js"
+import supabaseClient from "./supabase/supabaseClient"
 
 const DAY_IN_MS = 86_400_000
 
-export const checkSubscription = async () => {
-  const {
-    data: { user },
-  } = await supabaseServer().auth.getUser()
+export const checkSubscription = async ({ user }: { user: User | null }) => {
   if (!user) {
     return false
   }
 
-  const { data: user_subscription_response } = await supabaseAdmin
+  const { data: user_subscription_response } = await supabaseClient
     .from("user_subscription")
     .select()
     .eq("user_id", user.id)

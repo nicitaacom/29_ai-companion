@@ -26,7 +26,7 @@ export async function PATCH(req: Request, { params }: { params: { companionId: s
   }
 
   try {
-    const isPro = await checkSubscription()
+    const isPro = await checkSubscription({ user: user })
 
     if (!isPro) {
       return new NextResponse("Pro subscription required", { status: 403 })

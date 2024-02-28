@@ -1,8 +1,12 @@
 import { SubscriptionButton } from "@/components/subscription-button"
 import { checkSubscription } from "@/lib/subscription"
+import supabaseServer from "@/lib/supabase/supabaseServer"
 
 const SettingsPage = async () => {
-  const isPro = await checkSubscription()
+  const {
+    data: { user },
+  } = await supabaseServer().auth.getUser()
+  const isPro = await checkSubscription({ user: user })
 
   return (
     <div className="h-full p-4 space-y-2">

@@ -11,14 +11,13 @@ interface CompanionIdPageProps {
 }
 
 export default async function CompanionIdPage({ params }: CompanionIdPageProps) {
-  const isPro = await checkSubscription()
-  if (!isPro) {
-    redirect("/")
-  }
-
   const {
     data: { user },
   } = await supabaseServer().auth.getUser()
+  const isPro = await checkSubscription({ user: user })
+  if (!isPro) {
+    redirect("/")
+  }
 
   if (!user || !user.id || !user.email) {
     redirect("/")

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     return new NextResponse("Missing required fields", { status: 400 })
   }
 
-  const isPro = await checkSubscription()
+  const isPro = await checkSubscription({ user: user })
 
   if (!isPro) {
     return new NextResponse("Pro subscription required", { status: 403 })
