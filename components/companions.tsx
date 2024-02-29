@@ -12,7 +12,7 @@ interface CompanionsProps {
 export function Companions({ data, messages }: CompanionsProps) {
   if (data?.length === 0) {
     return (
-      <div className="pt-10 flex flex-col justify-center items-center space-y-3">
+      <div data-test="companions-data-0" className="pt-10 flex flex-col justify-center items-center space-y-3">
         <div className="relative w-60 h-60">
           <Image className="grayscale" src="/empty.png" alt="Empty" fill />
         </div>
