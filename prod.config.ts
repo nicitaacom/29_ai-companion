@@ -7,6 +7,7 @@ export default defineConfig({
     },
 
     env: { ...process.env },
+
     baseUrl: process.env.NEXT_PRODUCTION_URL,
   },
 })

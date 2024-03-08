@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
     "update-types": "pnpx supabase gen types typescript --project-id vahemcbozzowgcadavfm > app/interfaces/types_db.ts",
     "cypress-dev": "pnpx cypress open --config watchForFileChanges=false",
     "cypress-prod": "pnpx cypress open --config watchForFileChanges=false  --config-file prod.config.ts"
@@ -61,5 +63,6 @@
     "prettier": "^3.2.4",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@8.14.1"
 }
