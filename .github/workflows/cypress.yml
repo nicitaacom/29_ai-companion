@@ -91,7 +91,7 @@ jobs:
           echo "anon key $NEXT_PUBLIC_SUPABASE_ANON_KEY"
           echo "service role key $SUPABASE_SERVICE_ROLE_KEY"
           echo "cloudinary name $NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME"
-          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
