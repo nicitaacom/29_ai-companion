@@ -1,13 +1,25 @@
 # What inside? <br/> <sub> https://production-url/</sub>
 
-[![23-store-overview](https://i.imgur.com/F9FiGHK.jpg)](video here)
+![23-store-overview](https://i.imgur.com/F9FiGHK.jpg)(video here)
+
+<hr/>
+
+<br/>
+
+<br/>
+
+<br/>
 
 ## Project info
 
 ### Stack - Next 14 + TypeScript + Tailwind + Supabase + Stripe + MYSQL
 
+<hr/>
+
 <br/>
+
 <br/>
+
 <br/>
 
 # Clone repository
@@ -28,8 +40,12 @@ git clone https://github.com/nicitaacom/29_ai-companion/
 pnpm i
 ```
 
+<hr/>
+
 <br/>
+
 <br/>
+
 <br/>
 
 ## Step 2 - setup .env
