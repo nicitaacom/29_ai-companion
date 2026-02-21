@@ -1,6 +1,5 @@
-# What inside? <br/> <sub> https://production-url/</sub>
+# What inside? <br/> <sub> https://29-ai-companion.vercel.app/</sub>
 
-![23-store-overview](https://i.imgur.com/F9FiGHK.jpg)(video here)
 
 <hr/>
 
