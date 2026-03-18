@@ -9,8 +9,10 @@ declare global {
       SUPABASE_SERVICE_ROLE_KEY: string
 
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: string
+      NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: string
 
       PINECONE_INDEX: string
+      // Uses the Pinecone index host URL with the modern SDK for backward compatibility with existing env naming.
       PINECONE_ENVIRONMENT: string
       PINECONE_API_KEY: string
 

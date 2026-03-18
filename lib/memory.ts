@@ -1,6 +1,6 @@
 import { Redis } from "@upstash/redis"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
-import { PineconeClient } from "@pinecone-database/pinecone"
+import { Pinecone } from "@pinecone-database/pinecone"
 import { PineconeStore } from "langchain/vectorstores/pinecone"
 
 export type CompanionKey = {
@@ -12,29 +12,24 @@ export type CompanionKey = {
 export class MemoryManager {
   private static instance: MemoryManager
   private history: Redis
-  private vectorDBClient: PineconeClient
+  private vectorDBClient: Pinecone
 
   public constructor() {
     this.history = Redis.fromEnv()
-    this.vectorDBClient = new PineconeClient()
+    this.vectorDBClient = new Pinecone({
+      apiKey: this.getRequiredEnv("PINECONE_API_KEY"),
+    })
   }
 
   public async init() {
-    if (this.vectorDBClient instanceof PineconeClient) {
-      await this.vectorDBClient.init({
-        apiKey: process.env.PINECONE_API_KEY,
-        environment: process.env.PINECONE_ENVIRONMENT,
-      })
-    }
+    this.getPineconeIndex()
   }
 
   public async vectorSearch(recentChatHistory: string, companionFileName: string) {
-    const pineconeClient = <PineconeClient>this.vectorDBClient
-
-    const pineconeIndex = pineconeClient.Index(process.env.PINECONE_INDEX! || "")
+    const pineconeIndex = this.getPineconeIndex()
 
     const vectorStore = await PineconeStore.fromExistingIndex(
-      new OpenAIEmbeddings({ openAIApiKey: process.env.OPENAI_KEY }),
+      new OpenAIEmbeddings({ openAIApiKey: this.getRequiredEnv("OPENAI_KEY") }),
       { pineconeIndex },
     )
 
@@ -56,6 +51,28 @@ export class MemoryManager {
 
   private generateRedisCompanionKey(companionKey: CompanionKey): string {
     return `${companionKey.companionName}-${companionKey.modelName}-${companionKey.userId}`
+  }
+
+  private getPineconeIndex() {
+    const name = this.getRequiredEnv("PINECONE_INDEX")
+    const host = process.env.PINECONE_ENVIRONMENT?.trim()
+
+    // Keep the existing env name for backward compatibility, but treat it as the index host for the modern SDK.
+    if (host) {
+      return this.vectorDBClient.index({ host, name })
+    }
+
+    return this.vectorDBClient.index({ name })
+  }
+
+  private getRequiredEnv(name: "OPENAI_KEY" | "PINECONE_API_KEY" | "PINECONE_INDEX") {
+    const value = process.env[name]?.trim()
+
+    if (!value) {
+      throw new Error(`${name} is not set`)
+    }
+
+    return value
   }
 
   public async writeToHistory(text: string, companionKey: CompanionKey) {

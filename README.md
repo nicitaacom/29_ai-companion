@@ -263,7 +263,8 @@ https://youtu.be/PGPGcKBpAk8?t=17601
 
 https://youtu.be/PjYWpd7xkaM?t=15618
 
-Note that `PINECONE_ENVIRONMENT='gcp-starter'` for 02.2024 for free plan on GCP
+With the modern Pinecone SDK in this project, `PINECONE_ENVIRONMENT` should contain your index HOST URL,
+for example `https://your-index-xxxx.svc.your-project-id.pinecone.io`.
 
 ### 2.9 - REPLICATE_API_TOKEN
 

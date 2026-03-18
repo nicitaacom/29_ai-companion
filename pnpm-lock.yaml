@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.3.4
     version: 3.3.4(react-hook-form@7.50.0)
   '@pinecone-database/pinecone':
-    specifier: ^0.1.6
-    version: 0.1.6
+    specifier: ^7.1.0
+    version: 7.1.0
   '@radix-ui/react-avatar':
     specifier: ^1.0.4
     version: 1.0.4(@types/react-dom@18.2.18)(@types/react@18.2.52)(react-dom@18.2.0)(react@18.2.0)
@@ -61,7 +61,7 @@ dependencies:
     version: 2.1.0
   langchain:
     specifier: ^0.0.92
-    version: 0.0.92(@pinecone-database/pinecone@0.1.6)(@supabase/supabase-js@2.39.3)(@upstash/redis@1.28.4)(axios@1.6.7)(replicate@0.27.1)
+    version: 0.0.92(@pinecone-database/pinecone@7.1.0)(@supabase/supabase-js@2.39.3)(@upstash/redis@1.28.4)(axios@1.6.7)(replicate@0.27.1)
   lucide-react:
     specifier: ^0.321.0
     version: 0.321.0(react@18.2.0)
@@ -521,13 +521,9 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.0
 
-  /@pinecone-database/pinecone@0.1.6:
-    resolution: {integrity: sha512-tCnVc28udecthhgSBTdcMhYEW+xsR++AdZasp+ZE/AvUD1hOR2IR3edjk9m0sDxZyvXbno2KeqUbLIOZr7sCTw==}
-    engines: {node: '>=14.0.0'}
-    dependencies:
-      cross-fetch: 3.1.8
-    transitivePeerDependencies:
-      - encoding
+  /@pinecone-database/pinecone@7.1.0:
+    resolution: {integrity: sha512-w6HoBCriv4NKOVFjdj4/KuJ6df7RZpQEsZ61VctRzoauTXQpe8wpccsS94AawxAxMOu7hOTXVlcQ5QLHYKjrDA==}
+    engines: {node: '>=20.0.0'}
     dev: false
 
   /@pkgjs/parseargs@0.11.0:
@@ -3570,7 +3566,7 @@ packages:
       json-buffer: 3.0.1
     dev: true
 
-  /langchain@0.0.92(@pinecone-database/pinecone@0.1.6)(@supabase/supabase-js@2.39.3)(@upstash/redis@1.28.4)(axios@1.6.7)(replicate@0.27.1):
+  /langchain@0.0.92(@pinecone-database/pinecone@7.1.0)(@supabase/supabase-js@2.39.3)(@upstash/redis@1.28.4)(axios@1.6.7)(replicate@0.27.1):
     resolution: {integrity: sha512-77528kXJu9C391qV1a5jDzZLEjIblq/VtpH7xd4BwavgvhRmeSXR9WkrHHmih/Phpae4Ss3dtb7pcyd78rp/YA==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -3715,7 +3711,7 @@ packages:
         optional: true
     dependencies:
       '@anthropic-ai/sdk': 0.4.4
-      '@pinecone-database/pinecone': 0.1.6
+      '@pinecone-database/pinecone': 7.1.0
       '@supabase/supabase-js': 2.39.3
       '@upstash/redis': 1.28.4
       ansi-styles: 5.2.0

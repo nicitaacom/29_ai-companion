@@ -23,7 +23,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     <div className="space-y-4 w-full flex flex-col justify-center items-center">
       <CldUploadButton
         options={{ maxFiles: 1 }}
-        uploadPreset="n5wuk6bj"
+        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
         onUpload={(result: any) => onChange(result.info.secure_url)}>
         <div
           className="p-4 border-4 border-dashed border-primary/10 rounded-lg hover:opacity-75 transition
