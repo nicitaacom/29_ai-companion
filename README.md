@@ -76,140 +76,183 @@ Login in supabase - https://app.supabase.com/sign-in
 <summary>1. category</summary>
 
 ```sql
-create table
-  public.category (
-    id uuid not null default uuid_generate_v4 (),
-    name character varying(255) not null,
-    constraint category_pkey primary key (id)
-  ) tablespace pg_default;
+-- =====================================================
+-- 🔧 ENABLE EXTENSIONS
+-- =====================================================
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+
+
+-- =====================================================
+-- 🎯 CREATE CUSTOM ENUM TYPES
+-- =====================================================
+DO $$ 
+BEGIN
+    CREATE TYPE public.role AS ENUM ('user', 'assistant', 'system');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+
+
+-- =====================================================
+-- 📦 TABLE: category
+-- =====================================================
+CREATE TABLE public.category (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    name CHARACTER VARYING(255) NOT NULL,
+    CONSTRAINT category_pkey PRIMARY KEY (id)
+) TABLESPACE pg_default;
+
+-- 🔐 RLS ENABLED (NO POLICIES DEFINED – RESTRICTED ACCESS)
+ALTER TABLE public.category ENABLE ROW LEVEL SECURITY;
+
+
+
+
+
+-- =====================================================
+-- 📦 TABLE: companion (DEPENDS ON category AND auth.users)
+-- =====================================================
+CREATE TABLE public.companion (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL DEFAULT gen_random_uuid(),  -- ⚠️ DEFAULT IS RANDOM, SHOULD BE auth.uid() IN PRACTICE
+    username CHARACTER VARYING(255) NOT NULL,
+    src CHARACTER VARYING(255) NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    instructions TEXT NOT NULL,
+    seed TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('UTC'::text, now()),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('UTC'::text, now()),
+    category_id UUID NOT NULL,
+    CONSTRAINT companion_pkey PRIMARY KEY (id),
+    CONSTRAINT companion_category_id_fkey FOREIGN KEY (category_id) REFERENCES category (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT public_companion_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users (id) ON UPDATE CASCADE ON DELETE CASCADE
+) TABLESPACE pg_default;
+
+-- 🔐 RLS POLICIES FOR companion
+ALTER TABLE public.companion ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+    -- ALLOW SELECT FOR ALL AUTHENTICATED USERS
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'companion' AND policyname = 'Allow authenticated users to select companions') THEN
+        CREATE POLICY "Allow authenticated users to select companions" 
+        ON public.companion FOR SELECT USING (auth.role() = 'authenticated');
+    END IF;
+
+    -- ALLOW DELETE ONLY FOR OWNER
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'companion' AND policyname = 'Allow users to delete their own companions') THEN
+        CREATE POLICY "Allow users to delete their own companions" 
+        ON public.companion FOR DELETE USING (user_id = auth.uid());
+    END IF;
+END $$;
+
+
+
+
+
+-- =====================================================
+-- 📦 TABLE: messages (DEPENDS ON companion AND role ENUM)
+-- =====================================================
+CREATE TABLE public.messages (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    role public.role NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('UTC'::text, now()),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('UTC'::text, now()),
+    companion_id UUID NOT NULL,
+    user_id CHARACTER VARYING(255) NOT NULL,  -- ⚠️ TEXT TYPE, NOT UUID
+    CONSTRAINT message_pkey PRIMARY KEY (id)
+    -- FOREIGN KEY for companion_id could be added but not in original DDL; we'll add it for integrity
+    -- CONSTRAINT messages_companion_id_fkey FOREIGN KEY (companion_id) REFERENCES companion (id) ON DELETE CASCADE
+) TABLESPACE pg_default;
+
+-- Add foreign key (optional but recommended)
+ALTER TABLE public.messages ADD CONSTRAINT messages_companion_id_fkey FOREIGN KEY (companion_id) REFERENCES companion (id) ON DELETE CASCADE;
+
+-- 🔐 RLS POLICIES FOR messages
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+    -- ALLOW INSERT FOR ALL AUTHENTICATED USERS
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'messages' AND policyname = 'Allow authenticated users to insert messages') THEN
+        CREATE POLICY "Allow authenticated users to insert messages" 
+        ON public.messages FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+    END IF;
+
+    -- ALLOW SELECT FOR ALL AUTHENTICATED USERS
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'messages' AND policyname = 'Allow authenticated users to select messages') THEN
+        CREATE POLICY "Allow authenticated users to select messages" 
+        ON public.messages FOR SELECT USING (auth.role() = 'authenticated');
+    END IF;
+END $$;
+
+
+
+
+
+-- =====================================================
+-- 📦 TABLE: user_subscription
+-- =====================================================
+CREATE TABLE public.user_subscription (
+    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    user_id CHARACTER VARYING(255) NOT NULL,
+    stripe_customer_id CHARACTER VARYING(255) NULL,
+    stripe_subscription_id CHARACTER VARYING(255) NULL,
+    stripe_price_id CHARACTER VARYING(255) NULL,
+    stripe_current_period_end TIMESTAMP WITH TIME ZONE NULL,
+    CONSTRAINT usersubscription_pkey PRIMARY KEY (id),
+    CONSTRAINT usersubscription_stripecustomerid_key UNIQUE (stripe_customer_id),
+    CONSTRAINT usersubscription_stripesubscriptionid_key UNIQUE (stripe_subscription_id),
+    CONSTRAINT usersubscription_userid_key UNIQUE (user_id)
+) TABLESPACE pg_default;
+
+-- 🔐 RLS ENABLED (NO POLICIES DEFINED – RESTRICTED ACCESS)
+ALTER TABLE public.user_subscription ENABLE ROW LEVEL SECURITY;
+
+
+
+
+
+-- =====================================================
+-- 📦 TABLE: users (EXTENDS auth.users)
+-- =====================================================
+CREATE TABLE public.users (
+    id UUID NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    email TEXT NOT NULL,
+    avatar_url TEXT NULL,
+    providers TEXT[] NOT NULL DEFAULT '{}'::TEXT[],
+    role TEXT[] NOT NULL DEFAULT '{USER}'::TEXT[],
+    CONSTRAINT users_duplicate_pkey PRIMARY KEY (id),
+    CONSTRAINT users_id_fkey FOREIGN KEY (id) REFERENCES auth.users (id) ON UPDATE CASCADE ON DELETE CASCADE
+) TABLESPACE pg_default;
+
+-- 🔐 RLS POLICIES FOR users
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+    -- ALLOW SELECT OWN ROW
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'users' AND policyname = 'Allow users to select their own row') THEN
+        CREATE POLICY "Allow users to select their own row" 
+        ON public.users FOR SELECT USING (id = auth.uid());
+    END IF;
+
+    -- ALLOW UPDATE OWN ROW
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'users' AND policyname = 'Allow users to update their own row') THEN
+        CREATE POLICY "Allow users to update their own row" 
+        ON public.users FOR UPDATE USING (id = auth.uid());
+    END IF;
+END $$;
+
+
+
 ```
-
-</details>
-
-<details>
-<summary>2. companion</summary>
-
-```sql
-create table
-  public.companion (
-    id uuid not null default uuid_generate_v4 (),
-    user_id uuid not null default gen_random_uuid (),
-    username character varying(255) not null,
-    src character varying(255) not null,
-    name text not null,
-    description text not null,
-    instructions text not null,
-    seed text not null,
-    created_at timestamp with time zone not null default timezone ('UTC'::text, now()),
-    updated_at timestamp with time zone not null default timezone ('UTC'::text, now()),
-    category_id uuid not null,
-    constraint companion_pkey primary key (id),
-    constraint companion_category_id_fkey foreign key (category_id) references category (id) on update cascade on delete cascade,
-    constraint public_companion_user_id_fkey foreign key (user_id) references auth.users (id) on update cascade on delete cascade
-  ) tablespace pg_default;
-```
-
-**allow select for authenticated user**
-
-Target role - authenticated
-
-```sql
-true
-```
-
-**allow to delete their own companions**
-
-```sql
-(user_id = auth.uid())
-```
-
-</details>
-
-<details>
-<summary>3. messages</summary>
-
-```sql
-create table
-  public.messages (
-    id uuid not null default uuid_generate_v4 (),
-    role public.role not null,
-    content text not null,
-    created_at timestamp with time zone not null default timezone ('UTC'::text, now()),
-    updated_at timestamp with time zone not null default timezone ('UTC'::text, now()),
-    companion_id uuid not null,
-    user_id character varying(255) not null,
-    constraint message_pkey primary key (id)
-  ) tablespace pg_default;
-```
-
-**allow insert for authenticated users**
-
-Target role - authenticated
-
-```sql
-true
-```
-
-**allow select for authenticated users**
-
-Target role - authenticated
-
-```sql
-true
-```
-
-</details>
-
-<details>
-<summary>4. user_subscription</summary>
-
-```sql
-create table
-  public.user_subscription (
-    id uuid not null default uuid_generate_v4 (),
-    user_id character varying(255) not null,
-    stripe_customer_id character varying(255) null,
-    stripe_subscription_id character varying(255) null,
-    stripe_price_id character varying(255) null,
-    stripe_current_period_end timestamp with time zone null,
-    constraint usersubscription_pkey primary key (id),
-    constraint usersubscription_stripecustomerid_key unique (stripe_customer_id),
-    constraint usersubscription_stripesubscriptionid_key unique (stripe_subscription_id),
-    constraint usersubscription_userid_key unique (user_id)
-  ) tablespace pg_default;
-```
-
-</details>
-
-<details>
-<summary>4. user_subscription</summary>
-
-```sql
-create table
-  public.users (
-    id uuid not null,
-    created_at timestamp with time zone not null default now(),
-    email text not null,
-    avatar_url text null,
-    providers text[] not null default '{}'::text[],
-    role text[] not null default '{USER}'::text[],
-    constraint users_duplicate_pkey primary key (id),
-    constraint users_id_fkey foreign key (id) references auth.users (id) on update cascade on delete cascade
-  ) tablespace pg_default;
-```
-
-**allow select user based on user id**
-
-```sql
-(id = auth.uid())
-```
-
-**allow updated user based on user id**
-
-```sql
-(id = auth.uid())
-```
-
 </details>
 
 ### 2.7 - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
