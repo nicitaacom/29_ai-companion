@@ -22,7 +22,11 @@ export async function POST(req: Request) {
 
   try {
     // 1. Check if user with this email already exists
-    const { data: email_response } = await supabaseAdmin.from("users").select("email").eq("email", email).single()
+    const { data: email_response } = await supabaseAdmin
+      .from("users_29_companion")
+      .select("email")
+      .eq("email", email)
+      .single()
     if (email_response?.email === email) {
       return new NextResponse(`User with this email already exists`, { status: 400 })
     }
@@ -40,7 +44,9 @@ export async function POST(req: Request) {
 
     // 3. Insert row in 'public.users' 'public.users_cart' tables (if user exist throw error)
     if (user && user.user?.id) {
-      await supabaseAdmin.from("users").insert({ id: user.user.id, email: email, providers: ["credentials"] })
+      await supabaseAdmin
+        .from("users_29_companion")
+        .insert({ id: user.user.id, email: email, providers: ["credentials"] })
       await supabaseAdmin.from("users_cart").insert({ id: user.user.id })
     } else {
       return new NextResponse(`${`After signUp - user doesnt exist - try again`}`, { status: 400 })

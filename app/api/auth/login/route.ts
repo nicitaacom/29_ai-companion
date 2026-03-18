@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   try {
     // 1. Check is user with this email doesn't exist
     const { data: email_response, error: emailSelectError } = await supabaseAdmin
-      .from("users")
+      .from("users_29_companion")
       .select("email")
       .eq("email", body.email)
       .single()
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     // 2. Return info about providers to show error like 'You already have account with google - continue with google?'
     const { data: provider_response } = await supabaseAdmin
-      .from("users")
+      .from("users_29_companion")
       .select("providers")
       .eq("email", body.email)
       .single()

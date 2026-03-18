@@ -6,6 +6,7 @@ import axios, { AxiosError } from "axios"
 import { Lock, Mail } from "lucide-react"
 
 import { TAPIAuthLogin, TAPIAuthLoginResponse } from "@/app/api/auth/login/route"
+import { AuthModalVariant, useAccountModal } from "@/app/store/ui/accountModal"
 import { Input } from "@/components/ui/input"
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import supabaseClient from "@/lib/supabase/supabaseClient"
@@ -22,15 +23,12 @@ interface FormData {
   password: string
 }
 
-export function UserNotAuthenticatedContent() {
+export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant: AuthModalVariant }) {
   const router = useRouter()
   const [variant, setVariant] = useState<Variant>("login")
   const [responseMessage, setResponseMessage] = useState<React.ReactNode | null>(null)
   const { toast } = useToast()
-
-  const dialogClose = () => {
-    document.getElementById("closeDialog")?.click()
-  }
+  const closeAccountModal = useAccountModal(state => state.closeModal)
 
   //when user submit form and got response message from server
   function displayResponseMessage(message: React.ReactNode) {
@@ -158,9 +156,14 @@ export function UserNotAuthenticatedContent() {
     }
   }, [errors.email, errors.password])
 
+  useEffect(() => {
+    setVariant(initialVariant)
+    displayResponseMessage(null)
+  }, [initialVariant])
+
   function closeModal() {
     displayResponseMessage(null)
-    dialogClose()
+    closeAccountModal()
   }
 
   const onSubmit = async (data: FormData) => {

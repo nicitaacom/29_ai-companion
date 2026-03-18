@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 
+import { useAuthOpen } from "@/app/hooks/use-auth-open"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useProModal } from "@/app/hooks/use-pro-modal"
 import { Button } from "@/components/ui/button"
@@ -17,6 +18,7 @@ export const ProModal = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const { user } = useUser()
+  const { openAuth } = useAuthOpen()
 
   useEffect(() => {
     setIsMounted(true)
@@ -36,7 +38,8 @@ export const ProModal = () => {
     try {
       setIsLoading(true)
       if (!user) {
-        document.getElementById("closeDialog")?.click()
+        proModal.onClose()
+        openAuth("login")
         return
       }
 
