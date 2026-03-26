@@ -5,11 +5,24 @@ import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+function assignRef<TValue>(ref: React.ForwardedRef<TValue> | undefined, value: TValue | null) {
+  if (!ref || typeof ref === "string") {
+    return
+  }
+
+  if (typeof ref === "function") {
+    ref(value)
+    return
+  }
+
+  ;(ref as React.MutableRefObject<TValue | null>).current = value
+}
+
 type DropdownMenuContextValue = {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
-  triggerRef: React.RefObject<HTMLButtonElement | null>
-  contentRef: React.RefObject<HTMLDivElement | null>
+  triggerRef: React.MutableRefObject<HTMLButtonElement | null>
+  contentRef: React.MutableRefObject<HTMLDivElement | null>
 }
 
 const DropdownMenuContext = React.createContext<DropdownMenuContextValue | null>(null)
@@ -22,8 +35,8 @@ function useDropdownMenu() {
 
 const DropdownMenu = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = React.useState(false)
-  const triggerRef = React.useRef<HTMLButtonElement>(null)
-  const contentRef = React.useRef<HTMLDivElement>(null)
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null) as React.MutableRefObject<HTMLButtonElement | null>
+  const contentRef = React.useRef<HTMLDivElement | null>(null) as React.MutableRefObject<HTMLDivElement | null>
 
   React.useEffect(() => {
     if (!isOpen) return
@@ -72,8 +85,7 @@ const DropdownMenuTrigger = React.forwardRef<HTMLButtonElement, React.ButtonHTML
         onClick={handleClick}
         ref={value => {
           triggerRef.current = value
-          if (typeof ref === "function") ref(value)
-          else if (ref) ref.current = value
+          assignRef(ref, value)
         }}
         type="button"
         {...props}
@@ -97,14 +109,13 @@ const DropdownMenuContent = React.forwardRef<
   return (
     <div
       className={cn(
-      "absolute top-full z-50 mt-1 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2",
-      alignClassName,
-      className,
-    )}
+        "absolute top-full z-50 mt-1 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2",
+        alignClassName,
+        className,
+      )}
       ref={value => {
         contentRef.current = value
-        if (typeof ref === "function") ref(value)
-        else if (ref) ref.current = value
+        assignRef(ref, value)
       }}
       role="menu"
       style={{ marginTop: sideOffset, ...style }}

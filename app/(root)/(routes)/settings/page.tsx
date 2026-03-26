@@ -1,6 +1,8 @@
 import { SubscriptionButton } from "@/components/subscription-button"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 
+export const dynamic = "force-dynamic"
+
 const SettingsPage = async () => {
   const supabase = await supabaseServer()
   const {

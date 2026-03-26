@@ -25,6 +25,7 @@ Use this as the default style when generating code for this project.
 8. Use descriptive names like `index`, `context`, `error`, `value`, `item`, `store`.
 9. Use `useEffect` only when needed and keep side effects in hooks, not components.
 10. Keep UI minimalistic: small gaps, compact paddings, clean borders, soft blur, subtle shadows.
+11. Max 130 chars per line
 
 ## General architecture
 
@@ -412,7 +413,8 @@ import { NextResponse } from "next/server"
 import { aiPrettifyMessage } from "./aiPrettifyMessage"
 
 export async function POST(req: Request) {
-  const { encryptedEnvsClient, message, provider, model, userInstructions } = (await req.json()) as API.AIPrettifyMessageRequest
+  const { encryptedEnvsClient, message, provider, model, userInstructions } =
+    (await req.json()) as API.AIPrettifyMessageRequest
 
   if (!encryptedEnvsClient?.length) return NextResponse.json({ error: "encryptedEnvsClient missing" }, { status: 400 })
   if (!message) return NextResponse.json({ error: "message missing" }, { status: 400 })

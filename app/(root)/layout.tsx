@@ -3,6 +3,8 @@ import { Sidebar } from "@/components/sidebar"
 import { checkSubscription } from "@/lib/subscription"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 
+export const dynamic = "force-dynamic"
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const supabase = await supabaseServer()
   const {

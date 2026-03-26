@@ -24,7 +24,7 @@ declare global {
       REPLICATE_API_TOKEN: string
 
       STRIPE_WEBHOOK_SECRET: string
-      STRIPE_API_KEY: string
+      STRIPE_SECRET_KEY: string
     }
   }
 }

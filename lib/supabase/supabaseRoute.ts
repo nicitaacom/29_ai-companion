@@ -7,6 +7,6 @@ export async function getSupabaseRouteHandlerClient() {
   const cookieStore = await cookies()
 
   return createRouteHandlerClient<Database>({
-    cookies: () => cookieStore,
+    cookies: async () => cookieStore,
   })
 }

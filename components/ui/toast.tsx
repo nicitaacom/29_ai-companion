@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { motion } from "framer-motion"
+import { HTMLMotionProps, motion } from "framer-motion"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -44,7 +44,11 @@ type ToastContextValue = {
 
 const ToastContext = React.createContext<ToastContextValue>({})
 
-export interface ToastProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof toastVariants> {
+type ToastMotionDivProps = Omit<HTMLMotionProps<"div">, "children" | "ref"> & {
+  children?: React.ReactNode
+}
+
+export interface ToastProps extends ToastMotionDivProps, VariantProps<typeof toastVariants> {
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }

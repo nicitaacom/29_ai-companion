@@ -1,14 +1,10 @@
-import { Poppins } from "next/font/google"
 import Link from "next/link"
-import { twMerge } from "tailwind-merge"
 
 import { ModeToggle } from "./mode-toggle"
 import { MobileSidebar } from "./mobile-sidebar"
 import { AuthModal } from "@/app/(auth)/AuthModal"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 import { UpgradeButton } from "./upgrade-button"
-
-const font = Poppins({ weight: "600", subsets: ["latin"] })
 
 export async function Navbar({ isPro }: { isPro: boolean }) {
   const supabase = await supabaseServer()
@@ -23,7 +19,7 @@ export async function Navbar({ isPro }: { isPro: boolean }) {
       <div className="flex items-center">
         <MobileSidebar isPro={isPro} />
         <Link href="/">
-          <h1 className={twMerge("hidden md:block text-xl md:text-3xl font-bold text-primary", font.className)}>
+          <h1 className="font-brand hidden text-xl font-bold text-primary md:block md:text-3xl">
             companion.ai
           </h1>
         </Link>

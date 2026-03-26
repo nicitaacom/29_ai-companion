@@ -1,14 +1,15 @@
 import { checkSubscription } from "@/lib/subscription"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import supabaseServer from "@/lib/supabase/supabaseServer"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
-export async function PATCH(req: Request, { params }: { params: { companionId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ companionId: string }> }) {
+  const { companionId } = await params
   const { src, name, description, instructions, seed, category_id } = await req.json()
   const supabase = await supabaseServer()
 
   // check is companionId exist in params
-  if (!params.companionId) {
+  if (!companionId) {
     return new NextResponse("Companion ID is required", { status: 400 })
   }
 
@@ -46,7 +47,7 @@ export async function PATCH(req: Request, { params }: { params: { companionId: s
         instructions,
         seed,
       })
-      .eq("id", params.companionId)
+      .eq("id", companionId)
       .eq("user_id", user.id)
 
     return NextResponse.json(companion)
@@ -56,8 +57,9 @@ export async function PATCH(req: Request, { params }: { params: { companionId: s
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { companionId: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ companionId: string }> }) {
   try {
+    const { companionId } = await params
     const supabase = await supabaseServer()
     // Check is user authenticated
     const {
@@ -70,7 +72,7 @@ export async function DELETE(req: Request, { params }: { params: { companionId: 
 
     // delete companion that eq user_id (owner_id) who created that companion and eq companionId
     // so only companion owner may delete its own companion
-    const companion = await supabase.from("companion").delete().eq("user_id", user.id).eq("id", params.companionId)
+    const companion = await supabase.from("companion").delete().eq("user_id", user.id).eq("id", companionId)
 
     return NextResponse.json(companion)
   } catch (error) {

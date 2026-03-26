@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -11,6 +11,10 @@ import { SlotSafe } from "@/components/ui/slot-safe"
 type DialogContextValue = {
   open: boolean
   setOpen: (open: boolean) => void
+}
+
+type DialogMotionDivProps = Omit<HTMLMotionProps<"div">, "children" | "ref"> & {
+  children?: React.ReactNode
 }
 
 const DialogContext = React.createContext<DialogContextValue | null>(null)
@@ -25,19 +29,23 @@ function useDialogContext() {
   return context
 }
 
-function composeRefs<TValue>(...refs: Array<React.Ref<TValue> | undefined>) {
+function assignRef<TValue>(ref: React.ForwardedRef<TValue> | undefined, value: TValue | null) {
+  if (!ref || typeof ref === "string") {
+    return
+  }
+
+  if (typeof ref === "function") {
+    ref(value)
+    return
+  }
+
+  ref.current = value
+}
+
+function composeRefs<TValue>(...refs: Array<React.ForwardedRef<TValue> | undefined>) {
   return (value: TValue | null) => {
     refs.forEach(ref => {
-      if (!ref) {
-        return
-      }
-
-      if (typeof ref === "function") {
-        ref(value)
-        return
-      }
-
-      ;(ref as React.MutableRefObject<TValue | null>).current = value
+      assignRef(ref, value)
     })
   }
 }
@@ -132,39 +140,36 @@ const DialogClose = React.forwardRef<HTMLButtonElement, DialogCloseProps>(
 )
 DialogClose.displayName = "DialogClose"
 
-const DialogOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, onClick, ...props }, ref) => {
-    const { open, setOpen } = useDialogContext()
+const DialogOverlay = ({ className, onClick, ...props }: DialogMotionDivProps) => {
+  const { open, setOpen } = useDialogContext()
 
-    return (
-      <AnimatePresence>
-        {open ? (
-          <motion.div
-            key="dialog-overlay"
-            ref={ref}
-            aria-hidden="true"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className={cn("fixed inset-0 z-50 bg-black/80", className)}
-            onClick={event => {
-              onClick?.(event)
+  return (
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          key="dialog-overlay"
+          aria-hidden="true"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          className={cn("fixed inset-0 z-50 bg-black/80", className)}
+          onClick={event => {
+            onClick?.(event)
 
-              if (!event.defaultPrevented) {
-                setOpen(false)
-              }
-            }}
-            {...props}
-          />
-        ) : null}
-      </AnimatePresence>
-    )
-  },
-)
+            if (!event.defaultPrevented) {
+              setOpen(false)
+            }
+          }}
+          {...props}
+        />
+      ) : null}
+    </AnimatePresence>
+  )
+}
 DialogOverlay.displayName = "DialogOverlay"
 
-const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const DialogContent = React.forwardRef<HTMLDivElement, DialogMotionDivProps>(
   ({ className, children, onClick, onKeyDown, ...props }, ref) => {
     const { open, setOpen } = useDialogContext()
     const contentRef = React.useRef<HTMLDivElement | null>(null)

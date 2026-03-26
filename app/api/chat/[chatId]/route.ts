@@ -3,13 +3,19 @@ import { Replicate } from "langchain/llms/replicate"
 import { CallbackManager } from "langchain/callbacks"
 import { StreamingTextResponse, LangChainStream } from "ai"
 
+import { Database, TablesInsert } from "@/app/interfaces/types_db"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 import { rateLimit } from "@/lib/rate-limit"
 import { MemoryManager } from "@/lib/memory"
 
-export async function POST(req: Request, { params }: { params: { chatId: string } }) {
+type CompanionRow = Database["public"]["Tables"]["companion"]["Row"]
+type MessageInsert = TablesInsert<"messages">
+type MessageInsertList = MessageInsert[]
+
+export async function POST(req: Request, { params }: { params: Promise<{ chatId: string }> }) {
   try {
-    const { prompt } = await req.json()
+    const { chatId } = await params
+    const { prompt }: { prompt: string } = await req.json()
     const supabase = await supabaseServer()
 
     const {
@@ -19,6 +25,10 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
     // 1. Check is user authenticated
     if (!user || !user.id || !user.email) {
       return new NextResponse("Unauthorized", { status: 401 })
+    }
+
+    if (!chatId) {
+      return new NextResponse("Chat id is required", { status: 400 })
     }
 
     const identifier = req.url + "-" + user.id
@@ -32,7 +42,11 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
     // 3. Repeating this - https://github.com/AntonioErdeljac/next13-ai-companion/blob/master/app/api/chat/%5BchatId%5D/route.ts#L33-L46
 
     // 3.1 Select companion based on params.chatId (in fact its not chat id but companion_id) - userstand its like chat with companion id
-    const { data: companion_response, error: error_selecting_companion } = await supabase.from("companion").select().eq("id", params.chatId).single()
+    const { data: companion_response, error: error_selecting_companion } = await supabase
+      .from("companion")
+      .select()
+      .eq("id", chatId)
+      .single()
     if (error_selecting_companion) {
       return new NextResponse(
         `error selecting companion \n
@@ -40,10 +54,26 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
       )
     }
 
+    const companion = companion_response as CompanionRow | null
+
+    if (!companion) {
+      return new NextResponse("Companion not found", { status: 404 })
+    }
+
     // 3.2 Create a new message and return data about this message (to get generated id by supabase of that message)
+    const userMessages = [
+      {
+        companion_id: chatId,
+        content: prompt,
+        role: "user",
+        user_id: user.id,
+      },
+    ] satisfies MessageInsertList
+
     const { error: error_inserting_new_message } = await supabase
       .from("messages")
-      .insert([{ companion_id: params.chatId, content: prompt, role: "user", user_id: user.id }])
+      // @ts-ignore
+      .insert(userMessages as MessageInsertList)
 
     if (error_inserting_new_message) {
       return new NextResponse(
@@ -51,7 +81,8 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
          ${error_inserting_new_message.message}`,
       )
     }
-    const name = companion_response.id
+
+    const name = companion.id
     const companion_file_name = name + ".txt"
 
     const companionKey = {
@@ -63,7 +94,7 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
 
     const records = await memoryManager.readLatestHistory(companionKey)
     if (records.length === 0) {
-      await memoryManager.seedChatHistory(companion_response.seed, "\n\n", companionKey)
+      await memoryManager.seedChatHistory(companion.seed, "\n\n", companionKey)
     }
     await memoryManager.writeToHistory("User: " + prompt + "\n", companionKey)
 
@@ -98,15 +129,15 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
       await model
         .call(
           `
-        ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${companion_response.name}: prefix. 
+        ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${companion.name}: prefix. 
 
-        ${companion_response.instructions}
+        ${companion.instructions}
 
-        Below are relevant details about ${companion_response.name}'s past and the conversation you are in.
+        Below are relevant details about ${companion.name}'s past and the conversation you are in.
         ${relevantHistory}
 
 
-        ${recentChatHistory}\n${companion_response.name}:`,
+        ${recentChatHistory}\n${companion.name}:`,
         )
         .catch(console.error),
     )
@@ -125,9 +156,19 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
       memoryManager.writeToHistory("" + response.trim(), companionKey)
 
       // 3.2 Create a new message and return data about this message (to get generated id by supabase of that message)
+      const assistantMessages = [
+        {
+          companion_id: chatId,
+          content: response.trim(),
+          role: "system",
+          user_id: user.id,
+        },
+      ] satisfies MessageInsertList
+
       const { error: error_inserting_new_message } = await supabase
         .from("messages")
-        .insert([{ companion_id: params.chatId, content: prompt, role: "user", user_id: user.id }])
+        // @ts-ignore
+        .insert(assistantMessages as MessageInsertList)
 
       if (error_inserting_new_message) {
         return new NextResponse(

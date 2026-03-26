@@ -4,6 +4,8 @@ import { ArrowLeft, Sparkles } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
   title: "Page not found",
   description: "The page you were looking for does not exist or has been moved.",

@@ -13,6 +13,8 @@
 
 ### Stack - Next 14 + TypeScript + Tailwind + Supabase + Stripe + MYSQL
 
+This project is an AI companion platform where users can create character-style profiles, organize them by category, and open chat sessions with each companion through a modern web interface. It combines Supabase auth and database flows with a Next.js frontend, tailored forms, chat UI, and deployment-ready structure for building a polished companion experience quickly.
+
 <hr/>
 
 <br/>
@@ -269,7 +271,7 @@ https://youtu.be/PjYWpd7xkaM?t=15618
 
 https://youtu.be/PjYWpd7xkaM?t=17350
 
-### 2.11 - STRIPE_API_KEY
+### 2.11 - STRIPE_SECRET_KEY
 
 https://youtu.be/PjYWpd7xkaM?t=18978
 

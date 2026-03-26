@@ -1,18 +1,16 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { twMerge } from "tailwind-merge"
 import { Toaster } from "@/components/ui/toaster"
 import { ProModal } from "@/components/pro-modal"
 import { getURL } from "@/app/utils/getURL"
-
-const inter = Inter({ subsets: ["latin"] })
 
 const siteUrl = new URL(getURL())
 const siteTitle = "companion.ai"
 const siteDescription =
   "Build, chat with, and manage AI companions in a clean Supabase-powered workspace."
+
+export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
@@ -69,7 +67,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={twMerge("bg-secondary", inter.className)}>
+      <body className="bg-secondary font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ProModal />
           {children}

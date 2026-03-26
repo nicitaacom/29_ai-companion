@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
@@ -12,6 +12,10 @@ import { cn } from "@/lib/utils"
 type SheetContextValue = {
   open: boolean
   setOpen: (open: boolean) => void
+}
+
+type SheetMotionDivProps = Omit<HTMLMotionProps<"div">, "children" | "ref"> & {
+  children?: React.ReactNode
 }
 
 const SheetContext = React.createContext<SheetContextValue | null>(null)
@@ -24,6 +28,19 @@ function useSheetContext() {
   }
 
   return context
+}
+
+function assignRef<TValue>(ref: React.ForwardedRef<TValue> | undefined, value: TValue | null) {
+  if (!ref || typeof ref === "string") {
+    return
+  }
+
+  if (typeof ref === "function") {
+    ref(value)
+    return
+  }
+
+  ref.current = value
 }
 
 type SheetProps = {
@@ -116,35 +133,32 @@ const SheetPortal = ({ children }: { children: React.ReactNode }) => {
 }
 SheetPortal.displayName = "SheetPortal"
 
-const SheetOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, onClick, ...props }, ref) => {
-    const { open, setOpen } = useSheetContext()
+const SheetOverlay = ({ className, onClick, ...props }: SheetMotionDivProps) => {
+  const { open, setOpen } = useSheetContext()
 
-    return (
-      <AnimatePresence>
-        {open ? (
-          <motion.div
-            key="sheet-overlay"
-            ref={ref}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className={cn("fixed inset-0 z-50 bg-black/80", className)}
-            onClick={event => {
-              onClick?.(event)
+  return (
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          key="sheet-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className={cn("fixed inset-0 z-50 bg-black/80", className)}
+          onClick={event => {
+            onClick?.(event)
 
-              if (!event.defaultPrevented) {
-                setOpen(false)
-              }
-            }}
-            {...props}
-          />
-        ) : null}
-      </AnimatePresence>
-    )
-  },
-)
+            if (!event.defaultPrevented) {
+              setOpen(false)
+            }
+          }}
+          {...props}
+        />
+      ) : null}
+    </AnimatePresence>
+  )
+}
 SheetOverlay.displayName = "SheetOverlay"
 
 const sheetVariants = cva("fixed z-50 gap-4 bg-background p-6 shadow-lg", {
@@ -161,7 +175,7 @@ const sheetVariants = cva("fixed z-50 gap-4 bg-background p-6 shadow-lg", {
   },
 })
 
-interface SheetContentProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof sheetVariants> {}
+type SheetContentProps = SheetMotionDivProps & VariantProps<typeof sheetVariants>
 
 function getSheetMotion(side: NonNullable<SheetContentProps["side"]>) {
   if (side === "left") {
@@ -183,20 +197,13 @@ const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
   ({ side = "right", className, children, onKeyDown, ...props }, ref) => {
     const { open, setOpen } = useSheetContext()
     const contentRef = React.useRef<HTMLDivElement | null>(null)
-    const motionState = getSheetMotion(side)
+    const resolvedSide = side ?? "right"
+    const motionState = getSheetMotion(resolvedSide)
 
     const setContentRef = React.useCallback(
       (node: HTMLDivElement | null) => {
         contentRef.current = node
-
-        if (typeof ref === "function") {
-          ref(node)
-          return
-        }
-
-        if (ref) {
-          ref.current = node
-        }
+        assignRef(ref, node)
       },
       [ref],
     )
@@ -241,7 +248,7 @@ const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
               animate={motionState.animate}
               exit={motionState.exit}
               transition={{ type: "spring", stiffness: 320, damping: 30, mass: 0.9 }}
-              className={cn(sheetVariants({ side }), className)}
+              className={cn(sheetVariants({ side: resolvedSide }), className)}
               onClick={event => {
                 event.stopPropagation()
               }}

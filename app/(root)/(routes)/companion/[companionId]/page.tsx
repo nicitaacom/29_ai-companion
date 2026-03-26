@@ -4,13 +4,16 @@ import supabaseServer from "@/lib/supabase/supabaseServer"
 import { redirect } from "next/navigation"
 import { checkSubscription } from "@/lib/subscription"
 
+export const dynamic = "force-dynamic"
+
 interface CompanionIdPageProps {
-  params: {
+  params: Promise<{
     companionId: string
-  }
+  }>
 }
 
 export default async function CompanionIdPage({ params }: CompanionIdPageProps) {
+  const { companionId } = await params
   const supabase = await supabaseServer()
   const {
     data: { user },
@@ -27,7 +30,7 @@ export default async function CompanionIdPage({ params }: CompanionIdPageProps) 
   const companion = await supabaseAdmin
     .from("companion")
     .select()
-    .eq("id", params.companionId)
+    .eq("id", companionId)
     .eq("user_id", user.id)
     .single()
 

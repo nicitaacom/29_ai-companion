@@ -3,16 +3,18 @@
 import * as React from "react"
 
 function composeRefs<TValue>(...refs: Array<React.Ref<TValue> | undefined>) {
-  return (value: TValue) => {
+  return (value: TValue | null) => {
     refs.forEach(ref => {
       if (!ref) return
       if (typeof ref === "function") ref(value)
-      else (ref as React.MutableRefObject<TValue | null>).current = value
+      else if (typeof ref !== "string") (ref as React.MutableRefObject<TValue | null>).current = value
     })
   }
 }
 
-function mergeProps(slotProps: Record<string, unknown>, childProps: Record<string, unknown>) {
+type AnyProps = Record<string, unknown>
+
+function mergeProps(slotProps: AnyProps, childProps: AnyProps) {
   const overrideProps = { ...childProps }
 
   for (const propName in childProps) {
@@ -38,12 +40,17 @@ export const SlotSafe = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLE
   ({ children, ...slotProps }, forwardedRef) => {
     if (!React.isValidElement(children)) return null
 
-    const childProps = children.props as Record<string, unknown> & { ref?: React.Ref<HTMLElement> }
+    const child = children as React.ReactElement<any>
+    const childProps = (child.props ?? {}) as AnyProps
+    const childRef = (child as any).ref as React.Ref<HTMLElement> | undefined
 
-    return React.cloneElement(children, {
-      ...mergeProps(slotProps, childProps),
-      ref: composeRefs(forwardedRef, childProps.ref),
-    })
+    return React.cloneElement(
+      child,
+      {
+        ...mergeProps(slotProps as AnyProps, childProps),
+        ref: composeRefs(forwardedRef, childRef),
+      } as any,
+    )
   },
 )
 SlotSafe.displayName = "SlotSafe"

@@ -103,7 +103,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_companion_id_fkey"
+            columns: ["companion_id"]
+            isOneToOne: false
+            referencedRelation: "companion"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_subscription: {
         Row: {
@@ -132,7 +140,7 @@ export type Database = {
         }
         Relationships: []
       }
-      users: {
+      users_29_companion: {
         Row: {
           avatar_url: string | null
           created_at: string

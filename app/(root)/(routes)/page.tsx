@@ -3,6 +3,8 @@ import { Categories } from "@/components/categories"
 import { SearchInput } from "@/components/search-input"
 import { Companions } from "@/components/companions"
 
+export const dynamic = "force-dynamic"
+
 interface RootPageProps {
   searchParams: Promise<{
     categoryId?: string

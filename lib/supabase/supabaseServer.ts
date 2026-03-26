@@ -7,6 +7,6 @@ export default async function supabaseServer() {
   const cookieStore = await cookies()
 
   return createServerComponentClient<Database>({
-    cookies: () => cookieStore,
+    cookies: async () => cookieStore,
   })
 }
