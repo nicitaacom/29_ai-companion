@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import axios from "axios"
 
 import { useAuthOpen } from "@/app/hooks/use-auth-open"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -10,12 +9,10 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { useUser } from "@/app/hooks/useUser"
-import { checkSubscription } from "@/lib/subscription"
 
 export const ProModal = () => {
   const proModal = useProModal()
   const [isMounted, setIsMounted] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const { user } = useUser()
   const { openAuth } = useAuthOpen()
@@ -24,36 +21,17 @@ export const ProModal = () => {
     setIsMounted(true)
   }, [])
 
-  useEffect(() => {
-    async function checkIsPro() {
-      const isPro = await checkSubscription({ user: user })
-      if (isPro) {
-        proModal.onClose()
-      }
+  const onContinue = () => {
+    if (!user) {
+      proModal.onClose()
+      openAuth("login")
+      return
     }
-    checkIsPro()
-  }, [proModal, user])
 
-  const onSubscribe = async () => {
-    try {
-      setIsLoading(true)
-      if (!user) {
-        proModal.onClose()
-        openAuth("login")
-        return
-      }
-
-      const response = await axios.get("/api/stripe")
-
-      window.location.href = response.data.url
-    } catch (error) {
-      toast({
-        description: "Something went wrong",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
+    toast({
+      description: "This app is free to use.",
+    })
+    proModal.onClose()
   }
 
   if (!isMounted) {
@@ -64,20 +42,21 @@ export const ProModal = () => {
     <Dialog open={proModal.isOpen} onOpenChange={proModal.onClose}>
       <DialogContent>
         <DialogHeader className="space-y-4">
-          <DialogTitle className="text-center">Upgrade to Pro</DialogTitle>
+          <DialogTitle className="text-center">Free to use</DialogTitle>
           <DialogDescription className="text-center space-y-2">
             Create
-            <span className="text-sky-500 mx-1 font-medium">Custom AI</span>
-            Companions!
+            <span className="mx-1 font-medium text-sky-500">Custom AI</span>
+            Companions without a subscription.
           </DialogDescription>
         </DialogHeader>
         <Separator />
         <div className="flex justify-between">
           <p className="text-2xl font-medium">
-            $9<span className="text-sm font-normal">.99 / mo</span>
+            <span className="text-sm font-normal text-muted-foreground line-through">$9.99 / mo</span>
+            <span className="ml-2">0.00$ - free to use</span>
           </p>
-          <Button onClick={onSubscribe} disabled={isLoading} variant="premium">
-            Subscribe
+          <Button onClick={onContinue} variant="premium">
+            Continue
           </Button>
         </div>
       </DialogContent>

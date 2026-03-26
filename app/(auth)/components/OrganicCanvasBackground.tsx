@@ -1,0 +1,307 @@
+"use client"
+
+import { useEffect, useRef } from "react"
+import { twMerge } from "tailwind-merge"
+
+interface ParticleCanvas {
+  width: number
+  height: number
+}
+
+class Particle {
+  x = 0
+  y = 0
+  vx = 0
+  vy = 0
+  radius = 0
+  opacity = 0
+  pulse = 0
+  angle = 0
+  life = 0
+  currentRadius = 0
+  canvas: ParticleCanvas
+  noiseX = 0
+  noiseY = 0
+  noiseSpeed = 0
+  wanderAngle = 0
+  wanderRadius = 0
+  scale = 0
+  targetScale = 1
+  scaleSpeed = 0
+  isVisible = 1
+  hideTimer = 0
+  hideDelay = 0
+  maxHideTime = 0
+
+  constructor(canvas: ParticleCanvas) {
+    this.canvas = canvas
+    this.reset()
+    this.life = Math.random() * 100
+    this.setupOrganicMovement()
+    this.setupVisibilityMechanics()
+  }
+
+  setupOrganicMovement() {
+    this.noiseX = Math.random() * 1000
+    this.noiseY = Math.random() * 1000
+    this.noiseSpeed = (Math.random() * 0.002 + 0.0006) * (Math.random() * 0.4 + 0.2)
+    this.wanderAngle = Math.random() * Math.PI * 2
+    this.wanderRadius = Math.random() * 60 + 20
+  }
+
+  setupVisibilityMechanics() {
+    this.isVisible = Math.random() < 0.7 ? 1 : 0
+    this.hideDelay = Math.random() * 1800 + 1200
+    this.maxHideTime = Math.random() * 900 + 600
+    this.scale = this.isVisible ? 1 : 0
+    this.targetScale = this.isVisible ? 1 : 0
+    this.scaleSpeed = 0.02 + Math.random() * 0.03
+  }
+
+  reset() {
+    this.x = Math.random() * this.canvas.width
+    this.y = Math.random() * this.canvas.height
+    const speedMultiplier = Math.random() * 0.4 + 0.2
+    this.vx = (Math.random() - 0.5) * 0.4 * speedMultiplier
+    this.vy = (Math.random() - 0.5) * 0.4 * speedMultiplier
+    this.radius = Math.random() * 120 + 50
+    this.opacity = Math.random() * 0.22 + 0.08
+    this.pulse = Math.random() * 0.0075 + 0.0025
+    this.angle = 0
+  }
+
+  noise(x: number) {
+    const intX = Math.floor(x)
+    const fracX = x - intX
+    const a = this.hash(intX)
+    const b = this.hash(intX + 1)
+    return this.lerp(a, b, this.smoothstep(fracX))
+  }
+
+  hash(x: number) {
+    x = ((x >> 16) ^ x) * 0x45d9f3b
+    x = ((x >> 16) ^ x) * 0x45d9f3b
+    x = (x >> 16) ^ x
+    return (x / 0x100000000 + 0.5) * 2 - 1
+  }
+
+  lerp(a: number, b: number, t: number) {
+    return a + (b - a) * t
+  }
+
+  smoothstep(t: number) {
+    return t * t * (3 - 2 * t)
+  }
+
+  easeInOut(t: number) {
+    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+  }
+
+  update() {
+    this.hideTimer += 1
+
+    if (this.isVisible && this.hideTimer > this.hideDelay) {
+      this.targetScale = 0
+      if (this.scale <= 0.05) {
+        this.isVisible = 0
+        this.hideTimer = 0
+        this.hideDelay = Math.random() * 1800 + 1200
+      }
+    } else if (!this.isVisible && this.hideTimer > this.maxHideTime) {
+      this.isVisible = 1
+      this.targetScale = 1
+      this.hideTimer = 0
+      this.hideDelay = Math.random() * 2400 + 1800
+      this.maxHideTime = Math.random() * 900 + 600
+    }
+
+    const scaleDiff = this.targetScale - this.scale
+    const scalingFactor = this.easeInOut(Math.abs(scaleDiff))
+    this.scale += scaleDiff * this.scaleSpeed * (1 + scalingFactor)
+    this.scale = Math.max(0, Math.min(1, this.scale))
+
+    if (this.scale <= 0) {
+      return
+    }
+
+    this.wanderAngle += (Math.random() - 0.5) * 0.08
+    const wanderX = Math.cos(this.wanderAngle) * this.wanderRadius
+    const wanderY = Math.sin(this.wanderAngle) * this.wanderRadius
+
+    this.noiseX += this.noiseSpeed
+    this.noiseY += this.noiseSpeed * 0.7
+    const noiseForceX = this.noise(this.noiseX) * 0.15
+    const noiseForceY = this.noise(this.noiseY) * 0.15
+
+    this.vx += wanderX * 0.001 + noiseForceX * 0.08 + (Math.random() - 0.5) * 0.02
+    this.vy += wanderY * 0.001 + noiseForceY * 0.08 + (Math.random() - 0.5) * 0.02
+    this.vx *= 0.99
+    this.vy *= 0.99
+
+    const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy)
+    const maxSpeed = 0.4
+
+    if (speed > maxSpeed) {
+      this.vx = (this.vx / speed) * maxSpeed
+      this.vy = (this.vy / speed) * maxSpeed
+    }
+
+    this.x += this.vx + Math.sin(this.angle * 0.4) * 0.05
+    this.y += this.vy + Math.cos(this.angle * 0.6) * 0.05
+    this.angle += 0.004 + Math.sin(this.life * 0.1) * 0.002
+
+    this.life += this.pulse
+    const pulseScale = 1 + Math.sin(this.life) * 0.3 + Math.sin(this.life * 1.7) * 0.1
+    this.currentRadius = this.radius * pulseScale * this.scale
+
+    const margin = this.currentRadius
+    if (this.x < -margin) this.x = this.canvas.width + margin
+    if (this.x > this.canvas.width + margin) this.x = -margin
+    if (this.y < -margin) this.y = this.canvas.height + margin
+    if (this.y > this.canvas.height + margin) this.y = -margin
+  }
+
+  draw(ctx: CanvasRenderingContext2D, color: string) {
+    if (this.scale <= 0) {
+      return
+    }
+
+    const fadeOpacity = this.scale * this.opacity
+    const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.currentRadius)
+    gradient.addColorStop(0, `hsla(${color}, ${fadeOpacity})`)
+    gradient.addColorStop(0.45, `hsla(${color}, ${fadeOpacity * 0.5})`)
+    gradient.addColorStop(1, "hsla(0, 0%, 0%, 0)")
+
+    ctx.fillStyle = gradient
+    ctx.beginPath()
+    ctx.arc(this.x, this.y, this.currentRadius, 0, Math.PI * 2)
+    ctx.fill()
+  }
+}
+
+export function OrganicCanvasBackground({
+  children,
+  className,
+  parentClassName,
+  particleCount = 8,
+  color = "0, 0%, 100%",
+}: {
+  children: React.ReactNode
+  className?: string
+  parentClassName?: string
+  particleCount?: number
+  color?: string
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const animationRef = useRef<number | null>(null)
+  const particlesRef = useRef<Particle[]>([])
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const container = containerRef.current
+
+    if (!canvas || !container) {
+      return
+    }
+
+    const ctx = canvas.getContext("2d")
+
+    if (!ctx) {
+      return
+    }
+
+    const updateCanvasSize = () => {
+      const nextWidth = Math.floor(container.clientWidth)
+      const nextHeight = Math.floor(container.clientHeight)
+      const dpr = window.devicePixelRatio || 1
+
+      if (!nextWidth || !nextHeight) {
+        return
+      }
+
+      canvas.width = nextWidth * dpr
+      canvas.height = nextHeight * dpr
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.scale(dpr, dpr)
+      canvas.style.width = `${nextWidth}px`
+      canvas.style.height = `${nextHeight}px`
+
+      particlesRef.current = Array.from({ length: particleCount }, () =>
+        new Particle({
+          width: nextWidth,
+          height: nextHeight,
+        }),
+      )
+    }
+
+    const animate = () => {
+      const nextWidth = Math.floor(container.clientWidth)
+      const nextHeight = Math.floor(container.clientHeight)
+
+      if (!nextWidth || !nextHeight) {
+        animationRef.current = requestAnimationFrame(animate)
+        return
+      }
+
+      ctx.clearRect(0, 0, nextWidth, nextHeight)
+
+      let visibleCount = 0
+      for (const particle of particlesRef.current) {
+        if (particle.scale > 0.1) {
+          visibleCount += 1
+        }
+      }
+
+      if (visibleCount < 2) {
+        particlesRef.current.forEach((particle, index) => {
+          if (particle.scale <= 0.1 && index < 3) {
+            particle.targetScale = 1
+            particle.isVisible = 1
+          }
+        })
+      }
+
+      particlesRef.current.forEach(particle => {
+        particle.update()
+        particle.draw(ctx, color)
+      })
+
+      animationRef.current = requestAnimationFrame(animate)
+    }
+
+    const handleResize = () => {
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+
+      resizeTimeoutRef.current = setTimeout(updateCanvasSize, 100)
+    }
+
+    updateCanvasSize()
+    animate()
+
+    const resizeObserver = new ResizeObserver(handleResize)
+    resizeObserver.observe(container)
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener("resize", handleResize)
+      if (animationRef.current) cancelAnimationFrame(animationRef.current)
+      if (resizeTimeoutRef.current) clearTimeout(resizeTimeoutRef.current)
+    }
+  }, [color, particleCount])
+
+  return (
+    <div ref={containerRef} className={twMerge("relative isolate h-full w-full overflow-hidden", className)}>
+      <canvas
+        ref={canvasRef}
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-80"
+        style={{ mixBlendMode: "screen" }}
+      />
+      <div className={twMerge("relative z-10 h-full w-full", parentClassName)}>{children}</div>
+    </div>
+  )
+}

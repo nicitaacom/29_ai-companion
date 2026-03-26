@@ -4,6 +4,7 @@ import * as z from "zod"
 import axios, { AxiosError } from "axios"
 import { ICategoryDB } from "@/app/interfaces/ICategoryDB"
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -14,13 +15,24 @@ import { ImageUpload } from "@/components/image-upload"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Wand2 } from "lucide-react"
+import { Loader2, Plus, Wand2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 
 interface CompanionFormProps {
   initialData: ICompanionDB | null
   categories: ICategoryDB[]
+}
+
+interface CategoryCreatePanelProps {
+  hasCategories: boolean
+  isLoading: boolean
+  onCategoryReady: (category: ICategoryDB) => void
+}
+
+type CreateCategoryResponse = {
+  category?: ICategoryDB
+  error?: string
 }
 
 const PREAMBLE = `You are a fictional character whose name is Elon. You are a visionary entrepreneur and inventor. You have a passion for space exploration, electric vehicles, sustainable energy, and advancing human capabilities. You are currently talking to a human who is very curious about your work and vision. You are ambitious and forward-thinking, with a touch of wit. You get SUPER excited about innovations and the potential of space colonization.
@@ -60,26 +72,126 @@ const formSchema = z.object({
   }),
 })
 
+function CategoryCreatePanel({ hasCategories, isLoading, onCategoryReady }: CategoryCreatePanelProps) {
+  const { toast } = useToast()
+  const [newCategoryName, setNewCategoryName] = useState("")
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false)
+
+  const createCategory = async () => {
+    const trimmedCategoryName = newCategoryName.trim()
+
+    if (!trimmedCategoryName) {
+      toast({ variant: "destructive", description: "Enter a category name first." })
+      return
+    }
+
+    try {
+      setIsCreatingCategory(true)
+
+      const response = await axios.post<CreateCategoryResponse>("/api/category", {
+        name: trimmedCategoryName,
+      })
+
+      const category = response.data.category
+
+      if (!category) {
+        toast({ variant: "destructive", description: "Unable to create category." })
+        return
+      }
+
+      setNewCategoryName("")
+      onCategoryReady(category)
+      toast({ description: `Category "${category.name}" created.` })
+    } catch (error) {
+      if (axios.isAxiosError<CreateCategoryResponse>(error)) {
+        const existingCategory = error.response?.data?.category
+
+        if (existingCategory) {
+          setNewCategoryName("")
+          onCategoryReady(existingCategory)
+          toast({ description: `"${existingCategory.name}" already exists, so we selected it.` })
+          return
+        }
+
+        toast({
+          variant: "destructive",
+          description: error.response?.data?.error || "Unable to create category.",
+        })
+        return
+      }
+
+      toast({ variant: "destructive", description: "Unable to create category." })
+    } finally {
+      setIsCreatingCategory(false)
+    }
+  }
+
+  return (
+    <div className="space-y-2 rounded-xl border border-primary/10 bg-primary/5 p-3">
+      <p className="text-xs font-medium text-muted-foreground">Create a category</p>
+      {!hasCategories ? (
+        <p className="text-sm text-muted-foreground">No categories yet. Create one below and we will select it automatically.</p>
+      ) : null}
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input
+          value={newCategoryName}
+          onChange={event => setNewCategoryName(event.target.value)}
+          disabled={isLoading || isCreatingCategory}
+          placeholder="e.g. Entrepreneur, Anime, Coach"
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={isLoading || isCreatingCategory}
+          onClick={createCategory}
+          className="sm:min-w-[140px]">
+          {isCreatingCategory ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+          Create
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 export function CompanionForm({ initialData, categories }: CompanionFormProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const [availableCategories, setAvailableCategories] = useState(categories)
+  const hasCategories = availableCategories.length > 0
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      name: "",
-      description: "",
-      instructions: "",
-      seed: "",
-      src: "",
-      category_id: undefined,
+    defaultValues: {
+      name: initialData?.name ?? "",
+      description: initialData?.description ?? "",
+      instructions: initialData?.instructions ?? "",
+      seed: initialData?.seed ?? "",
+      src: initialData?.src ?? "",
+      category_id: initialData?.category_id ?? "",
     },
   })
 
   const isLoading = form.formState.isSubmitting
 
+  const onCategoryReady = (category: ICategoryDB) => {
+    setAvailableCategories(currentCategories => {
+      const hasCategory = currentCategories.some(existingCategory => existingCategory.id === category.id)
+
+      if (hasCategory) {
+        return currentCategories
+      }
+
+      return [...currentCategories, category]
+    })
+
+    form.setValue("category_id", category.id, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    })
+  }
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(82, "initialData - ", initialData)
     try {
       if (initialData) {
         // Update companion functionality
@@ -161,17 +273,16 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
                   <FormItem>
                     <FormLabel>Category</FormLabel>
                     <Select
-                      value={field.value}
+                      value={field.value ?? ""}
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
                       disabled={isLoading}>
                       <FormControl>
                         <SelectTrigger className="bg-background">
-                          <SelectValue defaultValue={field.value} placeholder="Select a category" />
+                          <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories.map(category => (
+                        {availableCategories.map(category => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
                           </SelectItem>
@@ -179,6 +290,7 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
                       </SelectContent>
                     </Select>
                     <FormDescription>Select a category for your AI</FormDescription>
+                    <CategoryCreatePanel hasCategories={hasCategories} isLoading={isLoading} onCategoryReady={onCategoryReady} />
                     <FormMessage />
                   </FormItem>
                 )

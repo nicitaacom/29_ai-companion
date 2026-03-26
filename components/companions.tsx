@@ -14,7 +14,7 @@ export function Companions({ data, messages }: CompanionsProps) {
     return (
       <div data-test="companions-data-0" className="pt-10 flex flex-col justify-center items-center space-y-3">
         <div className="relative w-60 h-60">
-          <Image className="grayscale" src="/empty.png" alt="Empty" fill />
+          <Image className="grayscale" src="/empty.png" alt="Empty" fill sizes="240px" loading="eager" />
         </div>
         <p className="text-sm text-muted-foreground">No companions found.</p>
       </div>

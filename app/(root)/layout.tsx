@@ -4,9 +4,10 @@ import { checkSubscription } from "@/lib/subscription"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await supabaseServer()
   const {
     data: { user },
-  } = await supabaseServer().auth.getUser()
+  } = await supabase.auth.getUser()
   const isPro = await checkSubscription({ user: user })
 
   return (

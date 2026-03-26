@@ -5,10 +5,11 @@ import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
   const { src, name, description, instructions, seed, category_id } = await req.json()
+  const supabase = await supabaseServer()
 
   const {
     data: { user },
-  } = await supabaseServer().auth.getUser()
+  } = await supabase.auth.getUser()
 
   // Check is user authenticated
   if (!user || !user.id || !user.email) {

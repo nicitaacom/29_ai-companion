@@ -5,6 +5,7 @@ import { NextResponse } from "next/server"
 
 export async function PATCH(req: Request, { params }: { params: { companionId: string } }) {
   const { src, name, description, instructions, seed, category_id } = await req.json()
+  const supabase = await supabaseServer()
 
   // check is companionId exist in params
   if (!params.companionId) {
@@ -14,7 +15,7 @@ export async function PATCH(req: Request, { params }: { params: { companionId: s
   // Check is user authenticated
   const {
     data: { user },
-  } = await supabaseServer().auth.getUser()
+  } = await supabase.auth.getUser()
 
   if (!user || !user.id || !user.email) {
     return new NextResponse("Unauthenticated", { status: 401 })
@@ -57,10 +58,11 @@ export async function PATCH(req: Request, { params }: { params: { companionId: s
 
 export async function DELETE(req: Request, { params }: { params: { companionId: string } }) {
   try {
+    const supabase = await supabaseServer()
     // Check is user authenticated
     const {
       data: { user },
-    } = await supabaseServer().auth.getUser()
+    } = await supabase.auth.getUser()
 
     if (!user || !user.id || !user.email) {
       return new NextResponse("Unauthenticated", { status: 401 })
@@ -68,11 +70,7 @@ export async function DELETE(req: Request, { params }: { params: { companionId: 
 
     // delete companion that eq user_id (owner_id) who created that companion and eq companionId
     // so only companion owner may delete its own companion
-    const companion = await supabaseServer()
-      .from("companion")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("id", params.companionId)
+    const companion = await supabase.from("companion").delete().eq("user_id", user.id).eq("id", params.companionId)
 
     return NextResponse.json(companion)
   } catch (error) {

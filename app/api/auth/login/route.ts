@@ -1,13 +1,14 @@
-import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { AxiosResponse } from "axios"
 import { NextResponse } from "next/server"
+
+import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 
 export type TAPIAuthLogin = {
   email: string
 }
 
 export interface IResponse {
-  providers: string[] | undefined
+  providers: string[] | null
 }
 
 export type TAPIAuthLoginResponse = AxiosResponse<IResponse>
@@ -15,37 +16,13 @@ export type TAPIAuthLoginResponse = AxiosResponse<IResponse>
 /* This route fired when user click 'login' button */
 
 export async function POST(req: Request) {
-  const body: TAPIAuthLogin = await req.json()
+  const { email } = (await req.json()) as TAPIAuthLogin
 
-  try {
-    // 1. Check is user with this email doesn't exist
-    const { data: email_response, error: emailSelectError } = await supabaseAdmin
-      .from("users_29_companion")
-      .select("email")
-      .eq("email", body.email)
-      .single()
-    const email = email_response?.email
+  if (!email) return NextResponse.json({ error: "email missing" }, { status: 400 })
 
-    if (!email) {
-      throw new Error("User with this email doesn't exist")
-    }
-    if (emailSelectError) {
-      console.log(22, "emailSelectError \n", emailSelectError)
-      throw emailSelectError
-    }
+  const { data: user, error } = await supabaseAdmin.from("users").select("providers").eq("email", email).maybeSingle()
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (!user) return NextResponse.json({ error: "User with this email doesn't exist" }, { status: 400 })
 
-    // 2. Return info about providers to show error like 'You already have account with google - continue with google?'
-    const { data: provider_response } = await supabaseAdmin
-      .from("users_29_companion")
-      .select("providers")
-      .eq("email", body.email)
-      .single()
-    const providers = provider_response?.providers
-
-    return NextResponse.json({ providers: providers })
-  } catch (error: any) {
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
-    }
-  }
+  return NextResponse.json({ providers: user.providers ?? null })
 }

@@ -10,10 +10,11 @@ import { MemoryManager } from "@/lib/memory"
 export async function POST(req: Request, { params }: { params: { chatId: string } }) {
   try {
     const { prompt } = await req.json()
+    const supabase = await supabaseServer()
 
     const {
       data: { user },
-    } = await supabaseServer().auth.getUser()
+    } = await supabase.auth.getUser()
 
     // 1. Check is user authenticated
     if (!user || !user.id || !user.email) {
@@ -31,11 +32,7 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
     // 3. Repeating this - https://github.com/AntonioErdeljac/next13-ai-companion/blob/master/app/api/chat/%5BchatId%5D/route.ts#L33-L46
 
     // 3.1 Select companion based on params.chatId (in fact its not chat id but companion_id) - userstand its like chat with companion id
-    const { data: companion_response, error: error_selecting_companion } = await supabaseServer()
-      .from("companion")
-      .select()
-      .eq("id", params.chatId)
-      .single()
+    const { data: companion_response, error: error_selecting_companion } = await supabase.from("companion").select().eq("id", params.chatId).single()
     if (error_selecting_companion) {
       return new NextResponse(
         `error selecting companion \n
@@ -44,7 +41,7 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
     }
 
     // 3.2 Create a new message and return data about this message (to get generated id by supabase of that message)
-    const { error: error_inserting_new_message } = await supabaseServer()
+    const { error: error_inserting_new_message } = await supabase
       .from("messages")
       .insert([{ companion_id: params.chatId, content: prompt, role: "user", user_id: user.id }])
 
@@ -128,7 +125,7 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
       memoryManager.writeToHistory("" + response.trim(), companionKey)
 
       // 3.2 Create a new message and return data about this message (to get generated id by supabase of that message)
-      const { error: error_inserting_new_message } = await supabaseServer()
+      const { error: error_inserting_new_message } = await supabase
         .from("messages")
         .insert([{ companion_id: params.chatId, content: prompt, role: "user", user_id: user.id }])
 

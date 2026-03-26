@@ -11,9 +11,10 @@ import { UpgradeButton } from "./upgrade-button"
 const font = Poppins({ weight: "600", subsets: ["latin"] })
 
 export async function Navbar({ isPro }: { isPro: boolean }) {
+  const supabase = await supabaseServer()
   const {
     data: { user },
-  } = await supabaseServer().auth.getUser()
+  } = await supabase.auth.getUser()
 
   return (
     <nav

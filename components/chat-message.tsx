@@ -1,6 +1,5 @@
 "use client"
 
-import { useTheme } from "next-themes"
 import { BeatLoader } from "react-spinners"
 
 import { twMerge } from "tailwind-merge"
@@ -10,6 +9,7 @@ import { BotAvatar } from "./bot-avatar"
 import { UserAvatar } from "./user-avatar"
 import { Button } from "./ui/button"
 import { Copy } from "lucide-react"
+import { useTheme } from "./theme-provider"
 
 export interface ChatMessageProps {
   role: "system" | "user"
@@ -20,7 +20,7 @@ export interface ChatMessageProps {
 
 export function ChatMessage({ role, content, isLoading, src }: ChatMessageProps) {
   const { toast } = useToast()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   const onCopy = () => {
     if (!content) {
@@ -35,7 +35,7 @@ export function ChatMessage({ role, content, isLoading, src }: ChatMessageProps)
     <div className={twMerge("group flex items-start gap-x-3 py-4 w-full", role === "user" && "justify-end")}>
       {role !== "user" && src && <BotAvatar src={src} />}
       <div className="rounded-md px-4 py-2 max-w-sm text-sm bg-primary/10">
-        {isLoading ? <BeatLoader size={5} color={theme === "light" ? "black" : "white"} /> : content}
+        {isLoading ? <BeatLoader size={5} color={resolvedTheme === "light" ? "black" : "white"} /> : content}
       </div>
       {role === "user" && <UserAvatar />}
       {role !== "user" && !isLoading && (

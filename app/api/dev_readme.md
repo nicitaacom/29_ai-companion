@@ -25,7 +25,7 @@
 
 1. Check if user with this email already exists
 2. Sign up to add row in 'auth.users'
-3. Insert row in 'public.users' 'public.users_cart' tables (if user exist throw error)
+3. Insert or update row in 'public.users' and track connected providers
 
 ### Usage for chat/[chatId] route
 

@@ -1,10 +1,12 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
+
 import { Database } from "@/app/interfaces/types_db"
 
-const supabaseServer = () => {
-  cookies().getAll() // Keep cookies in the JS execution context for Next.js build
-  return createServerComponentClient<Database>({ cookies })
-}
+export default async function supabaseServer() {
+  const cookieStore = await cookies()
 
-export default supabaseServer
+  return createServerComponentClient<Database>({
+    cookies: () => cookieStore,
+  })
+}

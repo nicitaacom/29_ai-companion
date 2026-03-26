@@ -1,64 +1,71 @@
 import { NextResponse } from "next/server"
-
-import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
-import { User, createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { User } from "@supabase/supabase-js"
 import { AxiosResponse } from "axios"
+
+import { ensureAppUser } from "@/lib/auth/ensureAppUser"
+import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
+import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
 
 export type TAPIAuthRegister = {
   email: string
   password: string
+  redirectTo?: string
 }
 
 export interface IResponse {
   user: User
+  message: string
 }
 
 export type TAPIAuthRegisterResponse = AxiosResponse<IResponse>
 
+async function selectExistingUserProviders(email: string) {
+  const { data, error } = await supabaseAdmin.from("users").select("providers").eq("email", email).maybeSingle()
+  if (error) return error.message
+  return data?.providers ?? null
+}
+
 export async function POST(req: Request) {
-  const { email, password }: TAPIAuthRegister = await req.json()
-  const supabase = createRouteHandlerClient({ cookies })
+  const { email, password, redirectTo } = (await req.json()) as TAPIAuthRegister
 
-  try {
-    // 1. Check if user with this email already exists
-    const { data: email_response } = await supabaseAdmin
-      .from("users_29_companion")
-      .select("email")
-      .eq("email", email)
-      .single()
-    if (email_response?.email === email) {
-      return new NextResponse(`User with this email already exists`, { status: 400 })
-    }
+  if (!email || !password) return NextResponse.json({ error: "email or password missing" }, { status: 400 })
 
-    /* Insert row in 'users' table for a new user */
-    // 2. Sign up to add row in 'auth.users'
-    const { data: user, error: signUpError } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
-    if (signUpError) {
-      console.log(`api/auth/register/route.ts ${signUpError}`)
-      return new NextResponse(`${signUpError}`, { status: 400 })
-    }
+  const existingProviders = await selectExistingUserProviders(email)
+  if (typeof existingProviders === "string") return NextResponse.json({ error: existingProviders }, { status: 400 })
 
-    // 3. Insert row in 'public.users' 'public.users_cart' tables (if user exist throw error)
-    if (user && user.user?.id) {
-      await supabaseAdmin
-        .from("users_29_companion")
-        .insert({ id: user.user.id, email: email, providers: ["credentials"] })
-      await supabaseAdmin.from("users_cart").insert({ id: user.user.id })
-    } else {
-      return new NextResponse(`${`After signUp - user doesnt exist - try again`}`, { status: 400 })
-    }
+  if (existingProviders) {
+    const providerList = existingProviders.join(", ") || "another provider"
+    const errorMessage = existingProviders.includes("credentials")
+      ? "User with this email already exists"
+      : `You already have an account with ${providerList}`
 
-    return NextResponse.json({ user })
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log(90, "REGISTER_NEW_USER_ERROR\n (supabase) \n", error.message)
-      return new NextResponse(`/api/auth/register/route.ts error \n ${error}`, {
-        status: 500,
-      })
-    }
+    return NextResponse.json({ error: errorMessage, providers: existingProviders }, { status: 400 })
   }
+
+  const requestUrl = new URL(req.url)
+  const callbackUrl = new URL("/auth/callback/credentials", requestUrl.origin)
+  if (redirectTo && redirectTo.startsWith("/")) callbackUrl.searchParams.set("next", redirectTo)
+
+  const supabase = await getSupabaseRouteHandlerClient()
+  const {
+    data: { user, session },
+    error: signUpError,
+  } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: callbackUrl.toString(),
+    },
+  })
+
+  if (signUpError) return NextResponse.json({ error: signUpError.message }, { status: 400 })
+  if (!user) return NextResponse.json({ error: "After sign up no user was returned" }, { status: 400 })
+
+  const ensureUserError = await ensureAppUser(user, "credentials")
+  if (ensureUserError) return NextResponse.json({ error: ensureUserError }, { status: 400 })
+
+  return NextResponse.json({
+    user,
+    message: session ? "Account created successfully." : "Check your email to finish creating your account.",
+  })
 }

@@ -4,13 +4,14 @@ import { ChevronLeft, Edit, MessagesSquare, MoreVertical, Trash } from "lucide-r
 
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { IMessage } from "@/app/interfaces/IMessageDB"
-import { Button } from "./ui/button"
+import { Button, buttonVariants } from "./ui/button"
 import { useRouter } from "next/navigation"
 import { BotAvatar } from "@/components/bot-avatar"
 import { useUser } from "@/app/hooks/useUser"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { useToast } from "./ui/use-toast"
 import axios from "axios"
+import { cn } from "@/lib/utils"
 
 interface ChatHeaderProps {
   companion: ICompanionDB & {
@@ -59,10 +60,10 @@ export function ChatHeader({ companion }: ChatHeaderProps) {
       </div>
       {user?.id === companion.user_id && (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon">
-              <MoreVertical />
-            </Button>
+          <DropdownMenuTrigger
+            className={cn(buttonVariants({ variant: "secondary", size: "icon" }))}
+            aria-label="Open actions">
+            <MoreVertical className="h-4 w-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => router.push(`/companion/${companion.id}`)}>
