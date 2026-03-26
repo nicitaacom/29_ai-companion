@@ -55,7 +55,7 @@ export class MemoryManager {
 
   private getPineconeIndex() {
     const name = this.getRequiredEnv("PINECONE_INDEX")
-    const host = process.env.PINECONE_ENVIRONMENT?.trim()
+    const host = process.env.PINECONE_HOST?.trim()
 
     // Keep the existing env name for backward compatibility, but treat it as the index host for the modern SDK.
     if (host) {

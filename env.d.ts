@@ -13,7 +13,7 @@ declare global {
 
       PINECONE_INDEX: string
       // Uses the Pinecone index host URL with the modern SDK for backward compatibility with existing env naming.
-      PINECONE_ENVIRONMENT: string
+      PINECONE_HOST: string
       PINECONE_API_KEY: string
 
       UPSTASH_REDIS_REST_URL: string

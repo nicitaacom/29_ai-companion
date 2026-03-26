@@ -21,6 +21,8 @@
 
 <br/>
 
+
+
 # Clone repository
 
 ## Step 1.1 - clone repository (variant 1)
@@ -262,9 +264,6 @@ https://youtu.be/PGPGcKBpAk8?t=17601
 ### 2.8 - PINECONE + UPSTASH + OPENAI
 
 https://youtu.be/PjYWpd7xkaM?t=15618
-
-With the modern Pinecone SDK in this project, `PINECONE_ENVIRONMENT` should contain your index HOST URL,
-for example `https://your-index-xxxx.svc.your-project-id.pinecone.io`.
 
 ### 2.9 - REPLICATE_API_TOKEN
 
