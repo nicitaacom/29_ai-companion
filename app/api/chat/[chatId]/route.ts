@@ -2,9 +2,19 @@ import { NextResponse } from "next/server"
 import OpenAI from "openai"
 
 import { Database, TablesInsert } from "@/app/interfaces/types_db"
+import {
+  buildRateLimitIdentifier,
+  TURNSTILE_VERIFIED_COOKIE_MAX_AGE,
+  TURNSTILE_VERIFIED_COOKIE_NAME,
+  TURNSTILE_VERIFIED_COOKIE_VALUE,
+} from "@/lib/chat-session"
+import { getChatVisitor, hasVerifiedHumanCookie } from "@/lib/chat-visitor"
+import { appendGuestChatMessage } from "@/lib/guest-chat-store"
 import supabaseServer from "@/lib/supabase/supabaseServer"
+import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { rateLimit } from "@/lib/rate-limit"
 import { MemoryManager } from "@/lib/memory"
+import { verifyTurnstileToken } from "@/lib/turnstile"
 
 type CompanionRow = Database["public"]["Tables"]["companion"]["Row"]
 type MessageInsert = TablesInsert<"messages">
@@ -21,17 +31,21 @@ function sanitizeHistory(history: string) {
 export async function POST(req: Request, { params }: { params: Promise<{ chatId: string }> }) {
   try {
     const { chatId } = await params
-    const { prompt }: { prompt?: string } = await req.json()
+    const {
+      prompt,
+      turnstileToken,
+    }: {
+      prompt?: string
+      turnstileToken?: string
+    } = await req.json()
     const supabase = await supabaseServer()
 
     const {
       data: { user },
     } = await supabase.auth.getUser()
-
-    // 1. Check is user authenticated
-    if (!user || !user.id || !user.email) {
-      return new NextResponse("Unauthorized", { status: 401 })
-    }
+    const visitor = await getChatVisitor(user)
+    const hasHumanVerification = await hasVerifiedHumanCookie()
+    let shouldSetHumanVerificationCookie = false
 
     if (!chatId) {
       return new NextResponse("Chat id is required", { status: 400 })
@@ -43,18 +57,40 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
 
     const cleanPrompt = prompt.trim()
 
-    const identifier = req.url + "-" + user.id
-    const { success } = await rateLimit(identifier)
+    if (process.env.NODE_ENV === "production" && !hasHumanVerification) {
+      const cleanTurnstileToken = turnstileToken?.trim()
 
-    // 2. Check rate limit by identifier (as I understood limit of messages in some amount of time)
-    if (!success) {
-      return new NextResponse("Rate Limit exeeded", { status: 429 })
+      if (!cleanTurnstileToken) {
+        return new NextResponse("Complete the robot check before sending a message.", { status: 403 })
+      }
+
+      const forwardedFor = req.headers.get("x-forwarded-for")
+      const ipAddress = req.headers.get("cf-connecting-ip") ?? forwardedFor?.split(",")[0]?.trim() ?? null
+      const verification = await verifyTurnstileToken({
+        ip: ipAddress,
+        token: cleanTurnstileToken,
+      })
+
+      if (!verification.success) {
+        return new NextResponse("Robot check failed. Please try again.", { status: 403 })
+      }
+
+      shouldSetHumanVerificationCookie = true
+    }
+
+    if (visitor.isFreeUser) {
+      const identifier = buildRateLimitIdentifier(chatId, visitor.participantId)
+      const { success } = await rateLimit(identifier)
+
+      if (!success) {
+        return new NextResponse("Rate limit exceeded", { status: 429 })
+      }
     }
 
     // 3. Repeating this - https://github.com/AntonioErdeljac/next13-ai-companion/blob/master/app/api/chat/%5BchatId%5D/route.ts#L33-L46
 
     // 3.1 Select companion based on params.chatId (in fact its not chat id but companion_id) - userstand its like chat with companion id
-    const { data: companion_response, error: error_selecting_companion } = await supabase
+    const { data: companion_response, error: error_selecting_companion } = await supabaseAdmin
       .from("companion")
       .select()
       .eq("id", chatId)
@@ -73,25 +109,34 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
     }
 
     // 3.2 Create a new message and return data about this message (to get generated id by supabase of that message)
-    const userMessages = [
-      {
-        companion_id: chatId,
-        content: cleanPrompt,
-        role: "user",
-        user_id: user.id,
-      },
-    ] satisfies MessageInsertList
+    if (visitor.isAuthenticated && visitor.userId) {
+      const userMessages = [
+        {
+          companion_id: chatId,
+          content: cleanPrompt,
+          role: "user",
+          user_id: visitor.userId,
+        },
+      ] satisfies MessageInsertList
 
-    const { error: error_inserting_new_message } = await supabase
-      .from("messages")
-      // @ts-ignore
-      .insert(userMessages as MessageInsertList)
+      const { error: error_inserting_new_message } = await supabaseAdmin
+        .from("messages")
+        // @ts-ignore
+        .insert(userMessages as MessageInsertList)
 
-    if (error_inserting_new_message) {
-      return new NextResponse(
-        `error inserting message \n
+      if (error_inserting_new_message) {
+        return new NextResponse(
+          `error inserting message \n
          ${error_inserting_new_message.message}`,
-      )
+        )
+      }
+    } else if (visitor.guestId) {
+      await appendGuestChatMessage({
+        companionId: chatId,
+        content: cleanPrompt,
+        guestId: visitor.guestId,
+        role: "user",
+      })
     }
 
     const name = companion.id
@@ -99,7 +144,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
 
     const companionKey = {
       companionName: name,
-      userId: user.id,
+      userId: visitor.participantId,
       modelName: "llama2-13b",
     }
     const memoryManager = await MemoryManager.getInstance()
@@ -163,32 +208,55 @@ ${recentChatHistory || "No prior conversation."}`,
 
     await memoryManager.writeToHistory(`${companion.name}: ${response}`, companionKey)
 
-    const assistantMessages = [
-      {
-        companion_id: chatId,
-        content: response,
-        role: "system",
-        user_id: user.id,
-      },
-    ] satisfies MessageInsertList
+    if (visitor.isAuthenticated && visitor.userId) {
+      const assistantMessages = [
+        {
+          companion_id: chatId,
+          content: response,
+          role: "system",
+          user_id: visitor.userId,
+        },
+      ] satisfies MessageInsertList
 
-    const { error: error_inserting_assistant_message } = await supabase
-      .from("messages")
-      // @ts-ignore
-      .insert(assistantMessages as MessageInsertList)
+      const { error: error_inserting_assistant_message } = await supabaseAdmin
+        .from("messages")
+        // @ts-ignore
+        .insert(assistantMessages as MessageInsertList)
 
-    if (error_inserting_assistant_message) {
-      return new NextResponse(
-        `error inserting message \n
+      if (error_inserting_assistant_message) {
+        return new NextResponse(
+          `error inserting message \n
          ${error_inserting_assistant_message.message}`,
-      )
+        )
+      }
+    } else if (visitor.guestId) {
+      await appendGuestChatMessage({
+        companionId: chatId,
+        content: response,
+        guestId: visitor.guestId,
+        role: "system",
+      })
     }
 
-    return new NextResponse(response, {
+    const nextResponse = new NextResponse(response, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
       },
     })
+
+    if (shouldSetHumanVerificationCookie) {
+      nextResponse.cookies.set({
+        httpOnly: true,
+        maxAge: TURNSTILE_VERIFIED_COOKIE_MAX_AGE,
+        name: TURNSTILE_VERIFIED_COOKIE_NAME,
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        value: TURNSTILE_VERIFIED_COOKIE_VALUE,
+      })
+    }
+
+    return nextResponse
   } catch (error) {
     console.log("[CHAT_POST]", error)
     return new NextResponse("Companion could not respond right now", { status: 500 })

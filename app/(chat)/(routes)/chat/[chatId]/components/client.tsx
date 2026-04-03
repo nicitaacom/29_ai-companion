@@ -3,12 +3,14 @@
 import { useCompletion } from "ai/react"
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { IMessage } from "@/app/interfaces/IMessageDB"
+import { useVerifyHuman } from "@/app/hooks/useVerifyHuman"
 import { ChatHeader } from "@/components/chat-header"
 import { useRouter } from "next/navigation"
-import { FormEvent, useEffect, useState } from "react"
+import { FormEvent, useEffect, useRef, useState } from "react"
 import { ChatForm } from "@/components/chat-form"
 import { ChatMessages } from "@/components/chat-messages"
 import { ChatMessageProps } from "@/components/chat-message"
+import { useToast } from "@/components/ui/use-toast"
 
 interface ChatClientProps {
   companion: ICompanionDB & {
@@ -17,6 +19,7 @@ interface ChatClientProps {
       messages: number
     }
   }
+  initialTurnstileVerified: boolean
 }
 
 function mapCompanionMessages(messages: IMessage[]): ChatMessageProps[] {
@@ -32,9 +35,14 @@ function mapCompanionMessages(messages: IMessage[]): ChatMessageProps[] {
     }))
 }
 
-export function ChatClient({ companion }: ChatClientProps) {
+export function ChatClient({ companion, initialTurnstileVerified }: ChatClientProps) {
   const router = useRouter()
+  const { toast } = useToast()
   const [messages, setMessages] = useState<ChatMessageProps[]>(mapCompanionMessages(companion.messages))
+  const turnstileRef = useRef<HTMLDivElement>(null)
+  const { isVerified, token } = useVerifyHuman(turnstileRef)
+  const requiresHumanVerification = process.env.NODE_ENV === "production"
+  const isHumanVerified = !requiresHumanVerification || initialTurnstileVerified || isVerified
 
   useEffect(() => {
     setMessages(mapCompanionMessages(companion.messages))
@@ -42,6 +50,11 @@ export function ChatClient({ companion }: ChatClientProps) {
 
   const { input, isLoading, handleInputChange, handleSubmit, setInput } = useCompletion({
     api: `/api/chat/${companion.id}`,
+    body: token
+      ? {
+          turnstileToken: token,
+        }
+      : undefined,
     onFinish(_prompt, completion) {
       const systemMessage: ChatMessageProps = {
         id: crypto.randomUUID(),
@@ -56,11 +69,23 @@ export function ChatClient({ companion }: ChatClientProps) {
     },
     onError() {
       setMessages(current => current.filter(message => !message.id?.startsWith("pending-user-")))
+      toast({
+        description: "Message could not be sent. If the robot check is visible, complete it and try again.",
+        variant: "destructive",
+      })
     },
   })
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    if (!isHumanVerified) {
+      toast({
+        description: "Complete the robot check before sending a message.",
+        variant: "destructive",
+      })
+      return
+    }
 
     const trimmedInput = input.trim()
     if (!trimmedInput || isLoading) {
@@ -81,7 +106,15 @@ export function ChatClient({ companion }: ChatClientProps) {
     <div className="flex flex-col h-full p-4 space-y-2">
       <ChatHeader companion={companion} />
       <ChatMessages companion={companion} isLoading={isLoading} messages={messages} />
-      <ChatForm isLoading={isLoading} input={input} handleInputChange={handleInputChange} onSubmit={onSubmit} />
+      <ChatForm
+        handleInputChange={handleInputChange}
+        input={input}
+        isHumanVerified={isHumanVerified}
+        isLoading={isLoading}
+        onSubmit={onSubmit}
+        showTurnstile={requiresHumanVerification}
+        turnstileRef={turnstileRef}
+      />
     </div>
   )
 }

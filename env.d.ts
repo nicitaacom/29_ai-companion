@@ -18,6 +18,8 @@ declare global {
 
       UPSTASH_REDIS_REST_URL: string
       UPSTASH_REDIS_REST_TOKEN: string
+      NEXT_PUBLIC_CLOUDFLARE_SITE_KEY: string
+      TURNSTILE_SECRET_KEY: string
 
       OPENAI_KEY: string
 
