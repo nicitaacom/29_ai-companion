@@ -1,8 +1,12 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      NEXT_PRODUCTION_URL: string
-      NEXT_DEVELOPMENT_URL: string
+      NEXT_PUBLIC_PRODUCTION_URL: string
+      NEXT_PUBLIC_DEVELOPMENT_URL: string
+      NEXT_PRODUCTION_URL?: string
+      NEXT_DEVELOPMENT_URL?: string
+      NEXT_PUBLIC_SITE_URL?: string
+      NEXT_PUBLIC_VERCEL_URL?: string
 
       NEXT_PUBLIC_SUPABASE_URL: string
       NEXT_PUBLIC_SUPABASE_ANON_KEY: string
@@ -12,12 +16,13 @@ declare global {
       NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: string
 
       PINECONE_INDEX: string
-      // Uses the Pinecone index host URL with the modern SDK for backward compatibility with existing env naming.
       PINECONE_HOST: string
       PINECONE_API_KEY: string
 
       UPSTASH_REDIS_REST_URL: string
       UPSTASH_REDIS_REST_TOKEN: string
+
+      // For Cloudflare robot protection
       NEXT_PUBLIC_CLOUDFLARE_SITE_KEY: string
       TURNSTILE_SECRET_KEY: string
 

@@ -1,5 +1,6 @@
 import { Ratelimit } from "@upstash/ratelimit"
 import { Redis } from "@upstash/redis"
+import { memorySlidingWindowLimit } from "@/lib/resilient-store"
 
 const redis = Redis.fromEnv()
 
@@ -31,6 +32,31 @@ const turnstileVerificationRateLimit = new Ratelimit({
   prefix: "ratelimit:turnstile:verify",
 })
 
+async function safeLimit({
+  fallbackKey,
+  fallbackLimit,
+  fallbackWindowMs,
+  limiter,
+  identifier,
+}: {
+  fallbackKey: string
+  fallbackLimit: number
+  fallbackWindowMs: number
+  identifier: string
+  limiter: Ratelimit
+}) {
+  try {
+    return await limiter.limit(identifier)
+  } catch (error) {
+    console.error("[RATE_LIMIT_FALLBACK]", error)
+    return memorySlidingWindowLimit({
+      key: fallbackKey,
+      limit: fallbackLimit,
+      windowMs: fallbackWindowMs,
+    })
+  }
+}
+
 export async function rateLimitChatRequest({
   ipAddress,
   isAuthenticated,
@@ -42,10 +68,23 @@ export async function rateLimitChatRequest({
 }) {
   const usageLimiter = isAuthenticated ? chatAuthenticatedUsageRateLimit : chatGuestUsageRateLimit
   const burstIdentifier = ipAddress?.trim() ? `ip:${ipAddress.trim()}` : `participant:${participantId}`
+  const usageIdentifier = `participant:${participantId}`
 
   const [burstLimit, usageLimit] = await Promise.all([
-    chatBurstRateLimit.limit(burstIdentifier),
-    usageLimiter.limit(`participant:${participantId}`),
+    safeLimit({
+      fallbackKey: `fallback:chat:burst:${burstIdentifier}`,
+      fallbackLimit: 10,
+      fallbackWindowMs: 60_000,
+      identifier: burstIdentifier,
+      limiter: chatBurstRateLimit,
+    }),
+    safeLimit({
+      fallbackKey: `fallback:chat:usage:${isAuthenticated ? "authenticated" : "guest"}:${usageIdentifier}`,
+      fallbackLimit: isAuthenticated ? 120 : 40,
+      fallbackWindowMs: 60 * 60 * 1000,
+      identifier: usageIdentifier,
+      limiter: usageLimiter,
+    }),
   ])
 
   const failedLimit = [burstLimit, usageLimit].find(result => !result.success)
@@ -58,5 +97,11 @@ export async function rateLimitChatRequest({
 
 export async function rateLimitTurnstileVerification(ipAddress?: string | null) {
   const identifier = ipAddress?.trim() ? `ip:${ipAddress.trim()}` : "ip:unknown"
-  return turnstileVerificationRateLimit.limit(identifier)
+  return safeLimit({
+    fallbackKey: `fallback:turnstile:${identifier}`,
+    fallbackLimit: 20,
+    fallbackWindowMs: 10 * 60 * 1000,
+    identifier,
+    limiter: turnstileVerificationRateLimit,
+  })
 }

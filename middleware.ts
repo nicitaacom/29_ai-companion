@@ -3,9 +3,12 @@ import { NextResponse } from "next/server"
 
 import type { Database } from "@/app/interfaces/types_db"
 import { GUEST_VISITOR_COOKIE_MAX_AGE, GUEST_VISITOR_COOKIE_NAME } from "@/lib/chat-session"
+import { assertProductionEnv } from "@/lib/env-validation"
 import type { NextRequest } from "next/server"
 
 export async function middleware(req: NextRequest) {
+  assertProductionEnv()
+
   const res = NextResponse.next()
   const supabase = createMiddlewareClient<Database>({ req, res })
   await supabase.auth.getSession()

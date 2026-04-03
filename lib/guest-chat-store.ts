@@ -1,6 +1,7 @@
 import { Redis } from "@upstash/redis"
 
 import { buildGuestChatStoreKey, buildGuestParticipantId } from "@/lib/chat-session"
+import { memoryListPush, memoryListRange } from "@/lib/resilient-store"
 
 type GuestChatRole = "user" | "system"
 
@@ -25,7 +26,14 @@ export async function getGuestChatMessages({
   guestId: string
 }): Promise<StoredGuestChatMessage[]> {
   const key = buildGuestChatStoreKey(companionId, guestId)
-  const storedMessages = (await guestChatRedis.lrange(key, 0, -1)) as string[]
+  let storedMessages: string[]
+
+  try {
+    storedMessages = (await guestChatRedis.lrange(key, 0, -1)) as string[]
+  } catch (error) {
+    console.error("[GUEST_CHAT_READ_FALLBACK]", error)
+    storedMessages = memoryListRange(key, 0, -1)
+  }
 
   return storedMessages
     .map(message => {
@@ -61,8 +69,15 @@ export async function appendGuestChatMessage({
     user_id: buildGuestParticipantId(guestId),
   }
 
-  await guestChatRedis.rpush(key, JSON.stringify(message))
-  await guestChatRedis.expire(key, GUEST_CHAT_TTL_SECONDS)
+  const serializedMessage = JSON.stringify(message)
+
+  try {
+    await guestChatRedis.rpush(key, serializedMessage)
+    await guestChatRedis.expire(key, GUEST_CHAT_TTL_SECONDS)
+  } catch (error) {
+    console.error("[GUEST_CHAT_WRITE_FALLBACK]", error)
+    memoryListPush(key, serializedMessage)
+  }
 
   return message
 }
