@@ -12,6 +12,7 @@ import { Copy } from "lucide-react"
 import { useTheme } from "./theme-provider"
 
 export interface ChatMessageProps {
+  id?: string
   role: "system" | "user"
   content?: string
   isLoading?: boolean

@@ -52,7 +52,10 @@ export default async function ChatIdPage({ params }: ChatIdPageProps) {
   }
 
   const companionData = companion as CompanionRow | null
-  const messageData = (messages ?? []) as unknown as MessageRow[]
+  const messageData = ((messages ?? []) as unknown as MessageRow[]).filter(message => {
+    const content = message.content?.trim()
+    return Boolean(content) && content?.toLowerCase() !== "undefined" && content?.toLowerCase() !== "null"
+  })
 
   if (!companionData || !companionData.id) {
     console.error(`Companion or messages not found \n

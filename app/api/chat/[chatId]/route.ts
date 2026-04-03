@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
-import { Replicate } from "langchain/llms/replicate"
-import { CallbackManager } from "langchain/callbacks"
-import { StreamingTextResponse, LangChainStream } from "ai"
+import OpenAI from "openai"
 
 import { Database, TablesInsert } from "@/app/interfaces/types_db"
 import supabaseServer from "@/lib/supabase/supabaseServer"
@@ -12,10 +10,18 @@ type CompanionRow = Database["public"]["Tables"]["companion"]["Row"]
 type MessageInsert = TablesInsert<"messages">
 type MessageInsertList = MessageInsert[]
 
+function sanitizeHistory(history: string) {
+  return history
+    .split("\n")
+    .map(line => line.trim())
+    .filter(line => line.length > 0 && line.toLowerCase() !== "undefined" && line.toLowerCase() !== "null")
+    .join("\n")
+}
+
 export async function POST(req: Request, { params }: { params: Promise<{ chatId: string }> }) {
   try {
     const { chatId } = await params
-    const { prompt }: { prompt: string } = await req.json()
+    const { prompt }: { prompt?: string } = await req.json()
     const supabase = await supabaseServer()
 
     const {
@@ -30,6 +36,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
     if (!chatId) {
       return new NextResponse("Chat id is required", { status: 400 })
     }
+
+    if (!prompt?.trim()) {
+      return new NextResponse("Prompt is required", { status: 400 })
+    }
+
+    const cleanPrompt = prompt.trim()
 
     const identifier = req.url + "-" + user.id
     const { success } = await rateLimit(identifier)
@@ -64,7 +76,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
     const userMessages = [
       {
         companion_id: chatId,
-        content: prompt,
+        content: cleanPrompt,
         role: "user",
         user_id: user.id,
       },
@@ -96,11 +108,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
     if (records.length === 0) {
       await memoryManager.seedChatHistory(companion.seed, "\n\n", companionKey)
     }
-    await memoryManager.writeToHistory("User: " + prompt + "\n", companionKey)
+    await memoryManager.writeToHistory(`Human: ${cleanPrompt}`, companionKey)
 
     // Query Pinecone
 
-    const recentChatHistory = await memoryManager.readLatestHistory(companionKey)
+    const recentChatHistory = sanitizeHistory(await memoryManager.readLatestHistory(companionKey))
 
     // Right now the preamble is included in the similarity search, but that
     // shouldn't be an issue
@@ -109,78 +121,76 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
 
     let relevantHistory = ""
     if (!!similarDocs && similarDocs.length !== 0) {
-      relevantHistory = similarDocs.map(doc => doc.pageContent).join("\n")
+      relevantHistory = sanitizeHistory(similarDocs.map(doc => doc.pageContent).join("\n"))
     }
-    const { handlers } = LangChainStream()
-    // Call Replicate for inference
-    const model = new Replicate({
-      model: "a16z-infra/llama-2-13b-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5",
-      input: {
-        max_length: 2048,
-      },
-      apiKey: process.env.REPLICATE_API_TOKEN,
-      callbackManager: CallbackManager.fromHandlers(handlers),
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_KEY,
     })
 
-    // Turn verbose on for debugging
-    model.verbose = true
-
-    const resp = String(
-      await model
-        .call(
-          `
-        ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${companion.name}: prefix. 
-
-        ${companion.instructions}
-
-        Below are relevant details about ${companion.name}'s past and the conversation you are in.
-        ${relevantHistory}
-
-
-        ${recentChatHistory}\n${companion.name}:`,
-        )
-        .catch(console.error),
-    )
-
-    const cleaned = resp.replaceAll(",", "")
-    const chunks = cleaned.split("\n")
-    const response = chunks[0]
-
-    await memoryManager.writeToHistory("" + response.trim(), companionKey)
-    var Readable = require("stream").Readable
-
-    let s = new Readable()
-    s.push(response)
-    s.push(null)
-    if (response !== undefined && response.length > 1) {
-      memoryManager.writeToHistory("" + response.trim(), companionKey)
-
-      // 3.2 Create a new message and return data about this message (to get generated id by supabase of that message)
-      const assistantMessages = [
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.8,
+      max_tokens: 300,
+      messages: [
         {
-          companion_id: chatId,
-          content: response.trim(),
           role: "system",
-          user_id: user.id,
+          content: `You are ${companion.name}. Reply as this companion, staying in character.
+
+Only generate plain sentences without prefixes like "${companion.name}:" or "Assistant:".
+
+Character instructions:
+${companion.instructions}
+
+Relevant past details:
+${relevantHistory || "No additional relevant history."}
+
+Conversation so far:
+${recentChatHistory || "No prior conversation."}`,
         },
-      ] satisfies MessageInsertList
+        {
+          role: "user",
+          content: cleanPrompt,
+        },
+      ],
+    })
 
-      const { error: error_inserting_new_message } = await supabase
-        .from("messages")
-        // @ts-ignore
-        .insert(assistantMessages as MessageInsertList)
+    const response = completion.choices[0]?.message?.content?.trim()
 
-      if (error_inserting_new_message) {
-        return new NextResponse(
-          `error inserting message \n
-         ${error_inserting_new_message.message}`,
-        )
-      }
+    if (!response) {
+      return new NextResponse("Model returned an empty response", { status: 502 })
     }
 
-    return new StreamingTextResponse(s)
+    await memoryManager.writeToHistory(`${companion.name}: ${response}`, companionKey)
+
+    const assistantMessages = [
+      {
+        companion_id: chatId,
+        content: response,
+        role: "system",
+        user_id: user.id,
+      },
+    ] satisfies MessageInsertList
+
+    const { error: error_inserting_assistant_message } = await supabase
+      .from("messages")
+      // @ts-ignore
+      .insert(assistantMessages as MessageInsertList)
+
+    if (error_inserting_assistant_message) {
+      return new NextResponse(
+        `error inserting message \n
+         ${error_inserting_assistant_message.message}`,
+      )
+    }
+
+    return new NextResponse(response, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    })
   } catch (error) {
     console.log("[CHAT_POST]", error)
-    return new NextResponse("Internal Error", { status: 500 })
+    return new NextResponse("Companion could not respond right now", { status: 500 })
   }
 }

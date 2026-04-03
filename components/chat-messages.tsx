@@ -26,7 +26,7 @@ export function ChatMessages({ messages, isLoading, companion }: ChatMessagesPro
 
   useEffect(() => {
     scrollRef?.current?.scrollIntoView({ behavior: "smooth" })
-  }, [])
+  }, [messages, isLoading])
 
   return (
     <div className="flex-1 overflow-y-auto pr-4">
@@ -37,7 +37,12 @@ export function ChatMessages({ messages, isLoading, companion }: ChatMessagesPro
         content={`Hello, I am ${companion.name}, ${companion.description}`}
       />
       {messages.map(message => (
-        <ChatMessage key={message.content} src={companion.src} content={message.content} role={message.role} />
+        <ChatMessage
+          key={message.id ?? `${message.role}-${message.content ?? "empty"}`}
+          src={companion.src}
+          content={message.content}
+          role={message.role}
+        />
       ))}
       {isLoading && <ChatMessage src={companion.src} role="system" isLoading />}
       <div ref={scrollRef} />
