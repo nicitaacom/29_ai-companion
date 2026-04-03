@@ -68,7 +68,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-secondary font-sans antialiased">
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ProModal />
           {children}

@@ -12,13 +12,15 @@ import { ChatMessages } from "@/components/chat-messages"
 import { ChatMessageProps } from "@/components/chat-message"
 import { useToast } from "@/components/ui/use-toast"
 
-interface ChatClientProps {
-  companion: ICompanionDB & {
-    messages: IMessage[]
-    _count: {
-      messages: number
-    }
+interface ChatCompanion extends ICompanionDB {
+  messages: IMessage[]
+  _count: {
+    messages: number
   }
+}
+
+interface ChatClientProps {
+  chatId: string
   initialTurnstileVerified: boolean
 }
 
@@ -35,21 +37,73 @@ function mapCompanionMessages(messages: IMessage[]): ChatMessageProps[] {
     }))
 }
 
-export function ChatClient({ companion, initialTurnstileVerified }: ChatClientProps) {
+export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps) {
   const router = useRouter()
   const { toast } = useToast()
-  const [messages, setMessages] = useState<ChatMessageProps[]>(mapCompanionMessages(companion.messages))
+  const [companion, setCompanion] = useState<ChatCompanion | null>(null)
+  const [messages, setMessages] = useState<ChatMessageProps[]>([])
+  const [isChatLoading, setIsChatLoading] = useState(true)
   const turnstileRef = useRef<HTMLDivElement>(null)
-  const { isVerified, token } = useVerifyHuman(turnstileRef)
   const requiresHumanVerification = process.env.NODE_ENV === "production"
+  const { errorMessage: turnstileErrorMessage, isVerified, token } = useVerifyHuman(turnstileRef, {
+    enabled: requiresHumanVerification && !initialTurnstileVerified,
+  })
   const isHumanVerified = !requiresHumanVerification || initialTurnstileVerified || isVerified
 
   useEffect(() => {
-    setMessages(mapCompanionMessages(companion.messages))
-  }, [companion.messages])
+    const abortController = new AbortController()
+
+    const loadChat = async () => {
+      try {
+        setIsChatLoading(true)
+
+        const response = await fetch(`/api/chat/${chatId}`, {
+          cache: "no-store",
+          signal: abortController.signal,
+        })
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            router.replace("/")
+            return
+          }
+
+          throw new Error(`Failed to load chat (${response.status})`)
+        }
+
+        const data = (await response.json()) as {
+          companion: ChatCompanion
+        }
+
+        setCompanion(data.companion)
+        setMessages(mapCompanionMessages(data.companion.messages))
+      } catch (error) {
+        if (abortController.signal.aborted) {
+          return
+        }
+
+        console.error("[CHAT_CLIENT_LOAD]", error)
+        toast({
+          description: "Chat could not be loaded right now.",
+          variant: "destructive",
+        })
+        router.replace("/")
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsChatLoading(false)
+        }
+      }
+    }
+
+    loadChat()
+
+    return () => {
+      abortController.abort()
+    }
+  }, [chatId, router, toast])
 
   const { input, isLoading, handleInputChange, handleSubmit, setInput } = useCompletion({
-    api: `/api/chat/${companion.id}`,
+    api: `/api/chat/${chatId}`,
     body: token
       ? {
           turnstileToken: token,
@@ -64,13 +118,11 @@ export function ChatClient({ companion, initialTurnstileVerified }: ChatClientPr
 
       setMessages(current => [...current, systemMessage])
       setInput("")
-
-      router.refresh()
     },
-    onError() {
+    onError(error) {
       setMessages(current => current.filter(message => !message.id?.startsWith("pending-user-")))
       toast({
-        description: "Message could not be sent. If the robot check is visible, complete it and try again.",
+        description: error.message || "Message could not be sent. If the robot check is visible, complete it and try again.",
         variant: "destructive",
       })
     },
@@ -81,14 +133,14 @@ export function ChatClient({ companion, initialTurnstileVerified }: ChatClientPr
 
     if (!isHumanVerified) {
       toast({
-        description: "Complete the robot check before sending a message.",
+        description: turnstileErrorMessage || "Complete the robot check before sending a message.",
         variant: "destructive",
       })
       return
     }
 
     const trimmedInput = input.trim()
-    if (!trimmedInput || isLoading) {
+    if (!trimmedInput || isLoading || isChatLoading || !companion) {
       return
     }
 
@@ -102,15 +154,31 @@ export function ChatClient({ companion, initialTurnstileVerified }: ChatClientPr
     handleSubmit(e)
   }
 
+  if (isChatLoading || !companion) {
+    return (
+      <div className="flex h-full items-center justify-center p-4 text-sm text-zinc-400">
+        Loading chat...
+      </div>
+    )
+  }
+
+  const companionWithLiveCount: ChatCompanion = {
+    ...companion,
+    _count: {
+      messages: messages.length,
+    },
+  }
+
   return (
     <div className="flex flex-col h-full p-4 space-y-2">
-      <ChatHeader companion={companion} />
-      <ChatMessages companion={companion} isLoading={isLoading} messages={messages} />
+      <ChatHeader companion={companionWithLiveCount} />
+      <ChatMessages companion={companionWithLiveCount} isLoading={isLoading} messages={messages} />
       <ChatForm
         handleInputChange={handleInputChange}
+        humanVerificationMessage={turnstileErrorMessage}
         input={input}
         isHumanVerified={isHumanVerified}
-        isLoading={isLoading}
+        isLoading={isLoading || isChatLoading}
         onSubmit={onSubmit}
         showTurnstile={requiresHumanVerification}
         turnstileRef={turnstileRef}

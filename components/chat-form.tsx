@@ -2,6 +2,7 @@
 
 import { ChatRequestOptions } from "ai"
 import { SendHorizonal } from "lucide-react"
+import Script from "next/script"
 import { ChangeEvent, FormEvent, MutableRefObject, useEffect, useRef } from "react"
 
 import { Input } from "@/components/ui/input"
@@ -11,6 +12,7 @@ interface ChatFormProps {
   input: string
   handleInputChange: (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void
   onSubmit: (e: FormEvent<HTMLFormElement>, chatRequestOptions?: ChatRequestOptions | undefined) => void
+  humanVerificationMessage?: string | null
   isLoading: boolean
   isHumanVerified: boolean
   showTurnstile: boolean
@@ -20,6 +22,7 @@ interface ChatFormProps {
 export function ChatForm({
   input,
   handleInputChange,
+  humanVerificationMessage,
   onSubmit,
   isHumanVerified,
   isLoading,
@@ -40,10 +43,19 @@ export function ChatForm({
 
   return (
     <form onSubmit={onSubmit} className="border-t border-primary/10 py-4">
+      {showTurnstile ? (
+        <Script
+          id="cloudflare-turnstile-script"
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+          strategy="afterInteractive"
+        />
+      ) : null}
       {showTurnstile && !isHumanVerified ? (
         <div className="relative px-2 pb-3">
           <div ref={turnstileRef} className="cf-turnstile"></div>
-          <p className="pt-3 text-xs text-zinc-500">Complete the robot check before sending your first message.</p>
+          <p className="pt-3 text-xs text-zinc-500">
+            {humanVerificationMessage || "Complete the robot check before sending your first message."}
+          </p>
         </div>
       ) : null}
       <div className="flex items-center gap-3 rounded-[28px] border border-white/10 bg-zinc-800/95 px-3 py-3 shadow-[0_16px_40px_-30px_rgba(0,0,0,0.85)] transition duration-200 hover:border-white/20 hover:bg-zinc-800 focus-within:border-sky-400/50 focus-within:bg-zinc-800 focus-within:shadow-[0_0_0_4px_rgba(56,189,248,0.12),0_16px_40px_-30px_rgba(0,0,0,0.85)]">

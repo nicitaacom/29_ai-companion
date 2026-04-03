@@ -3,22 +3,25 @@ import OpenAI from "openai"
 
 import { Database, TablesInsert } from "@/app/interfaces/types_db"
 import {
-  buildRateLimitIdentifier,
   TURNSTILE_VERIFIED_COOKIE_MAX_AGE,
   TURNSTILE_VERIFIED_COOKIE_NAME,
   TURNSTILE_VERIFIED_COOKIE_VALUE,
 } from "@/lib/chat-session"
 import { getChatVisitor, hasVerifiedHumanCookie } from "@/lib/chat-visitor"
-import { appendGuestChatMessage } from "@/lib/guest-chat-store"
-import supabaseServer from "@/lib/supabase/supabaseServer"
+import { appendGuestChatMessage, getGuestChatMessages } from "@/lib/guest-chat-store"
+import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
-import { rateLimit } from "@/lib/rate-limit"
+import { rateLimitChatRequest } from "@/lib/rate-limit"
 import { MemoryManager } from "@/lib/memory"
 import { verifyTurnstileToken } from "@/lib/turnstile"
 
 type CompanionRow = Database["public"]["Tables"]["companion"]["Row"]
 type MessageInsert = TablesInsert<"messages">
 type MessageInsertList = MessageInsert[]
+type MessageRow = Database["public"]["Tables"]["messages"]["Row"]
+
+export const runtime = "nodejs"
+export const maxDuration = 60
 
 function sanitizeHistory(history: string) {
   return history
@@ -26,6 +29,109 @@ function sanitizeHistory(history: string) {
     .map(line => line.trim())
     .filter(line => line.length > 0 && line.toLowerCase() !== "undefined" && line.toLowerCase() !== "null")
     .join("\n")
+}
+
+function filterValidMessages(messages: MessageRow[]) {
+  return messages.filter(message => {
+    const content = message.content?.trim()
+    return Boolean(content) && content?.toLowerCase() !== "undefined" && content?.toLowerCase() !== "null"
+  })
+}
+
+async function getChatRequestContext() {
+  const supabase = await getSupabaseRouteHandlerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const visitor = await getChatVisitor(user)
+  const hasHumanVerification = await hasVerifiedHumanCookie()
+
+  return {
+    hasHumanVerification,
+    visitor,
+  }
+}
+
+async function getCompanion(chatId: string) {
+  const { data: companion, error } = await supabaseAdmin.from("companion").select("*").eq("id", chatId).maybeSingle()
+
+  if (error) {
+    throw new Error(`Error fetching companion: ${error.message}`)
+  }
+
+  if (!companion) {
+    return null
+  }
+
+  return companion as CompanionRow
+}
+
+async function getMessagesForVisitor({
+  chatId,
+  visitor,
+}: {
+  chatId: string
+  visitor: Awaited<ReturnType<typeof getChatVisitor>>
+}) {
+  if (visitor.isAuthenticated) {
+    const { data: dbMessages, error } = await supabaseAdmin
+      .from("messages")
+      .select("*")
+      .eq("companion_id", chatId)
+      .eq("user_id", visitor.participantId)
+      .order("created_at", { ascending: true })
+
+    if (error) {
+      throw new Error(`Error fetching messages: ${error.message}`)
+    }
+
+    return (dbMessages ?? []) as MessageRow[]
+  }
+
+  if (!visitor.guestId) {
+    return [] as MessageRow[]
+  }
+
+  return (await getGuestChatMessages({
+    companionId: chatId,
+    guestId: visitor.guestId,
+  })) as MessageRow[]
+}
+
+function getRequestIp(req: Request) {
+  const forwardedFor = req.headers.get("x-forwarded-for")
+  return req.headers.get("cf-connecting-ip") ?? forwardedFor?.split(",")[0]?.trim() ?? null
+}
+
+export async function GET(_req: Request, { params }: { params: Promise<{ chatId: string }> }) {
+  try {
+    const { chatId } = await params
+
+    if (!chatId) {
+      return new NextResponse("Chat id is required", { status: 400 })
+    }
+
+    const [{ visitor }, companion] = await Promise.all([getChatRequestContext(), getCompanion(chatId)])
+
+    if (!companion) {
+      return new NextResponse("Companion not found", { status: 404 })
+    }
+
+    const messages = filterValidMessages(await getMessagesForVisitor({ chatId, visitor }))
+
+    return NextResponse.json({
+      companion: {
+        ...companion,
+        messages,
+        _count: {
+          messages: messages.length,
+        },
+      },
+    })
+  } catch (error) {
+    console.error("[CHAT_GET]", error)
+    return new NextResponse("Chat could not be loaded right now", { status: 500 })
+  }
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ chatId: string }> }) {
@@ -38,13 +144,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
       prompt?: string
       turnstileToken?: string
     } = await req.json()
-    const supabase = await supabaseServer()
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    const visitor = await getChatVisitor(user)
-    const hasHumanVerification = await hasVerifiedHumanCookie()
+    const { hasHumanVerification, visitor } = await getChatRequestContext()
     let shouldSetHumanVerificationCookie = false
 
     if (!chatId) {
@@ -56,6 +156,26 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
     }
 
     const cleanPrompt = prompt.trim()
+    const ipAddress = getRequestIp(req)
+
+    if (process.env.NODE_ENV === "production") {
+      const { reset, success } = await rateLimitChatRequest({
+        ipAddress,
+        isAuthenticated: visitor.isAuthenticated,
+        participantId: visitor.participantId,
+      })
+
+      if (!success) {
+        return new NextResponse("Rate limit exceeded", {
+          headers: reset
+            ? {
+                "Retry-After": Math.max(1, Math.ceil((reset - Date.now()) / 1000)).toString(),
+              }
+            : undefined,
+          status: 429,
+        })
+      }
+    }
 
     if (process.env.NODE_ENV === "production" && !hasHumanVerification) {
       const cleanTurnstileToken = turnstileToken?.trim()
@@ -64,8 +184,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
         return new NextResponse("Complete the robot check before sending a message.", { status: 403 })
       }
 
-      const forwardedFor = req.headers.get("x-forwarded-for")
-      const ipAddress = req.headers.get("cf-connecting-ip") ?? forwardedFor?.split(",")[0]?.trim() ?? null
       const verification = await verifyTurnstileToken({
         ip: ipAddress,
         token: cleanTurnstileToken,
@@ -78,31 +196,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
       shouldSetHumanVerificationCookie = true
     }
 
-    if (visitor.isFreeUser) {
-      const identifier = buildRateLimitIdentifier(chatId, visitor.participantId)
-      const { success } = await rateLimit(identifier)
-
-      if (!success) {
-        return new NextResponse("Rate limit exceeded", { status: 429 })
-      }
-    }
-
-    // 3. Repeating this - https://github.com/AntonioErdeljac/next13-ai-companion/blob/master/app/api/chat/%5BchatId%5D/route.ts#L33-L46
-
-    // 3.1 Select companion based on params.chatId (in fact its not chat id but companion_id) - userstand its like chat with companion id
-    const { data: companion_response, error: error_selecting_companion } = await supabaseAdmin
-      .from("companion")
-      .select()
-      .eq("id", chatId)
-      .single()
-    if (error_selecting_companion) {
-      return new NextResponse(
-        `error selecting companion \n
-        chatId !eq id (companion id) ${error_selecting_companion.message}`,
-      )
-    }
-
-    const companion = companion_response as CompanionRow | null
+    const companion = await getCompanion(chatId)
 
     if (!companion) {
       return new NextResponse("Companion not found", { status: 404 })
@@ -258,7 +352,7 @@ ${recentChatHistory || "No prior conversation."}`,
 
     return nextResponse
   } catch (error) {
-    console.log("[CHAT_POST]", error)
+    console.error("[CHAT_POST]", error)
     return new NextResponse("Companion could not respond right now", { status: 500 })
   }
 }
