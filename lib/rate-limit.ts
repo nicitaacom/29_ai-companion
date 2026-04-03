@@ -4,27 +4,6 @@ import { memorySlidingWindowLimit } from "@/lib/resilient-store"
 
 const redis = Redis.fromEnv()
 
-const chatBurstRateLimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(10, "60 s"),
-  analytics: true,
-  prefix: "ratelimit:chat:burst",
-})
-
-const chatAuthenticatedUsageRateLimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(120, "1 h"),
-  analytics: true,
-  prefix: "ratelimit:chat:usage:authenticated",
-})
-
-const chatGuestUsageRateLimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(40, "1 h"),
-  analytics: true,
-  prefix: "ratelimit:chat:usage:guest",
-})
-
 const turnstileVerificationRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(20, "10 m"),
@@ -54,44 +33,6 @@ async function safeLimit({
       limit: fallbackLimit,
       windowMs: fallbackWindowMs,
     })
-  }
-}
-
-export async function rateLimitChatRequest({
-  ipAddress,
-  isAuthenticated,
-  participantId,
-}: {
-  ipAddress?: string | null
-  isAuthenticated: boolean
-  participantId: string
-}) {
-  const usageLimiter = isAuthenticated ? chatAuthenticatedUsageRateLimit : chatGuestUsageRateLimit
-  const burstIdentifier = ipAddress?.trim() ? `ip:${ipAddress.trim()}` : `participant:${participantId}`
-  const usageIdentifier = `participant:${participantId}`
-
-  const [burstLimit, usageLimit] = await Promise.all([
-    safeLimit({
-      fallbackKey: `fallback:chat:burst:${burstIdentifier}`,
-      fallbackLimit: 10,
-      fallbackWindowMs: 60_000,
-      identifier: burstIdentifier,
-      limiter: chatBurstRateLimit,
-    }),
-    safeLimit({
-      fallbackKey: `fallback:chat:usage:${isAuthenticated ? "authenticated" : "guest"}:${usageIdentifier}`,
-      fallbackLimit: isAuthenticated ? 120 : 40,
-      fallbackWindowMs: 60 * 60 * 1000,
-      identifier: usageIdentifier,
-      limiter: usageLimiter,
-    }),
-  ])
-
-  const failedLimit = [burstLimit, usageLimit].find(result => !result.success)
-
-  return {
-    reset: failedLimit?.reset ?? null,
-    success: !failedLimit,
   }
 }
 

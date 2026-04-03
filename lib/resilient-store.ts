@@ -2,7 +2,13 @@ type SlidingWindowEntry = {
   timestamps: number[]
 }
 
+type FixedWindowEntry = {
+  count: number
+  reset: number
+}
+
 const rateLimitStore = new Map<string, SlidingWindowEntry>()
+const fixedWindowStore = new Map<string, FixedWindowEntry>()
 const listStore = new Map<string, string[]>()
 const sortedSetStore = new Map<string, Array<{ member: string; score: number }>>()
 
@@ -35,6 +41,76 @@ export function memorySlidingWindowLimit({
 
   return {
     reset: active[0] + windowMs,
+    success: true,
+  }
+}
+
+export function memoryFixedWindowGetRemaining({
+  key,
+  limit,
+  windowMs,
+}: {
+  key: string
+  limit: number
+  windowMs: number
+}) {
+  const now = Date.now()
+  const current = fixedWindowStore.get(key)
+
+  if (!current || current.reset <= now) {
+    const reset = now + windowMs
+    fixedWindowStore.set(key, { count: 0, reset })
+    return {
+      remaining: limit,
+      reset,
+    }
+  }
+
+  return {
+    remaining: Math.max(0, limit - current.count),
+    reset: current.reset,
+  }
+}
+
+export function memoryFixedWindowLimit({
+  key,
+  limit,
+  windowMs,
+}: {
+  key: string
+  limit: number
+  windowMs: number
+}) {
+  const now = Date.now()
+  const current = fixedWindowStore.get(key)
+
+  if (!current || current.reset <= now) {
+    const reset = now + windowMs
+    fixedWindowStore.set(key, { count: 1, reset })
+    return {
+      remaining: Math.max(0, limit - 1),
+      reset,
+      success: true,
+    }
+  }
+
+  if (current.count >= limit) {
+    return {
+      remaining: 0,
+      reset: current.reset,
+      success: false,
+    }
+  }
+
+  const next = {
+    count: current.count + 1,
+    reset: current.reset,
+  }
+  fixedWindowStore.set(key, next)
+
+  return {
+    remaining: Math.max(0, limit - next.count),
+    reset: next.reset,
     success: true,
   }
 }

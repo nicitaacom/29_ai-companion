@@ -4,9 +4,9 @@ import OpenAI from "openai"
 import { Database, TablesInsert } from "@/app/interfaces/types_db"
 import { getChatVisitor, hasVerifiedHumanCookie } from "@/lib/chat-visitor"
 import { appendGuestChatMessage, getGuestChatMessages } from "@/lib/guest-chat-store"
+import { executeRateLimitRequest } from "@/lib/rate-limit-core"
 import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
-import { rateLimitChatRequest } from "@/lib/rate-limit"
 import { MemoryManager } from "@/lib/memory"
 
 type CompanionRow = Database["public"]["Tables"]["companion"]["Row"]
@@ -92,11 +92,6 @@ async function getMessagesForVisitor({
   })) as MessageRow[]
 }
 
-function getRequestIp(req: Request) {
-  const forwardedFor = req.headers.get("x-forwarded-for")
-  return req.headers.get("cf-connecting-ip") ?? forwardedFor?.split(",")[0]?.trim() ?? null
-}
-
 export async function GET(_req: Request, { params }: { params: Promise<{ chatId: string }> }) {
   try {
     const { chatId } = await params
@@ -143,29 +138,29 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
     }
 
     const cleanPrompt = prompt.trim()
-    const ipAddress = getRequestIp(req)
+
+    if (process.env.NODE_ENV === "production" && !hasHumanVerification) {
+      return new NextResponse("Complete the robot check before sending a message.", { status: 403 })
+    }
 
     if (process.env.NODE_ENV === "production") {
-      const { reset, success } = await rateLimitChatRequest({
-        ipAddress,
-        isAuthenticated: visitor.isAuthenticated,
-        participantId: visitor.participantId,
+      const rateLimitResult = await executeRateLimitRequest(req, {
+        action: "rateLimit",
+        limiterName: "newChatMessage",
+        userId: visitor.participantId,
+        userTimezone: "UTC",
       })
 
-      if (!success) {
+      if (!rateLimitResult.success) {
         return new NextResponse("Rate limit exceeded", {
-          headers: reset
+          headers: rateLimitResult.retryAfter
             ? {
-                "Retry-After": Math.max(1, Math.ceil((reset - Date.now()) / 1000)).toString(),
+                "Retry-After": `${rateLimitResult.retryAfter}`,
               }
             : undefined,
           status: 429,
         })
       }
-    }
-
-    if (process.env.NODE_ENV === "production" && !hasHumanVerification) {
-      return new NextResponse("Complete the robot check before sending a message.", { status: 403 })
     }
 
     const companion = await getCompanion(chatId)

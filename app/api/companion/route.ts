@@ -1,4 +1,5 @@
 import { checkSubscription } from "@/lib/subscription"
+import { executeRateLimitRequest } from "@/lib/rate-limit-core"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 import { NextResponse } from "next/server"
@@ -18,6 +19,22 @@ export async function POST(req: Request) {
   // Chec is all required data passesed to this API route
   if (!src || !name || !description || !instructions || !seed || !category_id) {
     return new NextResponse("Missing required fields", { status: 400 })
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    const rateLimitResult = await executeRateLimitRequest(req, {
+      action: "rateLimit",
+      limiterName: "createAICompanion",
+      userId: user.id,
+      userTimezone: "UTC",
+    })
+
+    if (!rateLimitResult.success) {
+      return new NextResponse(rateLimitResult.error, {
+        headers: rateLimitResult.retryAfter ? { "Retry-After": `${rateLimitResult.retryAfter}` } : undefined,
+        status: rateLimitResult.status,
+      })
+    }
   }
 
   const isPro = await checkSubscription({ user: user })
