@@ -24,6 +24,13 @@ const chatGuestUsageRateLimit = new Ratelimit({
   prefix: "ratelimit:chat:usage:guest",
 })
 
+const turnstileVerificationRateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(20, "10 m"),
+  analytics: true,
+  prefix: "ratelimit:turnstile:verify",
+})
+
 export async function rateLimitChatRequest({
   ipAddress,
   isAuthenticated,
@@ -47,4 +54,9 @@ export async function rateLimitChatRequest({
     reset: failedLimit?.reset ?? null,
     success: !failedLimit,
   }
+}
+
+export async function rateLimitTurnstileVerification(ipAddress?: string | null) {
+  const identifier = ipAddress?.trim() ? `ip:${ipAddress.trim()}` : "ip:unknown"
+  return turnstileVerificationRateLimit.limit(identifier)
 }

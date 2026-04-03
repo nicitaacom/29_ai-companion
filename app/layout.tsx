@@ -4,11 +4,11 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { ProModal } from "@/components/pro-modal"
 import { getURL } from "@/app/utils/getURL"
+import Script from "next/script"
 
 const siteUrl = new URL(getURL())
 const siteTitle = "companion.ai"
-const siteDescription =
-  "Build, chat with, and manage AI companions in a clean Supabase-powered workspace."
+const siteDescription = "Build, chat with, and manage AI companions in a clean Supabase-powered workspace."
 
 export const dynamic = "force-dynamic"
 
@@ -68,6 +68,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-secondary font-sans antialiased">
+        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></Script>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ProModal />
           {children}

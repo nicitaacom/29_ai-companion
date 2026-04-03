@@ -3,10 +3,9 @@
 import { useCompletion } from "ai/react"
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { IMessage } from "@/app/interfaces/IMessageDB"
-import { useVerifyHuman } from "@/app/hooks/useVerifyHuman"
 import { ChatHeader } from "@/components/chat-header"
 import { useRouter } from "next/navigation"
-import { FormEvent, useEffect, useRef, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import { ChatForm } from "@/components/chat-form"
 import { ChatMessages } from "@/components/chat-messages"
 import { ChatMessageProps } from "@/components/chat-message"
@@ -43,12 +42,6 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
   const [companion, setCompanion] = useState<ChatCompanion | null>(null)
   const [messages, setMessages] = useState<ChatMessageProps[]>([])
   const [isChatLoading, setIsChatLoading] = useState(true)
-  const turnstileRef = useRef<HTMLDivElement>(null)
-  const requiresHumanVerification = process.env.NODE_ENV === "production"
-  const { errorMessage: turnstileErrorMessage, isVerified, token } = useVerifyHuman(turnstileRef, {
-    enabled: requiresHumanVerification && !initialTurnstileVerified,
-  })
-  const isHumanVerified = !requiresHumanVerification || initialTurnstileVerified || isVerified
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -104,11 +97,6 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
 
   const { input, isLoading, handleInputChange, handleSubmit, setInput } = useCompletion({
     api: `/api/chat/${chatId}`,
-    body: token
-      ? {
-          turnstileToken: token,
-        }
-      : undefined,
     onFinish(_prompt, completion) {
       const systemMessage: ChatMessageProps = {
         id: crypto.randomUUID(),
@@ -122,7 +110,8 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
     onError(error) {
       setMessages(current => current.filter(message => !message.id?.startsWith("pending-user-")))
       toast({
-        description: error.message || "Message could not be sent. If the robot check is visible, complete it and try again.",
+        description:
+          error.message || "Message could not be sent. If the robot check is visible, complete it and try again.",
         variant: "destructive",
       })
     },
@@ -130,14 +119,6 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    if (!isHumanVerified) {
-      toast({
-        description: turnstileErrorMessage || "Complete the robot check before sending a message.",
-        variant: "destructive",
-      })
-      return
-    }
 
     const trimmedInput = input.trim()
     if (!trimmedInput || isLoading || isChatLoading || !companion) {
@@ -155,11 +136,7 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
   }
 
   if (isChatLoading || !companion) {
-    return (
-      <div className="flex h-full items-center justify-center p-4 text-sm text-zinc-400">
-        Loading chat...
-      </div>
-    )
+    return <div className="flex h-full items-center justify-center p-4 text-sm text-zinc-400">Loading chat...</div>
   }
 
   const companionWithLiveCount: ChatCompanion = {
@@ -175,13 +152,10 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
       <ChatMessages companion={companionWithLiveCount} isLoading={isLoading} messages={messages} />
       <ChatForm
         handleInputChange={handleInputChange}
-        humanVerificationMessage={turnstileErrorMessage}
+        initialTurnstileVerified={initialTurnstileVerified}
         input={input}
-        isHumanVerified={isHumanVerified}
         isLoading={isLoading || isChatLoading}
         onSubmit={onSubmit}
-        showTurnstile={requiresHumanVerification}
-        turnstileRef={turnstileRef}
       />
     </div>
   )

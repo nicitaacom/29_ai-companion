@@ -2,18 +2,12 @@ import { NextResponse } from "next/server"
 import OpenAI from "openai"
 
 import { Database, TablesInsert } from "@/app/interfaces/types_db"
-import {
-  TURNSTILE_VERIFIED_COOKIE_MAX_AGE,
-  TURNSTILE_VERIFIED_COOKIE_NAME,
-  TURNSTILE_VERIFIED_COOKIE_VALUE,
-} from "@/lib/chat-session"
 import { getChatVisitor, hasVerifiedHumanCookie } from "@/lib/chat-visitor"
 import { appendGuestChatMessage, getGuestChatMessages } from "@/lib/guest-chat-store"
 import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { rateLimitChatRequest } from "@/lib/rate-limit"
 import { MemoryManager } from "@/lib/memory"
-import { verifyTurnstileToken } from "@/lib/turnstile"
 
 type CompanionRow = Database["public"]["Tables"]["companion"]["Row"]
 type MessageInsert = TablesInsert<"messages">
@@ -137,15 +131,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ chatId:
 export async function POST(req: Request, { params }: { params: Promise<{ chatId: string }> }) {
   try {
     const { chatId } = await params
-    const {
-      prompt,
-      turnstileToken,
-    }: {
-      prompt?: string
-      turnstileToken?: string
-    } = await req.json()
+    const { prompt }: { prompt?: string } = await req.json()
     const { hasHumanVerification, visitor } = await getChatRequestContext()
-    let shouldSetHumanVerificationCookie = false
 
     if (!chatId) {
       return new NextResponse("Chat id is required", { status: 400 })
@@ -178,22 +165,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
     }
 
     if (process.env.NODE_ENV === "production" && !hasHumanVerification) {
-      const cleanTurnstileToken = turnstileToken?.trim()
-
-      if (!cleanTurnstileToken) {
-        return new NextResponse("Complete the robot check before sending a message.", { status: 403 })
-      }
-
-      const verification = await verifyTurnstileToken({
-        ip: ipAddress,
-        token: cleanTurnstileToken,
-      })
-
-      if (!verification.success) {
-        return new NextResponse("Robot check failed. Please try again.", { status: 403 })
-      }
-
-      shouldSetHumanVerificationCookie = true
+      return new NextResponse("Complete the robot check before sending a message.", { status: 403 })
     }
 
     const companion = await getCompanion(chatId)
@@ -332,25 +304,11 @@ ${recentChatHistory || "No prior conversation."}`,
       })
     }
 
-    const nextResponse = new NextResponse(response, {
+    return new NextResponse(response, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
       },
     })
-
-    if (shouldSetHumanVerificationCookie) {
-      nextResponse.cookies.set({
-        httpOnly: true,
-        maxAge: TURNSTILE_VERIFIED_COOKIE_MAX_AGE,
-        name: TURNSTILE_VERIFIED_COOKIE_NAME,
-        path: "/",
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        value: TURNSTILE_VERIFIED_COOKIE_VALUE,
-      })
-    }
-
-    return nextResponse
   } catch (error) {
     console.error("[CHAT_POST]", error)
     return new NextResponse("Companion could not respond right now", { status: 500 })
