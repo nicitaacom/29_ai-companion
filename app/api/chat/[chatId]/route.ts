@@ -47,7 +47,7 @@ async function getChatRequestContext() {
 }
 
 async function getCompanion(chatId: string) {
-  const { data: companion, error } = await supabaseAdmin.from("companion").select("*").eq("id", chatId).maybeSingle()
+  const { data: companion, error } = await supabaseAdmin.from("29_companion").select("*").eq("id", chatId).maybeSingle()
 
   if (error) {
     throw new Error(`Error fetching companion: ${error.message}`)
@@ -69,7 +69,7 @@ async function getMessagesForVisitor({
 }) {
   if (visitor.isAuthenticated) {
     const { data: dbMessages, error } = await supabaseAdmin
-      .from("messages")
+      .from("29_messages")
       .select("*")
       .eq("companion_id", chatId)
       .eq("user_id", visitor.participantId)
@@ -181,8 +181,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
       ] satisfies MessageInsertList
 
       const { error: error_inserting_new_message } = await supabaseAdmin
-        .from("messages")
-        // @ts-ignore
+        .from("29_messages")
         .insert(userMessages as MessageInsertList)
 
       if (error_inserting_new_message) {
@@ -280,8 +279,7 @@ ${recentChatHistory || "No prior conversation."}`,
       ] satisfies MessageInsertList
 
       const { error: error_inserting_assistant_message } = await supabaseAdmin
-        .from("messages")
-        // @ts-ignore
+        .from("29_messages")
         .insert(assistantMessages as MessageInsertList)
 
       if (error_inserting_assistant_message) {

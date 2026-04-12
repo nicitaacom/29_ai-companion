@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   }
 
   const { data: existingCategory, error: existingCategoryError } = await supabaseAdmin
-    .from("category")
+    .from("29_category")
     .select("id, name")
     .ilike("name", categoryName)
     .maybeSingle()
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   }
 
   const { data: category, error } = await supabaseAdmin
-    .from("category")
+    .from("29_category")
     .insert({ name: categoryName })
     .select("id, name")
     .single()

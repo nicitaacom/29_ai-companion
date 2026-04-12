@@ -20,7 +20,7 @@ export interface IResponse {
 export type TAPIAuthRegisterResponse = AxiosResponse<IResponse>
 
 async function selectExistingUserProviders(email: string) {
-  const { data, error } = await supabaseAdmin.from("users").select("providers").eq("email", email).maybeSingle()
+  const { data, error } = await supabaseAdmin.from("29_users").select("providers").eq("email", email).maybeSingle()
   if (error) return error.message
   return data?.providers ?? null
 }

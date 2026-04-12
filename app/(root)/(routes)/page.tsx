@@ -42,8 +42,7 @@ export default async function RootPage({ searchParams }: RootPageProps) {
     ? await Promise.all(
         companions.map(async companion => {
           const { data: messages, error: messagesError } = await supabaseAdmin
-            .from("messages")
-            .select("id")
+            .from("29_messages")
             .eq("companion_id", companion.id)
 
           if (messagesError) {

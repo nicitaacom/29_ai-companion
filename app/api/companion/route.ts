@@ -44,7 +44,7 @@ export async function POST(req: Request) {
   }
   try {
     // Insert companion in 'companion' table
-    const companion = await supabaseAdmin.from("companion").insert({
+    const companion = await supabaseAdmin.from("29_companion").insert({
       category_id: category_id,
       user_id: user.id, // user_id - its owner_id (companion owner/creator)
       username: user.email.split("@")[0],

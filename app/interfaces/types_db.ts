@@ -3,7 +3,7 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
-      category: {
+      "29_category": {
         Row: {
           id: string
           name: string
@@ -18,7 +18,7 @@ export type Database = {
         }
         Relationships: []
       }
-      companion: {
+      "29_companion": {
         Row: {
           category_id: string
           created_at: string
@@ -63,19 +63,19 @@ export type Database = {
             foreignKeyName: "companion_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: "category"
+            referencedRelation: "29_category"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_companion_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "29_users"
             referencedColumns: ["id"]
           },
         ]
       }
-      messages: {
+      "29_messages": {
         Row: {
           companion_id: string
           content: string
@@ -108,7 +108,7 @@ export type Database = {
             foreignKeyName: "messages_companion_id_fkey"
             columns: ["companion_id"]
             isOneToOne: false
-            referencedRelation: "companion"
+            referencedRelation: "29_companion"
             referencedColumns: ["id"]
           },
         ]
@@ -140,7 +140,7 @@ export type Database = {
         }
         Relationships: []
       }
-      users_29_companion: {
+      "29_users": {
         Row: {
           avatar_url: string | null
           created_at: string

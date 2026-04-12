@@ -36,7 +36,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
     // Update companion that equals params.companionId and user.id (owner_id) who created that companion
     // so only owner of that companion may update its own companion
     const companion = await supabaseAdmin
-      .from("companion")
+      .from("29_companion")
       .update({
         category_id: category_id,
         user_id: user.id,
@@ -72,7 +72,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
     // delete companion that eq user_id (owner_id) who created that companion and eq companionId
     // so only companion owner may delete its own companion
-    const companion = await supabase.from("companion").delete().eq("user_id", user.id).eq("id", companionId)
+    const companion = await supabase.from("29_companion").delete().eq("user_id", user.id).eq("id", companionId)
 
     return NextResponse.json(companion)
   } catch (error) {

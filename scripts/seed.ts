@@ -17,7 +17,7 @@ async function main() {
       { name: "Scientists" },
     ]
 
-    const { data, error } = await supabaseClient.from("category").insert(categoriesData)
+    const { data, error } = await supabaseClient.from("29_category").insert(categoriesData)
 
     if (error) {
       console.error("Error seeding default categories:", error)

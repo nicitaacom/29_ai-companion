@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster"
 import { ProModal } from "@/components/pro-modal"
 import { getURL } from "@/app/utils/getURL"
 import Script from "next/script"
+import { UTMTracker } from "./utm-stats/UTMTracker"
+import { nanoid } from "ai"
 
 const siteUrl = new URL(getURL())
 const siteTitle = "companion.ai"
@@ -73,6 +75,7 @@ export default function RootLayout({
           <ProModal />
           {children}
           <Toaster />
+          <UTMTracker userId={`29-${nanoid()}`} />
         </ThemeProvider>
       </body>
     </html>

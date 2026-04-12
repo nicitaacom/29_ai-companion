@@ -29,7 +29,7 @@ export async function ensureAppUser(user: User, provider: AppAuthProvider): Prom
   if (!user.id || !user.email) return "Authenticated user is missing required fields"
 
   const { data: userById, error: userByIdError } = await supabaseAdmin
-    .from("users")
+    .from("29_users")
     .select("id, email, avatar_url, providers")
     .eq("id", user.id)
     .maybeSingle()
@@ -37,14 +37,18 @@ export async function ensureAppUser(user: User, provider: AppAuthProvider): Prom
 
   const { data: userByEmail, error: userByEmailError } = userById
     ? { data: null, error: null }
-    : await supabaseAdmin.from("users").select("id, email, avatar_url, providers").eq("email", user.email).maybeSingle()
+    : await supabaseAdmin
+        .from("29_users")
+        .select("id, email, avatar_url, providers")
+        .eq("email", user.email)
+        .maybeSingle()
   if (userByEmailError) return userByEmailError.message
 
   const existingUser = userById || userByEmail
   const avatarUrl = getAvatarUrl(user)
 
   if (!existingUser) {
-    const { error: insertError } = await supabaseAdmin.from("users").insert({
+    const { error: insertError } = await supabaseAdmin.from("29_users").insert({
       id: user.id,
       email: user.email,
       avatar_url: avatarUrl,
@@ -60,10 +64,11 @@ export async function ensureAppUser(user: User, provider: AppAuthProvider): Prom
     nextProviders.length !== (existingUser.providers ?? []).length ||
     nextProviders.some((providerItem, index) => providerItem !== existingUser.providers?.[index])
 
-  if (!shouldUpdateProviders && nextAvatarUrl === existingUser.avatar_url && existingUser.email === user.email) return null
+  if (!shouldUpdateProviders && nextAvatarUrl === existingUser.avatar_url && existingUser.email === user.email)
+    return null
 
   const { error: updateError } = await supabaseAdmin
-    .from("users")
+    .from("29_users")
     .update({
       email: user.email,
       avatar_url: nextAvatarUrl,
