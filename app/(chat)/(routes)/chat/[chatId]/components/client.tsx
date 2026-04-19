@@ -5,11 +5,13 @@ import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { IMessage } from "@/app/interfaces/IMessageDB"
 import { ChatHeader } from "@/components/chat-header"
 import { useRouter } from "next/navigation"
-import { FormEvent, useEffect, useState } from "react"
+import { FormEvent, useEffect, useRef, useState } from "react"
 import { ChatForm } from "@/components/chat-form"
 import { ChatMessages } from "@/components/chat-messages"
 import { ChatMessageProps } from "@/components/chat-message"
 import { useToast } from "@/components/ui/use-toast"
+import { useVerifyHuman } from "@/app/hooks/useVerifyHuman"
+import { FullscreenTurnstileGate } from "@/components/fullscreen-turnstile-gate"
 
 interface ChatCompanion extends ICompanionDB {
   messages: IMessage[]
@@ -39,9 +41,14 @@ function mapCompanionMessages(messages: IMessage[]): ChatMessageProps[] {
 export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const turnstileRef = useRef<HTMLDivElement>(null)
   const [companion, setCompanion] = useState<ChatCompanion | null>(null)
   const [messages, setMessages] = useState<ChatMessageProps[]>([])
   const [isChatLoading, setIsChatLoading] = useState(true)
+  const { errorMessage, isVerified, resetTurnstileFn, shouldRenderChallenge, status } = useVerifyHuman(turnstileRef, {
+    initialVerified: initialTurnstileVerified,
+  })
+  const isHumanVerified = process.env.NODE_ENV !== "production" || initialTurnstileVerified || isVerified
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -121,7 +128,7 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
     e.preventDefault()
 
     const trimmedInput = input.trim()
-    if (!trimmedInput || isLoading || isChatLoading || !companion) {
+    if (!trimmedInput || isLoading || isChatLoading || !companion || !isHumanVerified) {
       return
     }
 
@@ -148,12 +155,20 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
 
   return (
     <div className="flex flex-col h-full p-4 space-y-2">
+      {shouldRenderChallenge && !isHumanVerified ? (
+        <FullscreenTurnstileGate
+          errorMessage={errorMessage}
+          onRetry={resetTurnstileFn}
+          status={status}
+          turnstileRef={turnstileRef}
+        />
+      ) : null}
       <ChatHeader companion={companionWithLiveCount} />
       <ChatMessages companion={companionWithLiveCount} isLoading={isLoading} messages={messages} />
       <ChatForm
         handleInputChange={handleInputChange}
-        initialTurnstileVerified={initialTurnstileVerified}
         input={input}
+        isHumanVerified={isHumanVerified}
         isLoading={isLoading || isChatLoading}
         onSubmit={onSubmit}
       />

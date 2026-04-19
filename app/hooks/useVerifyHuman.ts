@@ -1,6 +1,6 @@
 "use client"
 
-import { RefObject, useEffect, useState } from "react"
+import { RefObject, useCallback, useEffect, useRef, useState } from "react"
 
 declare global {
   interface Window {
@@ -12,18 +12,65 @@ declare global {
           "error-callback"?: () => void
           "expired-callback"?: () => void
           sitekey?: string
+          theme?: "auto" | "dark" | "light"
         },
       ) => string
       reset: (widgetId?: string) => void
+      remove: (widgetId: string) => void
     }
   }
 }
 
-export const useVerifyHuman = (turnstileRef: RefObject<HTMLDivElement | null>) => {
-  const [isVerified, setIsVerified] = useState(false)
+interface UseVerifyHumanOptions {
+  initialVerified?: boolean
+  isEnabled?: boolean
+}
+
+export const useVerifyHuman = (
+  turnstileRef: RefObject<HTMLDivElement>,
+  { initialVerified = false, isEnabled = true }: UseVerifyHumanOptions = {},
+) => {
+  const widgetIdRef = useRef<string | null>(null)
+  const siteKey = process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY
+  const isBypassed = process.env.NODE_ENV !== "production" || !siteKey || !isEnabled
+  const [isVerified, setIsVerified] = useState(isBypassed || initialVerified)
+  const [status, setStatus] = useState<"idle" | "verifying" | "verified" | "error">(
+    isBypassed || initialVerified ? "verified" : "idle",
+  )
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const clearVerificationFn = useCallback(() => {
+    if (isBypassed) {
+      setIsVerified(true)
+      setStatus("verified")
+      setErrorMessage(null)
+      return
+    }
+
+    setIsVerified(false)
+    setStatus("idle")
+    setErrorMessage(null)
+  }, [isBypassed])
+
+  const resetTurnstileFn = useCallback(() => {
+    clearVerificationFn()
+
+    if (widgetIdRef.current && window.turnstile) {
+      window.turnstile.reset(widgetIdRef.current)
+    }
+  }, [clearVerificationFn])
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production" || !turnstileRef.current || !process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY) {
+    if (initialVerified || isBypassed) {
+      setIsVerified(true)
+      setStatus("verified")
+      setErrorMessage(null)
+      return
+    }
+
+    const turnstileNode = turnstileRef.current
+
+    if (!turnstileNode || !siteKey) {
       return
     }
 
@@ -31,13 +78,18 @@ export const useVerifyHuman = (turnstileRef: RefObject<HTMLDivElement | null>) =
     let intervalId: number | undefined
 
     const renderTurnstile = () => {
-      if (!turnstileRef.current || !window.turnstile) {
+      if (!window.turnstile || widgetIdRef.current) {
         return false
       }
 
-      window.turnstile.render(turnstileRef.current, {
-        sitekey: process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY,
+      turnstileNode.innerHTML = ""
+      widgetIdRef.current = window.turnstile.render(turnstileNode, {
+        sitekey: siteKey,
+        theme: "dark",
         callback: async (token: string) => {
+          setStatus("verifying")
+          setErrorMessage(null)
+
           try {
             const response = await fetch("/api/turnstile", {
               body: JSON.stringify({ token }),
@@ -48,27 +100,41 @@ export const useVerifyHuman = (turnstileRef: RefObject<HTMLDivElement | null>) =
             })
 
             if (!response.ok) {
-              setIsVerified(false)
+              if (!cancelled) {
+                setIsVerified(false)
+                setStatus("error")
+                setErrorMessage("Robot check failed. Please try again.")
+                window.turnstile?.reset(widgetIdRef.current ?? undefined)
+              }
               return
             }
 
             if (!cancelled) {
               setIsVerified(true)
+              setStatus("verified")
             }
           } catch (_error) {
             if (!cancelled) {
               setIsVerified(false)
+              setStatus("error")
+              setErrorMessage("Robot check could not be completed right now.")
+              window.turnstile?.reset(widgetIdRef.current ?? undefined)
             }
           }
         },
         "error-callback": () => {
           if (!cancelled) {
             setIsVerified(false)
+            setStatus("error")
+            setErrorMessage("Cloudflare Turnstile could not load correctly. Please try again.")
           }
         },
         "expired-callback": () => {
           if (!cancelled) {
+            setStatus("idle")
+            setErrorMessage("Challenge expired. Please complete it again.")
             setIsVerified(false)
+            window.turnstile?.reset(widgetIdRef.current ?? undefined)
           }
         },
       })
@@ -90,9 +156,21 @@ export const useVerifyHuman = (turnstileRef: RefObject<HTMLDivElement | null>) =
       if (intervalId) {
         window.clearInterval(intervalId)
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
-  return { isVerified }
+      if (widgetIdRef.current && window.turnstile) {
+        window.turnstile.remove(widgetIdRef.current)
+        widgetIdRef.current = null
+      }
+
+      turnstileNode.innerHTML = ""
+    }
+  }, [initialVerified, isBypassed, siteKey, turnstileRef])
+
+  return {
+    errorMessage,
+    isVerified,
+    resetTurnstileFn,
+    shouldRenderChallenge: !isBypassed && !initialVerified,
+    status,
+  }
 }
