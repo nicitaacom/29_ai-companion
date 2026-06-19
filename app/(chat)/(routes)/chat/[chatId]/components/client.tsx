@@ -12,7 +12,7 @@ import { ChatMessages } from "@/components/chat-messages"
 import { ChatMessageProps } from "@/components/chat-message"
 import { useToast } from "@/components/ui/use-toast"
 import { useVerifyHuman } from "@/app/hooks/useVerifyHuman"
-import { FullscreenTurnstileGate } from "@/components/fullscreen-turnstile-gate"
+import { FullscreenTurnstileGate } from "@/components/turnstile/fullscreen-turnstile-gate"
 
 interface ChatCompanion extends ICompanionDB {
   messages: IMessage[]
@@ -187,7 +187,13 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
         onFontIncrease={() => setFontSizeIdx(i => Math.min(i + 1, FONT_SIZES.length - 1))}
         onFontDecrease={() => setFontSizeIdx(i => Math.max(i - 1, 0))}
       />
-      <ChatMessages companion={companionWithLiveCount} isLoading={isLoading} messages={messages} fontSize={fontSize} streamingContent={completion} />
+      <ChatMessages
+        companion={companionWithLiveCount}
+        isLoading={isLoading}
+        messages={messages}
+        fontSize={fontSize}
+        streamingContent={completion}
+      />
       <ChatForm
         handleInputChange={handleInputChange}
         input={input}

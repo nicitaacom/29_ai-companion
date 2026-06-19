@@ -68,9 +68,7 @@ export const useVerifyHuman = (
       return
     }
 
-    const turnstileNode = turnstileRef.current
-
-    if (!turnstileNode || !siteKey) {
+    if (!siteKey) {
       return
     }
 
@@ -78,7 +76,8 @@ export const useVerifyHuman = (
     let intervalId: number | undefined
 
     const renderTurnstile = () => {
-      if (!window.turnstile || widgetIdRef.current) {
+      const turnstileNode = turnstileRef.current
+      if (!window.turnstile || !turnstileNode || widgetIdRef.current) {
         return false
       }
 
@@ -162,7 +161,7 @@ export const useVerifyHuman = (
         widgetIdRef.current = null
       }
 
-      turnstileNode.innerHTML = ""
+      if (turnstileRef.current) turnstileRef.current.innerHTML = ""
     }
   }, [initialVerified, isBypassed, siteKey, turnstileRef])
 
