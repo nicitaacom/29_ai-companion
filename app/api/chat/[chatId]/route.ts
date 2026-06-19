@@ -234,9 +234,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
     })
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      // decided to use that - so it produce higher quality outputs - anyway this website is not used very often
+      model: "gpt-5.4-mini-2026-03-17",
       temperature: 0.8,
-      max_tokens: 300,
+      max_tokens: 900,
       messages: [
         {
           role: "system",
