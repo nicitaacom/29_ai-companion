@@ -1,0 +1,4 @@
+- Dark, compact, premium UI.
+- Organic canvas background in the auth modal.
+- White particles on gray and charcoal surfaces.
+- Rounded panels, soft borders, and subtle blur.
