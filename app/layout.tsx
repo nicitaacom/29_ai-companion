@@ -9,7 +9,7 @@ import { UTMTracker } from "./utm-stats/UTMTracker"
 import { nanoid } from "ai"
 
 const siteUrl = new URL(getURL())
-const siteTitle = "companion.ai"
+const siteTitle = "jompanion.jokik.fi"
 const siteDescription = "Build, chat with, and manage AI companions in a clean Supabase-powered workspace."
 
 export const dynamic = "force-dynamic"

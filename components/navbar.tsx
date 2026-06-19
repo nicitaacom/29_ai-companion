@@ -19,9 +19,7 @@ export async function Navbar({ isPro }: { isPro: boolean }) {
       <div className="flex items-center">
         <MobileSidebar isPro={isPro} />
         <Link href="/">
-          <h1 className="font-brand hidden text-xl font-bold text-primary md:block md:text-3xl">
-            companion.ai
-          </h1>
+          <h1 className="font-brand hidden text-xl font-bold text-primary md:block md:text-3xl">jompanion.jokik.fi</h1>
         </Link>
       </div>
       <div className="flex items-center gap-x-3">
