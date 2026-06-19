@@ -39,6 +39,9 @@ function mapCompanionMessages(messages: IMessage[]): ChatMessageProps[] {
     }))
 }
 
+const FONT_SIZES = [13, 14, 15, 16, 17, 18, 20] as const
+const FONT_SIZE_DEFAULT_IDX = 2
+
 export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps) {
   const router = useRouter()
   const { toast } = useToast()
@@ -46,6 +49,9 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
   const [companion, setCompanion] = useState<ChatCompanion | null>(null)
   const [messages, setMessages] = useState<ChatMessageProps[]>([])
   const [isChatLoading, setIsChatLoading] = useState(true)
+  const [isFullWidth, setIsFullWidth] = useState(false)
+  const [fontSizeIdx, setFontSizeIdx] = useState(FONT_SIZE_DEFAULT_IDX)
+
   const { errorMessage, isVerified, resetTurnstileFn, shouldRenderChallenge, status } = useVerifyHuman(turnstileRef, {
     initialVerified: initialTurnstileVerified,
   })
@@ -103,8 +109,9 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
     }
   }, [chatId, router, toast])
 
-  const { input, isLoading, handleInputChange, handleSubmit, setInput } = useCompletion({
+  const { input, isLoading, completion, handleInputChange, handleSubmit, setInput } = useCompletion({
     api: `/api/chat/${chatId}`,
+    streamProtocol: "text",
     onFinish(_prompt, completion) {
       const systemMessage: ChatMessageProps = {
         id: crypto.randomUUID(),
@@ -116,7 +123,9 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
       setInput("")
     },
     onError(error) {
+      const failedMessage = messages.find(m => m.id?.startsWith("pending-user-"))
       setMessages(current => current.filter(message => !message.id?.startsWith("pending-user-")))
+      if (failedMessage?.content) setInput(failedMessage.content)
       toast({
         description:
           error.message || "Message could not be sent. If the robot check is visible, complete it and try again.",
@@ -141,6 +150,7 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
     setMessages(current => [...current, userMessage])
 
     handleSubmit(e)
+    setInput("")
   }
 
   if (isChatLoading || !companion) {
@@ -154,8 +164,12 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
     },
   }
 
+  const fontSize = FONT_SIZES[fontSizeIdx]
+
   return (
-    <div className="flex h-full flex-col space-y-2 p-4">
+    <div
+      className="flex h-full flex-col gap-3 p-4 mx-auto w-full transition-all duration-500 ease-in-out"
+      style={{ fontSize: `${fontSize}px`, maxWidth: isFullWidth ? "100%" : "56rem" }}>
       {shouldRenderChallenge && !isHumanVerified ? (
         <FullscreenTurnstileGate
           errorMessage={errorMessage}
@@ -164,8 +178,15 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
           turnstileRef={turnstileRef}
         />
       ) : null}
-      <ChatHeader companion={companionWithLiveCount} />
-      <ChatMessages companion={companionWithLiveCount} isLoading={isLoading} messages={messages} />
+      <ChatHeader
+        companion={companionWithLiveCount}
+        isFullWidth={isFullWidth}
+        onToggleFullWidth={() => setIsFullWidth(v => !v)}
+        fontSize={fontSize}
+        onFontIncrease={() => setFontSizeIdx(i => Math.min(i + 1, FONT_SIZES.length - 1))}
+        onFontDecrease={() => setFontSizeIdx(i => Math.max(i - 1, 0))}
+      />
+      <ChatMessages companion={companionWithLiveCount} isLoading={isLoading} messages={messages} fontSize={fontSize} streamingContent={completion} />
       <ChatForm
         handleInputChange={handleInputChange}
         input={input}

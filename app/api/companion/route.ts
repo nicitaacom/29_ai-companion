@@ -42,11 +42,21 @@ export async function POST(req: Request) {
   if (!isPro) {
     return new NextResponse("Pro subscription required", { status: 403 })
   }
-  try {
-    // Insert companion in 'companion' table
-    const companion = await supabaseAdmin.from("29_companion").insert({
-      category_id: category_id,
-      user_id: user.id, // user_id - its owner_id (companion owner/creator)
+
+  const { error: upsertError } = await supabaseAdmin
+    .from("29_users")
+    .upsert({ id: user.id, email: user.email }, { onConflict: "id" })
+
+  if (upsertError) {
+    console.log("[COMPANION_POST] upsert user", upsertError.message)
+    return NextResponse.json({ error: "Failed to sync user profile." }, { status: 500 })
+  }
+
+  const { data: companion, error } = await supabaseAdmin
+    .from("29_companion")
+    .insert({
+      category_id,
+      user_id: user.id,
       username: user.email.split("@")[0],
       src,
       name,
@@ -54,12 +64,13 @@ export async function POST(req: Request) {
       instructions,
       seed,
     })
+    .select()
+    .single()
 
-    return NextResponse.json(companion)
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log("[COMPANION_POST]", error.message)
-      return new NextResponse("Internal error", { status: 500 })
-    }
+  if (error) {
+    console.log("[COMPANION_POST]", error.message)
+    return NextResponse.json({ error: "Failed to create companion. Please try again." }, { status: 500 })
   }
+
+  return NextResponse.json(companion)
 }

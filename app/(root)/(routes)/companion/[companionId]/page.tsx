@@ -28,13 +28,13 @@ export default async function CompanionIdPage({ params }: CompanionIdPageProps) 
   }
 
   const companion = await supabaseAdmin
-    .from("companion")
+    .from("29_companion")
     .select()
     .eq("id", companionId)
     .eq("user_id", user.id)
     .single()
 
-  const categories = await supabaseAdmin.from("category").select()
+  const categories = await supabaseAdmin.from("29_category").select()
 
   return <CompanionForm initialData={companion.data} categories={categories.data ?? []} />
 }

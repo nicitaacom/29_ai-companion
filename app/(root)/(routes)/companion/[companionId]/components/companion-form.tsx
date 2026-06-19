@@ -5,7 +5,7 @@ import { ICategoryDB } from "@/app/interfaces/ICategoryDB"
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { toNestErrors } from "@hookform/resolvers"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 
@@ -153,8 +153,23 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
   const [availableCategories, setAvailableCategories] = useState(categories)
   const hasCategories = availableCategories.length > 0
 
+  const zodV4Resolver = async (values: z.infer<typeof formSchema>, _: unknown, options: any) => {
+    const result = formSchema.safeParse(values)
+    if (result.success) {
+      return { values: result.data, errors: {} }
+    }
+    const fieldErrors: Record<string, { message: string; type: string }> = {}
+    for (const issue of result.error.issues) {
+      const path = issue.path.join(".")
+      if (!fieldErrors[path]) fieldErrors[path] = { message: issue.message, type: issue.code }
+    }
+    return { values: {}, errors: toNestErrors(fieldErrors, options) }
+  }
+
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodV4Resolver,
+    mode: "onSubmit",
+    reValidateMode: "onChange",
     defaultValues: {
       name: initialData?.name ?? "",
       description: initialData?.description ?? "",
@@ -181,14 +196,13 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
     form.setValue("category_id", category.id, {
       shouldDirty: true,
       shouldTouch: true,
-      shouldValidate: true,
     })
   }
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const res = await fetch(
-        initialData ? `/api/companion/${initialData.id}` : "/api/companion/",
+        initialData ? `/api/companion/${initialData.id}` : "/api/companion",
         {
           method: initialData ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -203,7 +217,6 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
       }
 
       toast({ description: "Success" })
-      router.refresh()
       router.push("/")
     } catch (error) {
       toast({ variant: "destructive", description: "Something went wrong" })

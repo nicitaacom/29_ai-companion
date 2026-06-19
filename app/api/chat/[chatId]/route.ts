@@ -235,9 +235,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
 
     const completion = await openai.chat.completions.create({
       // decided to use that - so it produce higher quality outputs - anyway this website is not used very often
-      model: "gpt-5.4-mini-2026-03-17",
-      temperature: 0.8,
-      max_tokens: 900,
+      model: "gpt-5.4-mini",
+      // temperature: 0.8,
+      // max_tokens: 900, gpt-5.4-mini not supports such parameter
       messages: [
         {
           role: "system",
@@ -305,6 +305,7 @@ ${recentChatHistory || "No prior conversation."}`,
     })
   } catch (error) {
     console.error("[CHAT_POST]", error)
-    return new NextResponse("Companion could not respond right now", { status: 500 })
+    const message = error instanceof Error ? error.message : "Companion could not respond right now"
+    return new NextResponse(message, { status: 500 })
   }
 }

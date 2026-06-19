@@ -56,7 +56,7 @@ export default async function RootPage({ searchParams }: RootPageProps) {
     : null
 
   return (
-    <div className="h-full p-4 space-y-2">
+    <div className="p-4 space-y-2">
       <SearchInput />
       <Categories data={categories_data ?? []} />
       <Companions data={companions ?? []} messages={companionsWithMessageCount ?? []} />

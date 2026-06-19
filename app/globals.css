@@ -4,11 +4,11 @@
 
 html,
 :root {
-  min-height: 100%;
+  height: 100%;
 }
 
 body {
-  min-height: 100%;
+  height: 100%;
 }
 
 body {
@@ -88,7 +88,7 @@ body {
     --accent: 0 0% 14.9%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 90% 65%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 14.9%;
