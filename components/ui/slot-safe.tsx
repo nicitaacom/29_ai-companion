@@ -42,7 +42,7 @@ export const SlotSafe = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLE
 
     const child = children as React.ReactElement<any>
     const childProps = (child.props ?? {}) as AnyProps
-    const childRef = (child as any).ref as React.Ref<HTMLElement> | undefined
+    const childRef = (childProps.ref ?? undefined) as React.Ref<HTMLElement> | undefined
 
     return React.cloneElement(
       child,

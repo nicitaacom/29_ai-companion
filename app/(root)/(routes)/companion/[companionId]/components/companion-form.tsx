@@ -211,7 +211,7 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
   }
 
   return (
-    <div className="h-full p-4 space-y-2 max-w-3xl mx-auto">
+    <div className="p-4 space-y-2 max-w-3xl mx-auto">
       <Form {...form}>
         <form className="space-y-8 pb-10" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="w-full space-y-2">

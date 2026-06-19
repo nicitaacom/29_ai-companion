@@ -13,12 +13,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const isPro = await checkSubscription({ user: user })
 
   return (
-    <div className="h-full">
+    <div className="min-h-full">
       <Navbar isPro={isPro} />
       <div className="hidden md:flex mt-16 w-20 flex-col fixed inset-y-0">
         <Sidebar isPro={isPro} />
       </div>
-      <div className="md:pl-20 pt-16 h-full">{children}</div>
+      <div className="md:pl-20 pt-16">{children}</div>
     </div>
   )
 }

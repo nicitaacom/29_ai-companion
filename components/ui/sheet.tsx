@@ -213,13 +213,18 @@ const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
         return
       }
 
-      const previousOverflow = document.body.style.overflow
       document.body.style.overflow = "hidden"
 
       return () => {
-        document.body.style.overflow = previousOverflow
+        document.body.style.overflow = ""
       }
     }, [open])
+
+    React.useEffect(() => {
+      return () => {
+        document.body.style.overflow = ""
+      }
+    }, [])
 
     React.useEffect(() => {
       if (!open) {

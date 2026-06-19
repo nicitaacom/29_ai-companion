@@ -177,18 +177,23 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogMotionDivProps>(
     const setContentRef = React.useMemo(() => composeRefs<HTMLDivElement>(ref, contentRef), [ref])
 
     React.useEffect(() => {
+      return () => {
+        document.body.style.overflow = ""
+      }
+    }, [])
+
+    React.useEffect(() => {
       if (!open) {
         return
       }
 
       const previousActiveElement = document.activeElement as HTMLElement | null
-      const previousOverflow = document.body.style.overflow
 
       document.body.style.overflow = "hidden"
       contentRef.current?.focus()
 
       return () => {
-        document.body.style.overflow = previousOverflow
+        document.body.style.overflow = ""
         previousActiveElement?.focus?.()
       }
     }, [open])
