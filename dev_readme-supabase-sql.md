@@ -57,21 +57,23 @@ create extension if not exists "pgcrypto";
 -- =====================================================
 -- 📦 TABLE: 29_users (EXTENDS auth.users)
 -- =====================================================
-CREATE TABLE public.29_users (
+
+-- Drop old table if it exists with wrong schema (cascades to 29_companion FK)
+DROP TABLE IF EXISTS public."29_users" CASCADE;
+
+CREATE TABLE public."29_users" (
     id UUID NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     email TEXT NOT NULL UNIQUE,
     avatar_url TEXT NULL,
     providers TEXT[] NOT NULL DEFAULT '{}'::text[],
     role TEXT[] NOT NULL DEFAULT '{USER}'::text[],
-    CONSTRAINT 29_users_pkey PRIMARY KEY (id),
-    CONSTRAINT 29_users_id_fkey FOREIGN KEY (id) REFERENCES auth.users (id)
+    CONSTRAINT "29_users_pkey" PRIMARY KEY (id),
+    CONSTRAINT "29_users_id_fkey" FOREIGN KEY (id) REFERENCES auth.users (id)
 ) TABLESPACE pg_default;
 
-
-
 -- 🔐 RLS POLICIES FOR 29_users
-ALTER TABLE public.29_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public."29_users" ENABLE ROW LEVEL SECURITY;
 
 DO $$
 BEGIN
@@ -82,7 +84,7 @@ BEGIN
           AND policyname = 'Allow users to select their own row'
     ) THEN
         CREATE POLICY "Allow users to select their own row"
-        ON public.29_users FOR SELECT USING (auth.uid() = id);
+        ON public."29_users" FOR SELECT USING (auth.uid() = id);
     END IF;
 
     IF NOT EXISTS (
@@ -92,7 +94,7 @@ BEGIN
           AND policyname = 'Allow users to update their own row'
     ) THEN
         CREATE POLICY "Allow users to update their own row"
-        ON public.29_users FOR UPDATE
+        ON public."29_users" FOR UPDATE
         USING (auth.uid() = id)
         WITH CHECK (auth.uid() = id);
     END IF;
@@ -102,7 +104,7 @@ END $$;
 -- =====================================================
 -- 📦 TABLE: 29_category
 -- =====================================================
-CREATE TABLE public."29_category" (
+CREATE TABLE IF NOT EXISTS public."29_category" (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
     name TEXT NOT NULL UNIQUE,
     CONSTRAINT "29_category_pkey" PRIMARY KEY (id)
@@ -127,7 +129,8 @@ END $$;
 -- =====================================================
 -- 📦 TABLE: 29_companion
 -- =====================================================
-CREATE TABLE public."29_companion" (
+-- Note: if 29_users was just dropped+recreated above, the FK is gone — recreating the table restores it.
+CREATE TABLE IF NOT EXISTS public."29_companion" (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -200,7 +203,7 @@ END $$;
 -- =====================================================
 -- 📦 TABLE: 29_messages
 -- =====================================================
-CREATE TABLE public."29_messages" (
+CREATE TABLE IF NOT EXISTS public."29_messages" (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -215,8 +218,8 @@ CREATE TABLE public."29_messages" (
 ALTER TABLE public."29_messages" ENABLE ROW LEVEL SECURITY;
 
 -- 👉 Index for 29_messages
-CREATE INDEX IF NOT EXISTS 29_messages_companion_id_idx ON public."29_messages"(companion_id);
-CREATE INDEX IF NOT EXISTS 29_messages_user_id_idx ON public."29_messages"(user_id);
+CREATE INDEX IF NOT EXISTS "29_messages_companion_id_idx" ON public."29_messages"(companion_id);
+CREATE INDEX IF NOT EXISTS "29_messages_user_id_idx" ON public."29_messages"(user_id);
 
 DO $$
 BEGIN
@@ -266,7 +269,7 @@ END $$;
 -- =====================================================
 CREATE TABLE public.user_subscription (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL UNIQUE REFERENCES public.29_users (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    user_id UUID NOT NULL UNIQUE REFERENCES public."29_users" (id) ON UPDATE CASCADE ON DELETE CASCADE,
     stripe_customer_id TEXT NULL,
     stripe_subscription_id TEXT NULL,
     stripe_price_id TEXT NULL,
