@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
 import { User } from "@supabase/supabase-js"
-import { AxiosResponse } from "axios"
-
 import { ensureAppUser } from "@/lib/auth/ensureAppUser"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
@@ -17,7 +15,7 @@ export interface IResponse {
   message: string
 }
 
-export type TAPIAuthRegisterResponse = AxiosResponse<IResponse>
+export type TAPIAuthRegisterResponse = IResponse
 
 async function selectExistingUserProviders(email: string) {
   const { data, error } = await supabaseAdmin.from("29_users").select("providers").eq("email", email).maybeSingle()

@@ -8,7 +8,7 @@ interface FullscreenTurnstileGateProps {
   errorMessage?: string | null
   onRetry: () => void
   status: "idle" | "verifying" | "verified" | "error"
-  turnstileRef: RefObject<HTMLDivElement>
+  turnstileRef: RefObject<HTMLDivElement | null>
 }
 
 export function FullscreenTurnstileGate({

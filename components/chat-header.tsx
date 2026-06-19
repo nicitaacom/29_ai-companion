@@ -8,10 +8,9 @@ import { Button, buttonVariants } from "./ui/button"
 import { useRouter } from "next/navigation"
 import { BotAvatar } from "@/components/bot-avatar"
 import { useUser } from "@/app/hooks/useUser"
+import { twMerge } from "tailwind-merge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { useToast } from "./ui/use-toast"
-import axios from "axios"
-import { cn } from "@/lib/utils"
 
 interface ChatHeaderProps {
   companion: ICompanionDB & {
@@ -27,9 +26,13 @@ export function ChatHeader({ companion }: ChatHeaderProps) {
   const { user } = useUser()
   const { toast } = useToast()
 
-  const onDelete = async () => {
+  const handleBack = () => router.back()
+  const handleEdit = () => router.push(`/companion/${companion.id}`)
+
+  const handleDelete = async () => {
     try {
-      await axios.delete(`/api/companion/${companion.id}`)
+      const response = await fetch(`/api/companion/${companion.id}`, { method: "DELETE" })
+      if (!response.ok) throw new Error("Delete failed")
 
       toast({ description: "Success" })
 
@@ -41,9 +44,9 @@ export function ChatHeader({ companion }: ChatHeaderProps) {
   }
 
   return (
-    <div className="flex w-full justify-between items-center border-b border-primary/10 pb-4">
-      <div className="flex gap-x-2 items-center">
-        <Button onClick={() => router.back()} size="icon" variant="ghost">
+    <div className="flex w-full items-center justify-between border-b border-primary/10 pb-4">
+      <div className="flex items-center gap-x-2">
+        <Button size="icon" variant="ghost" onClick={handleBack}>
           <ChevronLeft className="w-8 h-8" />
         </Button>
         <BotAvatar src={companion.src} />
@@ -61,16 +64,16 @@ export function ChatHeader({ companion }: ChatHeaderProps) {
       {user?.id === companion.user_id && (
         <DropdownMenu>
           <DropdownMenuTrigger
-            className={cn(buttonVariants({ variant: "secondary", size: "icon" }))}
+            className={twMerge(buttonVariants({ variant: "secondary", size: "icon" }))}
             aria-label="Open actions">
             <MoreVertical className="h-4 w-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => router.push(`/companion/${companion.id}`)}>
+            <DropdownMenuItem onClick={handleEdit}>
               <Edit className="w-4 h-4 mr-2" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onDelete}>
+            <DropdownMenuItem onClick={handleDelete}>
               <Trash className="w-4 h-4 mr-2" />
               Delete
             </DropdownMenuItem>

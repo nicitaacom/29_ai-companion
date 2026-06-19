@@ -82,10 +82,10 @@ export function AuthInput({
         <input
           className={twMerge(
             `p-4 pt-5 pb-2 bg-background text-subTitle border-t placeholder:text-placeholder-color outline-none`,
-            startIcon && "pl-9",
-            endIcon && "pr-9",
-            disabled && "opacity-50 cursor-default pointer-events-none",
-            errors[id] && "focus:ring-rose-500 focus-visible:ring-rose-600",
+            startIcon ? "pl-9" : undefined,
+            endIcon ? "pr-9" : undefined,
+            disabled ? "opacity-50 cursor-default pointer-events-none" : undefined,
+            errors[id] ? "focus:ring-rose-500 focus-visible:ring-rose-600" : undefined,
             className,
           )}
           id={id}

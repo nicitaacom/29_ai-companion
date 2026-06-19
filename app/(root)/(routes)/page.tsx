@@ -15,22 +15,22 @@ export default async function RootPage({ searchParams }: RootPageProps) {
   const { categoryId } = await searchParams
 
   // 1. Fetch categories
-  const { data: categories_data, error: categories_error } = await supabaseAdmin.from("category").select("*")
+  const { data: categories_data, error: categories_error } = await supabaseAdmin.from("29_category").select("*")
   if (categories_error) console.log(6, "categories_error - ", categories_error)
 
   let companions
   if (categoryId) {
     // 2. Fetch Companions
     const { data: companions_response, error: companions_error } = await supabaseAdmin
-      .from("companion")
+      .from("29_companion")
       .select()
-      .eq("category_id", categoryId) // if categoryId - select *
+      .eq("category_id", categoryId)
       .order("created_at", { ascending: false })
     if (companions_error) console.log(7, "companions_error - ", companions_error)
     companions = companions_response
   } else {
     const { data: companions_response, error: companions_error } = await supabaseAdmin
-      .from("companion")
+      .from("29_companion")
       .select()
       .order("created_at", { ascending: false })
     if (companions_error) console.log(8, "companions_error - ", companions_error)
@@ -43,6 +43,7 @@ export default async function RootPage({ searchParams }: RootPageProps) {
         companions.map(async companion => {
           const { data: messages, error: messagesError } = await supabaseAdmin
             .from("29_messages")
+            .select()
             .eq("companion_id", companion.id)
 
           if (messagesError) {

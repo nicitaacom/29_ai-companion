@@ -1,11 +1,12 @@
 "use client"
 
-import { useCompletion } from "ai/react"
+import { useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
+
+import { useCompletion } from "@ai-sdk/react"
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { IMessage } from "@/app/interfaces/IMessageDB"
 import { ChatHeader } from "@/components/chat-header"
-import { useRouter } from "next/navigation"
-import { FormEvent, useEffect, useRef, useState } from "react"
 import { ChatForm } from "@/components/chat-form"
 import { ChatMessages } from "@/components/chat-messages"
 import { ChatMessageProps } from "@/components/chat-message"
@@ -41,7 +42,7 @@ function mapCompanionMessages(messages: IMessage[]): ChatMessageProps[] {
 export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps) {
   const router = useRouter()
   const { toast } = useToast()
-  const turnstileRef = useRef<HTMLDivElement>(null)
+  const turnstileRef = useRef<HTMLDivElement | null>(null)
   const [companion, setCompanion] = useState<ChatCompanion | null>(null)
   const [messages, setMessages] = useState<ChatMessageProps[]>([])
   const [isChatLoading, setIsChatLoading] = useState(true)
@@ -124,7 +125,7 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
     },
   })
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const trimmedInput = input.trim()
@@ -154,7 +155,7 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
   }
 
   return (
-    <div className="flex flex-col h-full p-4 space-y-2">
+    <div className="flex h-full flex-col space-y-2 p-4">
       {shouldRenderChallenge && !isHumanVerified ? (
         <FullscreenTurnstileGate
           errorMessage={errorMessage}

@@ -9,10 +9,10 @@ import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { MemoryManager } from "@/lib/memory"
 
-type CompanionRow = Database["public"]["Tables"]["companion"]["Row"]
-type MessageInsert = TablesInsert<"messages">
+type CompanionRow = Database["public"]["Tables"]["29_companion"]["Row"]
+type MessageInsert = TablesInsert<"29_messages">
 type MessageInsertList = MessageInsert[]
-type MessageRow = Database["public"]["Tables"]["messages"]["Row"]
+type MessageRow = Database["public"]["Tables"]["29_messages"]["Row"]
 
 export const runtime = "nodejs"
 export const maxDuration = 60

@@ -27,7 +27,7 @@ interface UseVerifyHumanOptions {
 }
 
 export const useVerifyHuman = (
-  turnstileRef: RefObject<HTMLDivElement>,
+  turnstileRef: RefObject<HTMLDivElement | null>,
   { initialVerified = false, isEnabled = true }: UseVerifyHumanOptions = {},
 ) => {
   const widgetIdRef = useRef<string | null>(null)

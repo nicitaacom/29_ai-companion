@@ -1,12 +1,11 @@
-import type { Metadata } from "next"
 import "./globals.css"
+import type { Metadata } from "next"
+import Script from "next/script"
+
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { ProModal } from "@/components/pro-modal"
 import { getURL } from "@/app/utils/getURL"
-import Script from "next/script"
-import { UTMTracker } from "./utm-stats/UTMTracker"
-import { nanoid } from "ai"
 
 const siteUrl = new URL(getURL())
 const siteTitle = "jompanion.jokik.fi"
@@ -75,7 +74,6 @@ export default function RootLayout({
           <ProModal />
           {children}
           <Toaster />
-          <UTMTracker userId={`29-${nanoid()}`} />
         </ThemeProvider>
       </body>
     </html>

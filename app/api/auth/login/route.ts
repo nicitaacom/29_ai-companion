@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios"
 import { NextResponse } from "next/server"
 
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
@@ -11,7 +10,7 @@ export interface IResponse {
   providers: string[] | null
 }
 
-export type TAPIAuthLoginResponse = AxiosResponse<IResponse>
+export type TAPIAuthLoginResponse = IResponse
 
 /* This route fired when user click 'login' button */
 

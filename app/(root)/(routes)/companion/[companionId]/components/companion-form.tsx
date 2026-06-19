@@ -1,7 +1,6 @@
 "use client"
 
 import * as z from "zod"
-import axios, { AxiosError } from "axios"
 import { ICategoryDB } from "@/app/interfaces/ICategoryDB"
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { useState } from "react"
@@ -88,38 +87,33 @@ function CategoryCreatePanel({ hasCategories, isLoading, onCategoryReady }: Cate
     try {
       setIsCreatingCategory(true)
 
-      const response = await axios.post<CreateCategoryResponse>("/api/category", {
-        name: trimmedCategoryName,
+      const res = await fetch("/api/category", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmedCategoryName }),
       })
+      const data: CreateCategoryResponse = await res.json()
 
-      const category = response.data.category
+      if (!res.ok) {
+        if (data.category) {
+          setNewCategoryName("")
+          onCategoryReady(data.category)
+          toast({ description: `"${data.category.name}" already exists, so we selected it.` })
+          return
+        }
+        toast({ variant: "destructive", description: data.error || "Unable to create category." })
+        return
+      }
 
-      if (!category) {
+      if (!data.category) {
         toast({ variant: "destructive", description: "Unable to create category." })
         return
       }
 
       setNewCategoryName("")
-      onCategoryReady(category)
-      toast({ description: `Category "${category.name}" created.` })
+      onCategoryReady(data.category)
+      toast({ description: `Category "${data.category.name}" created.` })
     } catch (error) {
-      if (axios.isAxiosError<CreateCategoryResponse>(error)) {
-        const existingCategory = error.response?.data?.category
-
-        if (existingCategory) {
-          setNewCategoryName("")
-          onCategoryReady(existingCategory)
-          toast({ description: `"${existingCategory.name}" already exists, so we selected it.` })
-          return
-        }
-
-        toast({
-          variant: "destructive",
-          description: error.response?.data?.error || "Unable to create category.",
-        })
-        return
-      }
-
       toast({ variant: "destructive", description: "Unable to create category." })
     } finally {
       setIsCreatingCategory(false)
@@ -134,17 +128,17 @@ function CategoryCreatePanel({ hasCategories, isLoading, onCategoryReady }: Cate
       ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
         <Input
-          value={newCategoryName}
-          onChange={event => setNewCategoryName(event.target.value)}
-          disabled={isLoading || isCreatingCategory}
           placeholder="e.g. Entrepreneur, Anime, Coach"
+          value={newCategoryName}
+          disabled={isLoading || isCreatingCategory}
+          onChange={event => setNewCategoryName(event.target.value)}
         />
         <Button
+          className="sm:min-w-[140px]"
           type="button"
           variant="secondary"
           disabled={isLoading || isCreatingCategory}
-          onClick={createCategory}
-          className="sm:min-w-[140px]">
+          onClick={createCategory}>
           {isCreatingCategory ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
           Create
         </Button>
@@ -193,24 +187,26 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      if (initialData) {
-        // Update companion functionality
-        await axios.patch(`/api/companion/${initialData.id}`, values)
-      } else {
-        // Create companion functionality
-        await axios.post(`/api/companion/`, values)
-      }
-      toast({ description: "Success" })
+      const res = await fetch(
+        initialData ? `/api/companion/${initialData.id}` : "/api/companion/",
+        {
+          method: initialData ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        },
+      )
 
-      router.refresh() // refresh all server components
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        toast({ variant: "destructive", description: data?.error || "Something went wrong" })
+        return
+      }
+
+      toast({ description: "Success" })
+      router.refresh()
       router.push("/")
     } catch (error) {
-      if (error instanceof AxiosError) {
-        console.log(error.response?.data)
-        toast({ variant: "destructive", description: error.response?.data })
-      } else {
-        toast({ variant: "destructive", description: "Something went wrong" })
-      }
+      toast({ variant: "destructive", description: "Something went wrong" })
     }
   }
 
