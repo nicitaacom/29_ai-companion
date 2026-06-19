@@ -170,12 +170,13 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
     <div
       className="flex h-full flex-col gap-3 p-4 mx-auto w-full transition-all duration-500 ease-in-out"
       style={{ fontSize: `${fontSize}px`, maxWidth: isFullWidth ? "100%" : "56rem" }}>
-      {shouldRenderChallenge && !isHumanVerified ? (
+      {shouldRenderChallenge ? (
         <FullscreenTurnstileGate
           errorMessage={errorMessage}
           onRetry={resetTurnstileFn}
           status={status}
           turnstileRef={turnstileRef}
+          hidden={isHumanVerified}
         />
       ) : null}
       <ChatHeader

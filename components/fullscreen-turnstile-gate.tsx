@@ -9,6 +9,7 @@ interface FullscreenTurnstileGateProps {
   onRetry: () => void
   status: "idle" | "verifying" | "verified" | "error"
   turnstileRef: RefObject<HTMLDivElement | null>
+  hidden?: boolean
 }
 
 export function FullscreenTurnstileGate({
@@ -16,9 +17,10 @@ export function FullscreenTurnstileGate({
   onRetry,
   status,
   turnstileRef,
+  hidden = false,
 }: FullscreenTurnstileGateProps) {
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/90 px-4 py-6 backdrop-blur-md">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/90 px-4 py-6 backdrop-blur-md" style={{ display: hidden ? "none" : undefined }}>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_38%),radial-gradient(circle_at_bottom,rgba(14,165,233,0.16),transparent_28%)]" />
       <div className="relative w-full max-w-xl rounded-[32px] border border-white/10 bg-zinc-900/95 p-6 shadow-[0_30px_120px_rgba(0,0,0,0.55)] md:p-8">
         <div className="space-y-3 text-center">
