@@ -140,10 +140,11 @@ CREATE TABLE IF NOT EXISTS public."29_companion" (
     src TEXT NOT NULL,
     name TEXT NOT NULL,
     description TEXT NOT NULL,
-    instructions TEXT NOT NULL,
+    prompt TEXT NOT NULL,
     seed TEXT NOT NULL,
     CONSTRAINT "29_companion_pkey" PRIMARY KEY (id)
 ) TABLESPACE pg_default;
+
 
 -- 👉 Index for 29_companion
 CREATE INDEX IF NOT EXISTS companion_user_id_idx ON public."29_companion"(user_id);
@@ -257,9 +258,92 @@ BEGIN
     END IF;
 END $$;
 
+
+-- =====================================================
+-- 📦 TABLE: 29_user_balance  (NOT YET CREATED - part of the /generate-image plan,
+--                              see dev_readme-generate-image-feature.md section 5)
+-- =====================================================
+-- Cached running balance per user. The source of truth for how the balance got to this number is
+-- 29_balance_transactions below - this table exists so reading a balance doesn't require summing the
+-- whole transaction history on every request.
+CREATE TABLE IF NOT EXISTS public."29_user_balance" (
+    user_id UUID NOT NULL REFERENCES public."29_users" (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    balance_usd NUMERIC(12,2) NOT NULL DEFAULT 0,  -- exact decimal cents, not float - confirm 2dp is enough (see open question 5 in the feature doc)
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT "29_user_balance_pkey" PRIMARY KEY (user_id)
+) TABLESPACE pg_default;
+
+-- 🔐 RLS POLICIES FOR 29_user_balance
+ALTER TABLE public."29_user_balance" ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_policies
+        WHERE tablename = '29_user_balance'
+          AND policyname = 'Allow users to select their own balance'
+    ) THEN
+        CREATE POLICY "Allow users to select their own balance"
+        ON public."29_user_balance" FOR SELECT
+        USING (auth.uid() = user_id);
+    END IF;
+END $$;
+
+-- ⚠️ Deliberately NO insert/update/delete policy for authenticated users. Balance changes must only
+-- ever happen server-side (the balance webhook branch on top-up, the generate-media route on
+-- deduction) using supabaseAdmin, which uses the service-role key and bypasses RLS entirely. If a
+-- client-writable path to this table is ever added, a user could grant themselves free balance.
+
+
+-- =====================================================
+-- 📦 TABLE: 29_balance_transactions  (NOT YET CREATED - see dev_readme-generate-image-feature.md section 5)
+-- =====================================================
+-- Append-only ledger. amount_usd is a signed delta: positive for a top-up, negative for a
+-- generation deduction - SUM(amount_usd) for a user should always equal their
+-- 29_user_balance.balance_usd row, so this table can reconcile/audit the cached balance.
+CREATE TABLE IF NOT EXISTS public."29_balance_transactions" (
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    user_id UUID NOT NULL REFERENCES public."29_users" (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    amount_usd NUMERIC(12,2) NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('topup', 'deduction')),
+    reference TEXT NULL,
+    CONSTRAINT "29_balance_transactions_pkey" PRIMARY KEY (id)
+) TABLESPACE pg_default;
+
+-- 👉 Index for 29_balance_transactions
+CREATE INDEX IF NOT EXISTS "29_balance_transactions_user_id_idx" ON public."29_balance_transactions"(user_id);
+
+-- 🔐 RLS POLICIES FOR 29_balance_transactions
+ALTER TABLE public."29_balance_transactions" ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_policies
+        WHERE tablename = '29_balance_transactions'
+          AND policyname = 'Allow users to view their own transactions'
+    ) THEN
+        CREATE POLICY "Allow users to view their own transactions"
+        ON public."29_balance_transactions" FOR SELECT
+        USING (auth.uid() = user_id);
+    END IF;
+END $$;
+
+-- ⚠️ Same rule as 29_user_balance above - no client-writable insert/update/delete policy. Only the
+-- service role writes rows here.
+
 ```
 
 ### Deprecated - website is free - so no need in user subscriptions
+
+Note: the Stripe/webhook _infrastructure_ below (`lib/stripe.ts`, `app/api/webhook/route.ts`) is
+about to become relevant again for the `/generate-image` balance top-up flow - but as a **new**
+checkout product/branch (topping up `29_user_balance`), not by un-deprecating this `user_subscription`
+table itself. Recurring subscriptions and one-time balance top-ups are different billing models; don't
+repurpose this table for balance.
 
 ```sql
 
