@@ -65,6 +65,7 @@ export default [
       "local-rules/hook-naming-convention": "warn",
       "local-rules/db-redis-verb-naming": "warn",
       "local-rules/response-variable-naming": "warn",
+      "local-rules/api-folder-requires-api-namespace": "warn",
     },
   },
   {
