@@ -112,6 +112,7 @@ const DropdownMenuContent = React.forwardRef<
 
   return (
     <div
+      style={{ marginTop: sideOffset, ...style }}
       className={cn(
         `absolute top-full z-50 mt-1 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground
          shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2`,
@@ -123,7 +124,6 @@ const DropdownMenuContent = React.forwardRef<
         assignRef(ref, value)
       }}
       role="menu"
-      style={{ marginTop: sideOffset, ...style }}
       {...props}
     />
   )

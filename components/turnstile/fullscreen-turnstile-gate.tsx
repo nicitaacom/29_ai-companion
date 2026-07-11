@@ -21,8 +21,8 @@ export function FullscreenTurnstileGate({
 }: FullscreenTurnstileGateProps) {
   return (
     <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/90 px-4 py-6 backdrop-blur-md"
-      style={{ display: hidden ? "none" : undefined }}>
+      style={{ display: hidden ? "none" : undefined }}
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-zinc-950/90 px-4 py-6 backdrop-blur-md">
       {/* eslint-disable-next-line max-len -- unbreakable Tailwind arbitrary-value gradient token */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_38%),radial-gradient(circle_at_bottom,rgba(14,165,233,0.16),transparent_28%)]" />
       <div

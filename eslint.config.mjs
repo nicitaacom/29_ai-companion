@@ -36,6 +36,7 @@ export default [
       "local-rules/no-banned-words": "error",
       "local-rules/no-function-in-deps": "warn",
       "local-rules/no-vague-names": "warn",
+      "local-rules/style-before-classname": "warn",
     },
   },
 ]

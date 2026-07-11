@@ -298,8 +298,8 @@ export function OrganicCanvasBackground({
     <div ref={containerRef} className={twMerge("relative isolate h-full w-full overflow-hidden", className)}>
       <canvas
         ref={canvasRef}
-        className="pointer-events-none absolute inset-0 h-full w-full opacity-80"
         style={{ mixBlendMode: "screen" }}
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-80"
       />
       <div className={twMerge("relative z-10 h-full w-full", parentClassName)}>{children}</div>
     </div>

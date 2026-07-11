@@ -168,8 +168,8 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
 
   return (
     <div
-      className="flex h-full flex-col gap-3 p-4 mx-auto w-full transition-all duration-500 ease-in-out"
-      style={{ fontSize: `${fontSize}px`, maxWidth: isFullWidth ? "100%" : "56rem" }}>
+      style={{ fontSize: `${fontSize}px`, maxWidth: isFullWidth ? "100%" : "56rem" }}
+      className="flex h-full flex-col gap-3 p-4 mx-auto w-full transition-all duration-500 ease-in-out">
       {shouldRenderChallenge ? (
         <FullscreenTurnstileGate
           errorMessage={errorMessage}
