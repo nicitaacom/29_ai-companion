@@ -1,4 +1,4 @@
-const { createClient } = require("@supabase/supabase-js")
+import { createClient } from "@supabase/supabase-js"
 
 const supabaseClient = createClient(
   "https://vahemcbozzowgcadavfm.supabase.co",

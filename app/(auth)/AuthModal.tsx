@@ -78,7 +78,11 @@ export function AuthModal({ user }: { user: User | null }) {
       )}
       <DialogContent className="w-[min(96vw,1120px)] max-w-[1120px] border-0 bg-transparent p-0 shadow-none sm:rounded-[30px] [&>button]:right-5 [&>button]:top-5 [&>button]:z-50 [&>button]:rounded-full [&>button]:border [&>button]:border-white/15 [&>button]:bg-black/25 [&>button]:text-white [&>button]:backdrop-blur-md [&>button]:hover:bg-black/40 [&>button]:data-[state=open]:bg-black/25">
         <div className="h-[min(94dvh,760px)] overflow-hidden sm:h-[min(92dvh,780px)] lg:h-[760px]">
-          {user ? <UserAuthenticatedContent user={user} /> : <UserNotAuthenticatedContent initialVariant={variant} />}
+          {user ? (
+            <UserAuthenticatedContent user={user} />
+          ) : (
+            <UserNotAuthenticatedContent key={variant} initialVariant={variant} />
+          )}
         </div>
       </DialogContent>
     </Dialog>

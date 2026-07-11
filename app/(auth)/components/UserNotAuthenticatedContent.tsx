@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { Loader2, Lock, Mail } from "lucide-react"
 import Image from "next/image"
@@ -64,7 +64,7 @@ export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant
   const router = useRouter()
   const { toast } = useToast()
   const closeModal = useAccountModal(state => state.closeModal)
-  const [variant, setVariant] = useState<Variant>("login")
+  const [variant, setVariant] = useState<Variant>(initialVariant)
   const [responseMessage, setResponseMessage] = useState<string | null>(null)
   const [providerHint, setProviderHint] = useState<Provider[] | null>(null)
   const [providerSubmitting, setProviderSubmitting] = useState<Exclude<Provider, "credentials"> | null>(null)
@@ -76,15 +76,7 @@ export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ defaultValues: { email: "", password: "" } })
 
-  useEffect(() => {
-    setVariant(initialVariant)
-    setResponseMessage(null)
-    setProviderHint(null)
-  }, [initialVariant])
-
-  useEffect(() => {
-    if (errors.email || errors.password) setResponseMessage(null)
-  }, [errors.email, errors.password])
+  const visibleResponseMessage = errors.email || errors.password ? null : responseMessage
 
   const asideContent = useMemo(
     () =>
@@ -307,9 +299,9 @@ export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant
             </Button>
           </form>
 
-          {(responseMessage || oauthProviderHints.length > 0) && (
+          {(visibleResponseMessage || oauthProviderHints.length > 0) && (
             <div className="space-y-3 rounded-[22px] border border-white/10 bg-white/[0.06] p-4">
-              {responseMessage && <p className="text-sm leading-6 text-white/[0.72]">{responseMessage}</p>}
+              {visibleResponseMessage && <p className="text-sm leading-6 text-white/[0.72]">{visibleResponseMessage}</p>}
               {oauthProviderHints.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {oauthProviderHints.map(provider => (

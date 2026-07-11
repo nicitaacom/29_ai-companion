@@ -40,17 +40,14 @@ export const SlotSafe = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLE
   ({ children, ...slotProps }, forwardedRef) => {
     if (!React.isValidElement(children)) return null
 
-    const child = children as React.ReactElement<any>
+    const child = children as React.ReactElement<AnyProps>
     const childProps = (child.props ?? {}) as AnyProps
     const childRef = (childProps.ref ?? undefined) as React.Ref<HTMLElement> | undefined
 
-    return React.cloneElement(
-      child,
-      {
-        ...mergeProps(slotProps as AnyProps, childProps),
-        ref: composeRefs(forwardedRef, childRef),
-      } as any,
-    )
+    return React.cloneElement(child, {
+      ...mergeProps(slotProps as AnyProps, childProps),
+      ref: composeRefs(forwardedRef, childRef),
+    })
   },
 )
 SlotSafe.displayName = "SlotSafe"

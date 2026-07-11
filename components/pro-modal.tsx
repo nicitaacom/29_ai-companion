@@ -1,8 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-
 import { useAuthOpen } from "@/app/hooks/use-auth-open"
+import { useMounted } from "@/app/hooks/use-mounted"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useProModal } from "@/app/hooks/use-pro-modal"
 import { Button } from "@/components/ui/button"
@@ -12,14 +11,10 @@ import { useUser } from "@/app/hooks/useUser"
 
 export const ProModal = () => {
   const proModal = useProModal()
-  const [isMounted, setIsMounted] = useState(false)
+  const isMounted = useMounted()
   const { toast } = useToast()
   const { user } = useUser()
   const { openAuth } = useAuthOpen()
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   const onContinue = () => {
     if (!user) {

@@ -6,6 +6,7 @@ import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useMounted } from "@/app/hooks/use-mounted"
 import { SlotSafe } from "@/components/ui/slot-safe"
 
 type DialogContextValue = {
@@ -101,11 +102,7 @@ const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
 DialogTrigger.displayName = "DialogTrigger"
 
 const DialogPortal = ({ children }: { children: React.ReactNode }) => {
-  const [mounted, setMounted] = React.useState(false)
-
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useMounted()
 
   if (!mounted) {
     return null

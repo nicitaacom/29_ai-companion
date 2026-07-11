@@ -1,14 +1,8 @@
 import { SubscriptionButton } from "@/components/subscription-button"
-import supabaseServer from "@/lib/supabase/supabaseServer"
 
 export const dynamic = "force-dynamic"
 
-const SettingsPage = async () => {
-  const supabase = await supabaseServer()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+const SettingsPage = () => {
   return (
     <div className="h-full p-4 space-y-2">
       <h3 className="text-lg font-medium">Settings</h3>

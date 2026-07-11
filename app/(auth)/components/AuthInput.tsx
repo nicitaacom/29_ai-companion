@@ -42,7 +42,7 @@ export function AuthInput({
   register,
   errors,
   disabled,
-  required, // TODO - check is required do something
+  required = true,
 }: AuthInputProps) {
   const validationRules: ValidationRules = {
     email: {
@@ -92,7 +92,7 @@ export function AuthInput({
           type={type}
           placeholder={placeholder}
           {...register(id, {
-            required: requiredMessage,
+            required: required ? requiredMessage : undefined,
             pattern: {
               value: patternValue,
               message: patternMessage,

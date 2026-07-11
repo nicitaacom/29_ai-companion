@@ -23,6 +23,11 @@ export default [
       "local-rules": { rules: localRules },
       unicorn,
     },
-    rules: {},
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { args: "all", argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
+      ],
+    },
   },
 ]

@@ -142,7 +142,7 @@ async function safeGetRemaining({
   })
 
   try {
-    const currentCount = Number(((await (redis as any).get(bucket.key)) ?? 0) as number | string)
+    const currentCount = Number((await redis.get<number | string>(bucket.key)) ?? 0)
 
     return {
       remaining: Math.max(0, spec.maxAllowed - currentCount),
@@ -174,10 +174,10 @@ async function safeRateLimit({
   })
 
   try {
-    const currentCount = Number((await (redis as any).incr(bucket.key)) as number)
+    const currentCount = await redis.incr(bucket.key)
 
     if (currentCount === 1) {
-      await (redis as any).expire(bucket.key, spec.windowSec)
+      await redis.expire(bucket.key, spec.windowSec)
     }
 
     return {

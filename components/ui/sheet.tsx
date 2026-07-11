@@ -6,6 +6,7 @@ import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
+import { useMounted } from "@/app/hooks/use-mounted"
 import { SlotSafe } from "@/components/ui/slot-safe"
 import { cn } from "@/lib/utils"
 
@@ -119,11 +120,7 @@ const SheetClose = React.forwardRef<HTMLButtonElement, SheetCloseProps>(
 SheetClose.displayName = "SheetClose"
 
 const SheetPortal = ({ children }: { children: React.ReactNode }) => {
-  const [mounted, setMounted] = React.useState(false)
-
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useMounted()
 
   if (!mounted) {
     return null

@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronLeft, Edit, MessagesSquare, MoreVertical, Trash, Maximize2, Minimize2, ALargeSmall } from "lucide-react"
+import { ChevronLeft, Edit, MessagesSquare, MoreVertical, Trash, Maximize2, Minimize2 } from "lucide-react"
 
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { IMessage } from "@/app/interfaces/IMessageDB"
@@ -50,7 +50,7 @@ export function ChatHeader({
 
       router.refresh()
       router.push("/")
-    } catch (error) {
+    } catch (_error) {
       toast({ description: "Something went wrong", variant: "destructive" })
     }
   }

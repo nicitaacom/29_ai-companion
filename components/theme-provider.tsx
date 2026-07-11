@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react"
 
 type Theme = "light" | "dark" | "system"
 type ResolvedTheme = "light" | "dark"
@@ -19,8 +19,13 @@ type ThemeProviderValue = {
 }
 
 const STORAGE_KEY = "theme"
+const THEME_CHANGE_EVENT = "theme-provider:change"
 
 const ThemeContext = createContext<ThemeProviderValue | null>(null)
+
+function isTheme(value: string | null): value is Theme {
+  return value === "light" || value === "dark" || value === "system"
+}
 
 function getSystemTheme(): ResolvedTheme {
   if (typeof window === "undefined") {
@@ -38,63 +43,55 @@ function resolveTheme(theme: Theme, enableSystem: boolean): ResolvedTheme {
   return theme
 }
 
-export const ThemeProvider = ({
-  children,
-  defaultTheme = "system",
-  enableSystem = true,
-}: ThemeProviderProps) => {
-  const [theme, setThemeState] = useState<Theme>(defaultTheme)
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => resolveTheme(defaultTheme, enableSystem))
+function subscribeToStoredTheme(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange)
+  window.addEventListener(THEME_CHANGE_EVENT, onStoreChange)
+
+  return () => {
+    window.removeEventListener("storage", onStoreChange)
+    window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange)
+  }
+}
+
+function subscribeToSystemTheme(onStoreChange: () => void) {
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+  mediaQuery.addEventListener("change", onStoreChange)
+
+  return () => mediaQuery.removeEventListener("change", onStoreChange)
+}
+
+export const ThemeProvider = ({ children, defaultTheme = "system", enableSystem = true }: ThemeProviderProps) => {
+  const storedTheme = useSyncExternalStore(
+    subscribeToStoredTheme,
+    () => {
+      const value = window.localStorage.getItem(STORAGE_KEY)
+      return isTheme(value) ? value : defaultTheme
+    },
+    () => defaultTheme,
+  )
+
+  const systemTheme = useSyncExternalStore(subscribeToSystemTheme, getSystemTheme, (): ResolvedTheme => "light")
+
+  const resolvedTheme = storedTheme === "system" ? (enableSystem ? systemTheme : "light") : resolveTheme(storedTheme, enableSystem)
 
   useEffect(() => {
-    const storedTheme = window.localStorage.getItem(STORAGE_KEY) as Theme | null
-
-    if (storedTheme === "light" || storedTheme === "dark" || storedTheme === "system") {
-      setThemeState(storedTheme)
-      setResolvedTheme(resolveTheme(storedTheme, enableSystem))
-      return
-    }
-
-    setThemeState(defaultTheme)
-    setResolvedTheme(resolveTheme(defaultTheme, enableSystem))
-  }, [defaultTheme, enableSystem])
-
-  useEffect(() => {
-    const nextResolvedTheme = resolveTheme(theme, enableSystem)
     const root = document.documentElement
-
     root.classList.remove("light", "dark")
-    root.classList.add(nextResolvedTheme)
+    root.classList.add(resolvedTheme)
+  }, [resolvedTheme])
 
-    setResolvedTheme(nextResolvedTheme)
+  const setTheme = useCallback((theme: Theme) => {
     window.localStorage.setItem(STORAGE_KEY, theme)
-
-    if (!enableSystem || theme !== "system") {
-      return
-    }
-
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-    const handleSystemChange = () => {
-      const updatedTheme = mediaQuery.matches ? "dark" : "light"
-      root.classList.remove("light", "dark")
-      root.classList.add(updatedTheme)
-      setResolvedTheme(updatedTheme)
-    }
-
-    mediaQuery.addEventListener("change", handleSystemChange)
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleSystemChange)
-    }
-  }, [enableSystem, theme])
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT))
+  }, [])
 
   const value = useMemo(
     () => ({
-      theme,
+      theme: storedTheme,
       resolvedTheme,
-      setTheme: setThemeState,
+      setTheme,
     }),
-    [resolvedTheme, theme],
+    [resolvedTheme, setTheme, storedTheme],
   )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

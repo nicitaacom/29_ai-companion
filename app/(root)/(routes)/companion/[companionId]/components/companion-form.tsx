@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Loader2, Plus, Wand2 } from "lucide-react"
+import { ResolverOptions } from "react-hook-form"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 
@@ -113,7 +114,7 @@ function CategoryCreatePanel({ hasCategories, isLoading, onCategoryReady }: Cate
       setNewCategoryName("")
       onCategoryReady(data.category)
       toast({ description: `Category "${data.category.name}" created.` })
-    } catch (error) {
+    } catch (_error) {
       toast({ variant: "destructive", description: "Unable to create category." })
     } finally {
       setIsCreatingCategory(false)
@@ -153,7 +154,11 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
   const [availableCategories, setAvailableCategories] = useState(categories)
   const hasCategories = availableCategories.length > 0
 
-  const zodV4Resolver = async (values: z.infer<typeof formSchema>, _: unknown, options: any) => {
+  const zodV4Resolver = async (
+    values: z.infer<typeof formSchema>,
+    _: unknown,
+    options: ResolverOptions<z.infer<typeof formSchema>>,
+  ) => {
     const result = formSchema.safeParse(values)
     if (result.success) {
       return { values: result.data, errors: {} }
@@ -218,7 +223,7 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
 
       toast({ description: "Success" })
       router.push("/")
-    } catch (error) {
+    } catch (_error) {
       toast({ variant: "destructive", description: "Something went wrong" })
     }
   }

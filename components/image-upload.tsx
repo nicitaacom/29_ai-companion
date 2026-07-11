@@ -1,8 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { CldUploadButton } from "next-cloudinary"
+import { CldUploadButton, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import Image from "next/image"
+import { twMerge } from "tailwind-merge"
+
+import { useMounted } from "@/app/hooks/use-mounted"
 
 interface ImageUploadProps {
   value: string
@@ -11,11 +13,7 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  const isMounted = useMounted()
 
   if (!isMounted) return null
 
@@ -24,10 +22,14 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
       <CldUploadButton
         options={{ maxFiles: 1 }}
         uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-        onSuccess={(result: any) => onChange(result.info.secure_url)}>
+        onSuccess={(result: CloudinaryUploadWidgetResults) => {
+          if (typeof result.info === "object" && result.info?.secure_url) onChange(result.info.secure_url)
+        }}>
         <div
-          className="p-4 border-4 border-dashed border-primary/10 rounded-lg hover:opacity-75 transition
-         flex flex-col space-y-2 justify-center items-center">
+          className={twMerge(
+            "p-4 border-4 border-dashed border-primary/10 rounded-lg hover:opacity-75 transition flex flex-col space-y-2 justify-center items-center",
+            disabled ? "opacity-50 pointer-events-none" : undefined,
+          )}>
           <div className="relative w-40 h-40">
             <Image className="rounded-lg object-cover" src={value || "/placeholder.svg"} alt="Upload" fill />
           </div>

@@ -33,11 +33,12 @@ export const useVerifyHuman = (
   const widgetIdRef = useRef<string | null>(null)
   const siteKey = process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY
   const isBypassed = process.env.NODE_ENV !== "production" || !siteKey || !isEnabled
-  const [isVerified, setIsVerified] = useState(isBypassed || initialVerified)
-  const [status, setStatus] = useState<"idle" | "verifying" | "verified" | "error">(
-    isBypassed || initialVerified ? "verified" : "idle",
-  )
+  const [isVerified, setIsVerified] = useState(false)
+  const [status, setStatus] = useState<"idle" | "verifying" | "verified" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const resolvedIsVerified = isBypassed || initialVerified || isVerified
+  const resolvedStatus = isBypassed || initialVerified ? "verified" : status
 
   const clearVerificationFn = useCallback(() => {
     if (isBypassed) {
@@ -61,19 +62,13 @@ export const useVerifyHuman = (
   }, [clearVerificationFn])
 
   useEffect(() => {
-    if (initialVerified || isBypassed) {
-      setIsVerified(true)
-      setStatus("verified")
-      setErrorMessage(null)
-      return
-    }
-
-    if (!siteKey) {
+    if (initialVerified || isBypassed || !siteKey) {
       return
     }
 
     let cancelled = false
     let intervalId: number | undefined
+    let mountedNode: HTMLDivElement | null = null
 
     const renderTurnstile = () => {
       const turnstileNode = turnstileRef.current
@@ -81,6 +76,7 @@ export const useVerifyHuman = (
         return false
       }
 
+      mountedNode = turnstileNode
       turnstileNode.innerHTML = ""
       widgetIdRef.current = window.turnstile.render(turnstileNode, {
         sitekey: siteKey,
@@ -161,15 +157,15 @@ export const useVerifyHuman = (
         widgetIdRef.current = null
       }
 
-      if (turnstileRef.current) turnstileRef.current.innerHTML = ""
+      if (mountedNode) mountedNode.innerHTML = ""
     }
   }, [initialVerified, isBypassed, siteKey, turnstileRef])
 
   return {
     errorMessage,
-    isVerified,
+    isVerified: resolvedIsVerified,
     resetTurnstileFn,
     shouldRenderChallenge: !isBypassed && !initialVerified,
-    status,
+    status: resolvedStatus,
   }
 }
