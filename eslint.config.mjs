@@ -46,6 +46,7 @@ export default [
       "local-rules/arrow-fn-only-for-hooks": "warn",
       "local-rules/ts-ignore-dynamic-table-only": "warn",
       "local-rules/type-naming-prefix": "warn",
+      "local-rules/no-type-export-in-action-or-component": "warn",
     },
   },
   {
