@@ -16,7 +16,7 @@ export default async function RootPage({ searchParams }: RootPageProps) {
 
   // 1. Fetch categories
   const { data: categories_data, error: categories_error } = await supabaseAdmin.from("29_category").select("*")
-  if (categories_error) console.log(6, "categories_error - ", categories_error)
+  if (categories_error) console.log(19, "categories_error - ", categories_error)
 
   let companions
   if (categoryId) {
@@ -26,14 +26,14 @@ export default async function RootPage({ searchParams }: RootPageProps) {
       .select()
       .eq("category_id", categoryId)
       .order("created_at", { ascending: false })
-    if (companions_error) console.log(7, "companions_error - ", companions_error)
+    if (companions_error) console.log(29, "companions_error - ", companions_error)
     companions = companions_response
   } else {
     const { data: companions_response, error: companions_error } = await supabaseAdmin
       .from("29_companion")
       .select()
       .order("created_at", { ascending: false })
-    if (companions_error) console.log(8, "companions_error - ", companions_error)
+    if (companions_error) console.log(36, "companions_error - ", companions_error)
     companions = companions_response
   }
 

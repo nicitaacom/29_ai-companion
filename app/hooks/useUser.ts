@@ -20,7 +20,7 @@ export const useUser = () => {
         }
       } catch (error) {
         if (error instanceof Error) {
-          console.log(13, "error getting user - ", error.message)
+          console.log(23, "error getting user - ", error.message)
         }
       }
     }

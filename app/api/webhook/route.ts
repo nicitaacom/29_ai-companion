@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       stripe_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
     })
     if (error_insert_user_subscription) {
-      console.log(39, `ERROR_INSERTING_USER_SUBSCRIPTION - ${error_insert_user_subscription.message}`)
+      console.log(40, `ERROR_INSERTING_USER_SUBSCRIPTION - ${error_insert_user_subscription.message}`)
       return new NextResponse(`${error_insert_user_subscription.message}`, { status: 400 })
     }
   }
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       })
       .eq("stripe_subscription_id", subscription.id)
     if (error_updating_user_subscription) {
-      console.log(51, `ERROR_UPDATING_USER_SUBSCRIPTION - ${error_updating_user_subscription.message}`)
+      console.log(57, `ERROR_UPDATING_USER_SUBSCRIPTION - ${error_updating_user_subscription.message}`)
       return new NextResponse(`${error_updating_user_subscription.message}`, { status: 400 })
     }
   }

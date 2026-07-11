@@ -51,6 +51,7 @@ export default [
       "local-rules/no-cross-route-group-absolute-import": "warn",
       "local-rules/require-absolute-import-for-shared-folders": "warn",
       "local-rules/function-body-own-line": "warn",
+      "local-rules/console-log-line-number": "warn",
     },
   },
   {
