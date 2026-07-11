@@ -59,6 +59,7 @@ export default [
       "local-rules/api-type-req-resp-suffix": "warn",
       "local-rules/no-req-json-catch": "warn",
       "local-rules/no-void-only-jsx-handler": "warn",
+      "local-rules/no-handlers-variable": "warn",
     },
   },
   {
