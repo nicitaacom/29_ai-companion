@@ -54,9 +54,11 @@ const getOAuthRedirectUrl = (provider: Exclude<Provider, "credentials">) => {
 }
 
 const getProviderHint = (providers: Provider[] | null | undefined) => {
-  const oauthProviders = providers?.filter(p => p !== "credentials") as Exclude<Provider, "credentials">[] | undefined
+  const oauthProviders = providers?.filter(provider => provider !== "credentials") as
+    | Exclude<Provider, "credentials">[]
+    | undefined
   if (!oauthProviders?.length) return null
-  const label = oauthProviders.map(p => providerLabels[p]).join(" or ")
+  const label = oauthProviders.map(provider => providerLabels[provider]).join(" or ")
   return `This email is already connected to ${label}. Continue with that provider instead.`
 }
 
@@ -113,14 +115,14 @@ export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant
 
   const handleSignIn = async (email: string, password: string) => {
     try {
-      const res = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email } as TAPIAuthLogin),
       })
-      const data: LoginResponse & AuthApiError = await res.json()
+      const data: LoginResponse & AuthApiError = await response.json()
 
-      if (!res.ok) {
+      if (!response.ok) {
         setProviderHint(data.providers ?? null)
         setResponseMessage(data.error || "Unable to sign in.")
         return
@@ -145,14 +147,14 @@ export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant
 
   const handleSignUp = async (email: string, password: string) => {
     try {
-      const res = await fetch("/api/auth/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, redirectTo: getCurrentRedirectPath() } as TAPIAuthRegister),
       })
-      const data: RegisterResponse & AuthApiError = await res.json()
+      const data: RegisterResponse & AuthApiError = await response.json()
 
-      if (!res.ok) {
+      if (!response.ok) {
         setProviderHint(data.providers ?? null)
         setResponseMessage(data.error || "Unable to create your account.")
         return
@@ -175,7 +177,7 @@ export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant
   }
 
   const isDisabled = isSubmitting || providerSubmitting !== null
-  const oauthProviderHints = providerHint?.filter(p => p !== "credentials") ?? []
+  const oauthProviderHints = providerHint?.filter(provider => provider !== "credentials") ?? []
 
   return (
     <AuthModalShell

@@ -70,31 +70,31 @@ class Particle {
     this.angle = 0
   }
 
-  noise(x: number) {
-    const intX = Math.floor(x)
-    const fracX = x - intX
-    const a = this.hash(intX)
-    const b = this.hash(intX + 1)
-    return this.lerp(a, b, this.smoothstep(fracX))
+  noise(value: number) {
+    const intValue = Math.floor(value)
+    const fracValue = value - intValue
+    const startHash = this.hash(intValue)
+    const endHash = this.hash(intValue + 1)
+    return this.lerp(startHash, endHash, this.smoothstep(fracValue))
   }
 
-  hash(x: number) {
-    x = ((x >> 16) ^ x) * 0x45d9f3b
-    x = ((x >> 16) ^ x) * 0x45d9f3b
-    x = (x >> 16) ^ x
-    return (x / 0x100000000 + 0.5) * 2 - 1
+  hash(seed: number) {
+    let mixed = ((seed >> 16) ^ seed) * 0x45d9f3b
+    mixed = ((mixed >> 16) ^ mixed) * 0x45d9f3b
+    mixed = (mixed >> 16) ^ mixed
+    return (mixed / 0x100000000 + 0.5) * 2 - 1
   }
 
-  lerp(a: number, b: number, t: number) {
-    return a + (b - a) * t
+  lerp(start: number, end: number, progress: number) {
+    return start + (end - start) * progress
   }
 
-  smoothstep(t: number) {
-    return t * t * (3 - 2 * t)
+  smoothstep(progress: number) {
+    return progress * progress * (3 - 2 * progress)
   }
 
-  easeInOut(t: number) {
-    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+  easeInOut(progress: number) {
+    return progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress
   }
 
   update() {

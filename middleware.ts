@@ -9,12 +9,12 @@ import type { NextRequest } from "next/server"
 export async function middleware(req: NextRequest) {
   assertProductionEnv()
 
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient<Database>({ req, res })
+  const response = NextResponse.next()
+  const supabase = createMiddlewareClient<Database>({ req, res: response })
   await supabase.auth.getSession()
 
   if (!req.cookies.get(GUEST_VISITOR_COOKIE_NAME)?.value) {
-    res.cookies.set({
+    response.cookies.set({
       httpOnly: true,
       maxAge: GUEST_VISITOR_COOKIE_MAX_AGE,
       name: GUEST_VISITOR_COOKIE_NAME,
@@ -25,5 +25,5 @@ export async function middleware(req: NextRequest) {
     })
   }
 
-  return res
+  return response
 }

@@ -35,6 +35,7 @@ export default [
       "local-rules/no-localstorage-direct": "warn",
       "local-rules/no-banned-words": "error",
       "local-rules/no-function-in-deps": "warn",
+      "local-rules/no-vague-names": "warn",
     },
   },
 ]

@@ -123,7 +123,7 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
       setInput("")
     },
     onError(error) {
-      const failedMessage = messages.find(m => m.id?.startsWith("pending-user-"))
+      const failedMessage = messages.find(message => message.id?.startsWith("pending-user-"))
       setMessages(current => current.filter(message => !message.id?.startsWith("pending-user-")))
       if (failedMessage?.content) setInput(failedMessage.content)
       toast({
@@ -182,10 +182,10 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
       <ChatHeader
         companion={companionWithLiveCount}
         isFullWidth={isFullWidth}
-        onToggleFullWidth={() => setIsFullWidth(v => !v)}
+        onToggleFullWidth={() => setIsFullWidth(currentIsFullWidth => !currentIsFullWidth)}
         fontSize={fontSize}
-        onFontIncrease={() => setFontSizeIdx(i => Math.min(i + 1, FONT_SIZES.length - 1))}
-        onFontDecrease={() => setFontSizeIdx(i => Math.max(i - 1, 0))}
+        onFontIncrease={() => setFontSizeIdx(currentIndex => Math.min(currentIndex + 1, FONT_SIZES.length - 1))}
+        onFontDecrease={() => setFontSizeIdx(currentIndex => Math.max(currentIndex - 1, 0))}
       />
       <ChatMessages
         companion={companionWithLiveCount}

@@ -130,7 +130,7 @@ export function memoryListPush(key: string, value: string) {
 export function memorySortedSetAdd(key: string, value: { member: string; score: number }) {
   const current = sortedSetStore.get(key) ?? []
   current.push(value)
-  current.sort((a, b) => a.score - b.score)
+  current.sort((first, second) => first.score - second.score)
   sortedSetStore.set(key, current)
 }
 

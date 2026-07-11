@@ -90,14 +90,14 @@ function CategoryCreatePanel({ hasCategories, isLoading, onCategoryReady }: Cate
     try {
       setIsCreatingCategory(true)
 
-      const res = await fetch("/api/category", {
+      const response = await fetch("/api/category", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: trimmedCategoryName }),
       })
-      const data: CreateCategoryResponse = await res.json()
+      const data: CreateCategoryResponse = await response.json()
 
-      if (!res.ok) {
+      if (!response.ok) {
         if (data.category) {
           setNewCategoryName("")
           onCategoryReady(data.category)
@@ -210,14 +210,14 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const res = await fetch(initialData ? `/api/companion/${initialData.id}` : "/api/companion", {
+      const response = await fetch(initialData ? `/api/companion/${initialData.id}` : "/api/companion", {
         method: initialData ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       })
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
         toast({ variant: "destructive", description: data?.error || "Something went wrong" })
         return
       }
