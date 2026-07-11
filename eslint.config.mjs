@@ -52,6 +52,7 @@ export default [
       "local-rules/require-absolute-import-for-shared-folders": "warn",
       "local-rules/function-body-own-line": "warn",
       "local-rules/console-log-line-number": "warn",
+      "local-rules/no-redundant-return-parens": "warn",
     },
   },
   {
