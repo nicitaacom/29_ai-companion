@@ -60,6 +60,7 @@ export default [
       "local-rules/no-req-json-catch": "warn",
       "local-rules/no-void-only-jsx-handler": "warn",
       "local-rules/no-handlers-variable": "warn",
+      "local-rules/no-inner-component": "warn",
     },
   },
   {
