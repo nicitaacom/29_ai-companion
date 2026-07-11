@@ -31,6 +31,7 @@ export default [
       "unicorn/catch-error-name": "warn",
       "max-len": ["warn", { code: 130, ignoreUrls: true }],
       "import/newline-after-import": ["warn", { count: 1 }],
+      "local-rules/no-export-const-classname": "warn",
     },
   },
 ]
