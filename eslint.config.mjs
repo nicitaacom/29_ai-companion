@@ -41,6 +41,7 @@ export default [
       "local-rules/no-throwaway-alias": "warn",
       "local-rules/no-zustand-types-in-store-file": "warn",
       "local-rules/input-value-naming": "warn",
+      "local-rules/handle-prefix-location": "warn",
     },
   },
 ]

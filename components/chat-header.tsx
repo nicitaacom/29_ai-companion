@@ -10,7 +10,7 @@ import { BotAvatar } from "@/components/bot-avatar"
 import { useUser } from "@/app/hooks/useUser"
 import { twMerge } from "tailwind-merge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import { useToast } from "./ui/use-toast"
+import { useChatHeaderHandlers } from "@/components/hooks/useChatHeaderHandlers"
 
 interface ChatHeaderProps {
   companion: ICompanionDB & {
@@ -36,24 +36,10 @@ export function ChatHeader({
 }: ChatHeaderProps) {
   const router = useRouter()
   const { user } = useUser()
-  const { toast } = useToast()
+  const { handleDelete } = useChatHeaderHandlers(companion.id)
 
   const handleBack = () => router.back()
   const handleEdit = () => router.push(`/companion/${companion.id}`)
-
-  const handleDelete = async () => {
-    try {
-      const response = await fetch(`/api/companion/${companion.id}`, { method: "DELETE" })
-      if (!response.ok) throw new Error("Delete failed")
-
-      toast({ description: "Success" })
-
-      router.refresh()
-      router.push("/")
-    } catch (_error) {
-      toast({ description: "Something went wrong", variant: "destructive" })
-    }
-  }
 
   return (
     <div
