@@ -61,6 +61,7 @@ export default [
       "local-rules/no-void-only-jsx-handler": "warn",
       "local-rules/no-handlers-variable": "warn",
       "local-rules/no-inner-component": "warn",
+      "local-rules/arrow-parens-avoid": "warn",
     },
   },
   {
