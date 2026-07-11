@@ -40,8 +40,8 @@ export class MemoryManager {
 
     const similarDocs = await vectorStore
       .similaritySearch(recentChatHistory, 3, { fileName: companionFileName })
-      .catch(err => {
-        console.log("WARNING: failed to get vector search results.", err)
+      .catch(error => {
+        console.log("WARNING: failed to get vector search results.", error)
       })
     return similarDocs
   }

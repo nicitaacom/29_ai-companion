@@ -28,6 +28,7 @@ export default [
         "warn",
         { args: "all", argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
       ],
+      "unicorn/catch-error-name": "warn",
     },
   },
 ]
