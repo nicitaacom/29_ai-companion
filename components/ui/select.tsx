@@ -84,6 +84,9 @@ const Select = ({
 
   const contextValue = useMemo(
     () => ({ value, setValue, open, setOpen, disabled, items, registerItem }),
+    // registerItem is a stable useCallback with empty deps; mirroring it into a ref would require writing to the
+    // ref during render, which react-hooks/refs forbids, so the usual ref-holding pattern is not an option here
+    // eslint-disable-next-line local-rules/no-function-in-deps
     [disabled, items, open, registerItem, setValue, value],
   )
 
@@ -203,6 +206,9 @@ const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
 
     useEffect(() => {
       if (label) registerItem(value, label)
+      // registerItem is stable across renders (see the no-function-in-deps suppression in Select above); ref-mirroring
+      // it here would need a render-time ref write, which react-hooks/refs forbids
+      // eslint-disable-next-line local-rules/no-function-in-deps
     }, [label, registerItem, value])
 
     return (

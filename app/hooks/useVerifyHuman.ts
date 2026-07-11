@@ -53,13 +53,18 @@ export const useVerifyHuman = (
     setErrorMessage(null)
   }, [isBypassed])
 
+  const clearVerificationFnRef = useRef(clearVerificationFn)
+  useEffect(() => {
+    clearVerificationFnRef.current = clearVerificationFn
+  })
+
   const resetTurnstileFn = useCallback(() => {
-    clearVerificationFn()
+    clearVerificationFnRef.current()
 
     if (widgetIdRef.current && window.turnstile) {
       window.turnstile.reset(widgetIdRef.current)
     }
-  }, [clearVerificationFn])
+  }, [])
 
   useEffect(() => {
     if (initialVerified || isBypassed || !siteKey) {
