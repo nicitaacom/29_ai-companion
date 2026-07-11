@@ -58,6 +58,7 @@ export default [
       "local-rules/prefer-inline-zustand-setter": "warn",
       "local-rules/api-type-req-resp-suffix": "warn",
       "local-rules/no-req-json-catch": "warn",
+      "local-rules/no-void-only-jsx-handler": "warn",
     },
   },
   {
