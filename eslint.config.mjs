@@ -38,6 +38,7 @@ export default [
       "local-rules/no-vague-names": "warn",
       "local-rules/style-before-classname": "warn",
       "local-rules/sdk-method-naming": "warn",
+      "local-rules/no-throwaway-alias": "warn",
     },
   },
 ]

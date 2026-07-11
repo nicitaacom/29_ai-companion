@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 import { SlotSafe } from "@/components/ui/slot-safe"
 
+// eslint-disable-next-line local-rules/no-throwaway-alias -- exported public API name used app-wide, not a single-use rebind
 const Form = FormProvider
 
 type FormFieldContextValue<
