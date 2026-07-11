@@ -39,6 +39,7 @@ export default [
       "local-rules/style-before-classname": "warn",
       "local-rules/sdk-method-naming": "warn",
       "local-rules/no-throwaway-alias": "warn",
+      "local-rules/no-zustand-types-in-store-file": "warn",
     },
   },
 ]

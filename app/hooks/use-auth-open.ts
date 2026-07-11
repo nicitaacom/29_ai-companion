@@ -1,6 +1,6 @@
 "use client"
 
-import { AuthModalVariant } from "@/app/store/ui/accountModal"
+import { TAuthModalVariant } from "@/app/store/ui/types/TAuthModalVariant"
 import { buildAuthUrl, isIframeMode, openAuthModal } from "@/app/utils/auth"
 import { useSearchParams } from "next/navigation"
 
@@ -9,9 +9,9 @@ export function useAuthOpen() {
   const search = searchParams.toString()
   const iframeMode = isIframeMode(search)
 
-  const getAuthUrl = (variant: AuthModalVariant) => buildAuthUrl({ variant })
+  const getAuthUrl = (variant: TAuthModalVariant) => buildAuthUrl({ variant })
 
-  const openAuth = (variant: AuthModalVariant = "login") => {
+  const openAuth = (variant: TAuthModalVariant = "login") => {
     if (iframeMode) {
       window.open(buildAuthUrl({ variant, origin: window.location.origin }), "_blank", "noopener,noreferrer")
       return

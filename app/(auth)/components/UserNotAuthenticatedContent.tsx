@@ -9,7 +9,8 @@ import { useForm } from "react-hook-form"
 
 import { TAPIAuthLogin } from "@/app/api/auth/login/route"
 import { TAPIAuthRegister } from "@/app/api/auth/register/route"
-import { AuthModalVariant, useAccountModal } from "@/app/store/ui/accountModal"
+import { useAccountModal } from "@/app/store/ui/accountModal"
+import { TAuthModalVariant } from "@/app/store/ui/types/TAuthModalVariant"
 import { useToast } from "@/components/ui/use-toast"
 import supabaseClient from "@/lib/supabase/supabaseClient"
 import { Button } from "@/components/ui/button"
@@ -62,7 +63,7 @@ const getProviderHint = (providers: Provider[] | null | undefined) => {
   return `This email is already connected to ${label}. Continue with that provider instead.`
 }
 
-export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant: AuthModalVariant }) {
+export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant: TAuthModalVariant }) {
   const router = useRouter()
   const { toast } = useToast()
   const closeModal = useAccountModal(state => state.closeModal)

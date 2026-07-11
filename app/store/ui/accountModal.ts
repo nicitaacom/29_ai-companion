@@ -1,11 +1,11 @@
 import { create } from "zustand"
 
-export type AuthModalVariant = "login" | "register"
+import { TAuthModalVariant } from "./types/TAuthModalVariant"
 
 type AccountModalStore = {
   isOpen: boolean
-  variant: AuthModalVariant
-  openModal: (variant?: AuthModalVariant) => void
+  variant: TAuthModalVariant
+  openModal: (variant?: TAuthModalVariant) => void
   closeModal: () => void
 }
 

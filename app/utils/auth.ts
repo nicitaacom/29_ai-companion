@@ -1,4 +1,5 @@
-import { AuthModalVariant, useAccountModal } from "@/app/store/ui/accountModal"
+import { useAccountModal } from "@/app/store/ui/accountModal"
+import { TAuthModalVariant } from "@/app/store/ui/types/TAuthModalVariant"
 
 const AUTH_QUERY_KEY = "auth"
 const IFRAME_QUERY_KEY = "is_iframe"
@@ -44,7 +45,7 @@ export function getNormalizedQueryValue(search: string, key: string) {
   return null
 }
 
-export function getRequestedAuthVariant(search: string): AuthModalVariant | null {
+export function getRequestedAuthVariant(search: string): TAuthModalVariant | null {
   const variant = getNormalizedQueryValue(search, AUTH_QUERY_KEY)
 
   if (variant === "login" || variant === "register") {
@@ -58,7 +59,7 @@ export function isIframeMode(search: string) {
   return getNormalizedQueryValue(search, IFRAME_QUERY_KEY) === "true"
 }
 
-export function buildAuthUrl({ variant, origin }: { variant: AuthModalVariant; origin?: string }) {
+export function buildAuthUrl({ variant, origin }: { variant: TAuthModalVariant; origin?: string }) {
   const baseUrl = process.env.NEXT_PUBLIC_PRODUCTION_URL || origin || ""
 
   if (!baseUrl) {
@@ -71,6 +72,6 @@ export function buildAuthUrl({ variant, origin }: { variant: AuthModalVariant; o
   return url.toString()
 }
 
-export function openAuthModal(variant: AuthModalVariant = "login") {
+export function openAuthModal(variant: TAuthModalVariant = "login") {
   useAccountModal.getState().openModal(variant)
 }
