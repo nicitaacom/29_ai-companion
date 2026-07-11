@@ -8,7 +8,7 @@ export const useUser = () => {
   useEffect(() => {
     let isActive = true
 
-    async function fetchUser() {
+    async function selectUser() {
       try {
         const {
           data: { user },
@@ -24,7 +24,7 @@ export const useUser = () => {
       }
     }
 
-    fetchUser()
+    selectUser()
     const {
       data: { subscription },
     } = supabaseClient.auth.onAuthStateChange((_event, session) => {

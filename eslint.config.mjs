@@ -37,6 +37,7 @@ export default [
       "local-rules/no-function-in-deps": "warn",
       "local-rules/no-vague-names": "warn",
       "local-rules/style-before-classname": "warn",
+      "local-rules/sdk-method-naming": "warn",
     },
   },
 ]
