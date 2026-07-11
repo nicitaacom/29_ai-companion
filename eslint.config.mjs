@@ -43,6 +43,7 @@ export default [
       "local-rules/input-value-naming": "warn",
       "local-rules/handle-prefix-location": "warn",
       "local-rules/no-process-env-non-null-assertion": "warn",
+      "local-rules/arrow-fn-only-for-hooks": "warn",
     },
   },
 ]

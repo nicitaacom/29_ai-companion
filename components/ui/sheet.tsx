@@ -51,7 +51,7 @@ type SheetProps = {
   onOpenChange?: (open: boolean) => void
 }
 
-const Sheet = ({ children, open: controlledOpen, defaultOpen = false, onOpenChange }: SheetProps) => {
+function Sheet({ children, open: controlledOpen, defaultOpen = false, onOpenChange }: SheetProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen)
   const open = controlledOpen ?? uncontrolledOpen
 
@@ -119,7 +119,7 @@ const SheetClose = React.forwardRef<HTMLButtonElement, SheetCloseProps>(
 )
 SheetClose.displayName = "SheetClose"
 
-const SheetPortal = ({ children }: { children: React.ReactNode }) => {
+function SheetPortal({ children }: { children: React.ReactNode }) {
   const mounted = useMounted()
 
   if (!mounted) {
@@ -130,7 +130,7 @@ const SheetPortal = ({ children }: { children: React.ReactNode }) => {
 }
 SheetPortal.displayName = "SheetPortal"
 
-const SheetOverlay = ({ className, onClick, ...props }: SheetMotionDivProps) => {
+function SheetOverlay({ className, onClick, ...props }: SheetMotionDivProps) {
   const { open, setOpen } = useSheetContext()
 
   return (
@@ -275,14 +275,14 @@ const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
 )
 SheetContent.displayName = "SheetContent"
 
-const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />
-)
+function SheetHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />
+}
 SheetHeader.displayName = "SheetHeader"
 
-const SheetFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)} {...props} />
-)
+function SheetFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)} {...props} />
+}
 SheetFooter.displayName = "SheetFooter"
 
 const SheetTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(

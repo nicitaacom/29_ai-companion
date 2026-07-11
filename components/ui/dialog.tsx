@@ -58,7 +58,7 @@ type DialogProps = {
   onOpenChange?: (open: boolean) => void
 }
 
-const Dialog = ({ children, open: controlledOpen, defaultOpen = false, onOpenChange }: DialogProps) => {
+function Dialog({ children, open: controlledOpen, defaultOpen = false, onOpenChange }: DialogProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen)
   const open = controlledOpen ?? uncontrolledOpen
 
@@ -101,7 +101,7 @@ const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
 )
 DialogTrigger.displayName = "DialogTrigger"
 
-const DialogPortal = ({ children }: { children: React.ReactNode }) => {
+function DialogPortal({ children }: { children: React.ReactNode }) {
   const mounted = useMounted()
 
   if (!mounted) {
@@ -137,7 +137,7 @@ const DialogClose = React.forwardRef<HTMLButtonElement, DialogCloseProps>(
 )
 DialogClose.displayName = "DialogClose"
 
-const DialogOverlay = ({ className, onClick, ...props }: DialogMotionDivProps) => {
+function DialogOverlay({ className, onClick, ...props }: DialogMotionDivProps) {
   const { open, setOpen } = useDialogContext()
 
   return (
@@ -273,14 +273,14 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogMotionDivProps>(
 )
 DialogContent.displayName = "DialogContent"
 
-const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
-)
+function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
+}
 DialogHeader.displayName = "DialogHeader"
 
-const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)} {...props} />
-)
+function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)} {...props} />
+}
 DialogFooter.displayName = "DialogFooter"
 
 const DialogTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(

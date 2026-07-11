@@ -33,7 +33,7 @@ function useDropdownMenu() {
   return context
 }
 
-const DropdownMenu = ({ children }: { children: React.ReactNode }) => {
+function DropdownMenu({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = React.useState(false)
   const triggerRef = React.useRef<HTMLButtonElement | null>(null) as React.MutableRefObject<HTMLButtonElement | null>
   const contentRef = React.useRef<HTMLDivElement | null>(null) as React.MutableRefObject<HTMLDivElement | null>
@@ -196,14 +196,20 @@ const DropdownMenuSeparator = React.forwardRef<HTMLDivElement, React.HTMLAttribu
 )
 DropdownMenuSeparator.displayName = "DropdownMenuSeparator"
 
-const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span className={cn("ml-auto text-xs tracking-widest opacity-60", className)} {...props} />
-)
+function DropdownMenuShortcut({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+  return <span className={cn("ml-auto text-xs tracking-widest opacity-60", className)} {...props} />
+}
 DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
 
-const DropdownMenuGroup = ({ children }: { children: React.ReactNode }) => <>{children}</>
-const DropdownMenuPortal = ({ children }: { children: React.ReactNode }) => <>{children}</>
-const DropdownMenuSub = ({ children }: { children: React.ReactNode }) => <>{children}</>
+function DropdownMenuGroup({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
+function DropdownMenuPortal({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
+function DropdownMenuSub({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
 const DropdownMenuSubContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ children, ...props }, ref) => (
     <div ref={ref} {...props}>
@@ -228,7 +234,9 @@ const DropdownMenuSubTrigger = React.forwardRef<
 ))
 DropdownMenuSubTrigger.displayName = "DropdownMenuSubTrigger"
 
-const DropdownMenuRadioGroup = ({ children }: { children: React.ReactNode }) => <>{children}</>
+function DropdownMenuRadioGroup({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
 
 export {
   DropdownMenu,

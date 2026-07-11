@@ -8,7 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useTheme } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 
-export const ModeToggle = () => {
+export function ModeToggle() {
   const { setTheme } = useTheme()
 
   return (

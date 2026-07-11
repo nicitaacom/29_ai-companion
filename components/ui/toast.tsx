@@ -9,7 +9,9 @@ import { cn } from "@/lib/utils"
 
 const TOAST_DURATION = 6000
 
-const ToastProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>
+function ToastProvider({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
 
 const ToastViewport = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (

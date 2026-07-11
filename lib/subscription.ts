@@ -1,6 +1,6 @@
 import { User } from "@supabase/supabase-js"
 
-export const checkSubscription = async ({ user }: { user: User | null }) => {
+export async function checkSubscription({ user }: { user: User | null }) {
   if (!user) {
     return false
   }

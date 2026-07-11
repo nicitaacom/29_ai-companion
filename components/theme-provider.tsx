@@ -60,7 +60,7 @@ function subscribeToSystemTheme(onStoreChange: () => void) {
   return () => mediaQuery.removeEventListener("change", onStoreChange)
 }
 
-export const ThemeProvider = ({ children, defaultTheme = "system", enableSystem = true }: ThemeProviderProps) => {
+export function ThemeProvider({ children, defaultTheme = "system", enableSystem = true }: ThemeProviderProps) {
   const storedTheme = useSyncExternalStore(
     subscribeToStoredTheme,
     () => {

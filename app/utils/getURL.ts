@@ -1,5 +1,5 @@
 //This function may be user on client side and server side
-export const getURL = () => {
+export function getURL() {
   // if you change port - change it here as well
   const rawUrl =
     process.env.NODE_ENV === "development"

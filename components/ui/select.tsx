@@ -22,7 +22,7 @@ const useSelectContext = () => {
   return context
 }
 
-const getTextContent = (node: React.ReactNode): string => {
+function getTextContent(node: React.ReactNode): string {
   if (typeof node === "string" || typeof node === "number") return String(node)
   if (Array.isArray(node)) return node.map(getTextContent).join("")
   if (!node || typeof node !== "object" || !("props" in node)) return ""
@@ -37,13 +37,13 @@ type SelectProps = {
   disabled?: boolean
 }
 
-const Select = ({
+function Select({
   children,
   value: controlledValue,
   defaultValue = "",
   onValueChange,
   disabled = false,
-}: SelectProps) => {
+}: SelectProps) {
   const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue)
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<Record<string, string>>({})
@@ -99,9 +99,9 @@ const Select = ({
   )
 }
 
-const SelectGroup = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={twMerge("space-y-1", className)} {...props} />
-)
+function SelectGroup({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={twMerge("space-y-1", className)} {...props} />
+}
 SelectGroup.displayName = "SelectGroup"
 
 type SelectValueProps = {
@@ -109,7 +109,7 @@ type SelectValueProps = {
   className?: string
 }
 
-const SelectValue = ({ placeholder, className }: SelectValueProps) => {
+function SelectValue({ placeholder, className }: SelectValueProps) {
   const { value, items } = useSelectContext()
   const selectedLabel = value ? items[value] ?? value : ""
   const text = selectedLabel || placeholder || ""

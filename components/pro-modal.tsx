@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { useUser } from "@/app/hooks/useUser"
 
-export const ProModal = () => {
+export function ProModal() {
   const proModal = useProModal()
   const isMounted = useMounted()
   const { toast } = useToast()

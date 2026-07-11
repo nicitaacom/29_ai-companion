@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 
-export const SubscriptionButton = () => {
+export function SubscriptionButton() {
   return (
     <Button size="sm" variant="default" disabled className="cursor-default">
       <span className="line-through opacity-50">$9.99 / mo</span>

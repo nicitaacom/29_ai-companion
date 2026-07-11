@@ -44,17 +44,18 @@ const providerLabels: Record<Exclude<Provider, "credentials">, string> = {
   github: "GitHub",
 }
 
-const getCurrentRedirectPath = () =>
-  typeof window === "undefined" ? "/" : `${window.location.pathname}${window.location.search}`
+function getCurrentRedirectPath() {
+  return typeof window === "undefined" ? "/" : `${window.location.pathname}${window.location.search}`
+}
 
-const getOAuthRedirectUrl = (provider: Exclude<Provider, "credentials">) => {
+function getOAuthRedirectUrl(provider: Exclude<Provider, "credentials">) {
   const url = new URL(`/auth/callback/oauth`, window.location.origin)
   url.searchParams.set("provider", provider)
   url.searchParams.set("next", getCurrentRedirectPath())
   return url.toString()
 }
 
-const getProviderHint = (providers: Provider[] | null | undefined) => {
+function getProviderHint(providers: Provider[] | null | undefined) {
   const oauthProviders = providers?.filter(provider => provider !== "credentials") as
     | Exclude<Provider, "credentials">[]
     | undefined
