@@ -62,6 +62,7 @@ export default [
       "local-rules/no-handlers-variable": "warn",
       "local-rules/no-inner-component": "warn",
       "local-rules/arrow-parens-avoid": "warn",
+      "local-rules/hook-naming-convention": "warn",
     },
   },
   {
