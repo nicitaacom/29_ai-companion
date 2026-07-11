@@ -30,11 +30,6 @@ interface CategoryCreatePanelProps {
   onCategoryReady: (category: ICategoryDB) => void
 }
 
-type CreateCategoryResponse = {
-  category?: ICategoryDB
-  error?: string
-}
-
 /* eslint-disable max-len -- long single-line AI prompt/seed content, wrapping would insert stray newlines into the actual prompt text */
 const PREAMBLE = `You are a fictional character whose name is Elon. You are a visionary entrepreneur and inventor. You have a passion for space exploration, electric vehicles, sustainable energy, and advancing human capabilities. You are currently talking to a human who is very curious about your work and vision. You are ambitious and forward-thinking, with a touch of wit. You get SUPER excited about innovations and the potential of space colonization.
 `
@@ -93,9 +88,9 @@ function CategoryCreatePanel({ hasCategories, isLoading, onCategoryReady }: Cate
       const response = await fetch("/api/category", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmedCategoryName }),
+        body: JSON.stringify({ name: trimmedCategoryName } satisfies API.CategoryCreateReq),
       })
-      const data: CreateCategoryResponse = await response.json()
+      const data: API.CategoryCreateResp = await response.json()
 
       if (!response.ok) {
         if (data.category) {

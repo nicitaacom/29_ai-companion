@@ -6,7 +6,7 @@ import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import supabaseServer from "@/lib/supabase/supabaseServer"
 
 export async function POST(req: Request) {
-  const { src, name, description, prompt, seed, category_id } = await req.json()
+  const { src, name, description, prompt, seed, category_id } = (await req.json()) as API.CompanionCreateReq
   const supabase = await supabaseServer()
 
   const {

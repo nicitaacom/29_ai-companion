@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useCompletion } from "@ai-sdk/react"
 
-import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { IMessage } from "@/app/interfaces/IMessageDB"
 import { useToast } from "@/components/ui/use-toast"
 import { useVerifyHuman } from "@/app/hooks/useVerifyHuman"
@@ -13,13 +12,6 @@ import { ChatHeader } from "@/components/chat-header"
 import { ChatMessageProps } from "@/components/chat-message"
 import { ChatMessages } from "@/components/chat-messages"
 import { FullscreenTurnstileGate } from "@/components/turnstile/fullscreen-turnstile-gate"
-
-interface ChatCompanion extends ICompanionDB {
-  messages: IMessage[]
-  _count: {
-    messages: number
-  }
-}
 
 interface ChatClientProps {
   chatId: string
@@ -46,7 +38,7 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
   const router = useRouter()
   const { toast } = useToast()
   const turnstileRef = useRef<HTMLDivElement | null>(null)
-  const [companion, setCompanion] = useState<ChatCompanion | null>(null)
+  const [companion, setCompanion] = useState<API.ChatCompanion | null>(null)
   const [messages, setMessages] = useState<ChatMessageProps[]>([])
   const [isChatLoading, setIsChatLoading] = useState(true)
   const [isFullWidth, setIsFullWidth] = useState(false)
@@ -78,9 +70,7 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
           throw new Error(`Failed to load chat (${response.status})`)
         }
 
-        const data = (await response.json()) as {
-          companion: ChatCompanion
-        }
+        const data: API.ChatGetResp = await response.json()
 
         setCompanion(data.companion)
         setMessages(mapCompanionMessages(data.companion.messages))
@@ -157,7 +147,7 @@ export function ChatClient({ chatId, initialTurnstileVerified }: ChatClientProps
     return <div className="flex h-full items-center justify-center p-4 text-sm text-zinc-400">Loading chat...</div>
   }
 
-  const companionWithLiveCount: ChatCompanion = {
+  const companionWithLiveCount: API.ChatCompanion = {
     ...companion,
     _count: {
       messages: messages.length,

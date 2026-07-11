@@ -14,8 +14,6 @@ import { useAccountModal } from "@/app/store/ui/accountModal"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { TAPIAuthLogin } from "@/app/api/auth/login/route"
-import { TAPIAuthRegister } from "@/app/api/auth/register/route"
 
 type Variant = "login" | "register"
 type Provider = "credentials" | "github" | "google"
@@ -119,7 +117,7 @@ export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email } as TAPIAuthLogin),
+        body: JSON.stringify({ email } satisfies API.AuthLoginReq),
       })
       const data: LoginResponse & AuthApiError = await response.json()
 
@@ -151,7 +149,7 @@ export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, redirectTo: getCurrentRedirectPath() } as TAPIAuthRegister),
+        body: JSON.stringify({ email, password, redirectTo: getCurrentRedirectPath() } satisfies API.AuthRegisterReq),
       })
       const data: RegisterResponse & AuthApiError = await response.json()
 

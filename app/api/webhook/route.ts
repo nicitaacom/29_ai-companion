@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       stripe_customer_id: subscription.customer as string,
       stripe_price_id: subscription.items.data[0].price.id,
       stripe_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-    })
+    } satisfies API.WebhookSubscriptionInsert)
     if (error_insert_user_subscription) {
       console.log(40, `ERROR_INSERTING_USER_SUBSCRIPTION - ${error_insert_user_subscription.message}`)
       return new NextResponse(`${error_insert_user_subscription.message}`, { status: 400 })
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       .update({
         stripe_price_id: subscription.items.data[0].price.id,
         stripe_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-      })
+      } satisfies API.WebhookSubscriptionUpdate)
       .eq("stripe_subscription_id", subscription.id)
     if (error_updating_user_subscription) {
       console.log(57, `ERROR_UPDATING_USER_SUBSCRIPTION - ${error_updating_user_subscription.message}`)

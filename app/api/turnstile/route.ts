@@ -18,7 +18,7 @@ function getRequestIp(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { token }: { token?: string } = await req.json()
+    const { token } = (await req.json()) as API.TurnstileVerifyReq
     const cleanToken = token?.trim()
 
     if (!cleanToken) {
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       return new NextResponse("Robot check failed. Please try again.", { status: 403 })
     }
 
-    const response = NextResponse.json({ success: true })
+    const response = NextResponse.json({ success: true } satisfies API.TurnstileVerifyResp)
 
     response.cookies.set({
       httpOnly: true,

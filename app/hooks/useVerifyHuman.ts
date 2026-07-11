@@ -92,7 +92,7 @@ export const useVerifyHuman = (
 
           try {
             const response = await fetch("/api/turnstile", {
-              body: JSON.stringify({ token }),
+              body: JSON.stringify({ token } satisfies API.TurnstileVerifyReq),
               headers: {
                 "Content-Type": "application/json",
               },

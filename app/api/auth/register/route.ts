@@ -1,22 +1,8 @@
 import { NextResponse } from "next/server"
-import { User } from "@supabase/supabase-js"
 
 import { ensureAppUser } from "@/lib/auth/ensureAppUser"
 import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
-
-export type TAPIAuthRegister = {
-  email: string
-  password: string
-  redirectTo?: string
-}
-
-export interface IResponse {
-  user: User
-  message: string
-}
-
-export type TAPIAuthRegisterResponse = IResponse
 
 async function selectExistingUserProviders(email: string) {
   const { data, error } = await supabaseAdmin.from("29_users").select("providers").eq("email", email).maybeSingle()
@@ -25,7 +11,7 @@ async function selectExistingUserProviders(email: string) {
 }
 
 export async function POST(req: Request) {
-  const { email, password, redirectTo } = (await req.json()) as TAPIAuthRegister
+  const { email, password, redirectTo } = (await req.json()) as API.AuthRegisterReq
 
   if (!email || !password) return NextResponse.json({ error: "email or password missing" }, { status: 400 })
 
@@ -68,5 +54,5 @@ export async function POST(req: Request) {
   return NextResponse.json({
     user,
     message: session ? "Account created successfully." : "Check your email to finish creating your account.",
-  })
+  } satisfies API.AuthRegisterResp)
 }

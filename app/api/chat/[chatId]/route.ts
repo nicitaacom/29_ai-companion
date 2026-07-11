@@ -116,7 +116,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ chatId:
           messages: messages.length,
         },
       },
-    })
+    } satisfies API.ChatGetResp)
   } catch (error) {
     console.error("[CHAT_GET]", error)
     return new NextResponse("Chat could not be loaded right now", { status: 500 })
@@ -126,7 +126,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ chatId:
 export async function POST(req: Request, { params }: { params: Promise<{ chatId: string }> }) {
   try {
     const { chatId } = await params
-    const { prompt }: { prompt?: string } = await req.json()
+    const { prompt } = (await req.json()) as API.ChatPostReq
     const { hasHumanVerification, visitor } = await getChatRequestContext()
 
     if (!chatId) {

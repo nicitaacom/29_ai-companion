@@ -6,7 +6,7 @@ import supabaseServer from "@/lib/supabase/supabaseServer"
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ companionId: string }> }) {
   const { companionId } = await params
-  const { src, name, description, prompt, seed, category_id } = await req.json()
+  const { src, name, description, prompt, seed, category_id } = (await req.json()) as API.CompanionUpdateReq
   const supabase = await supabaseServer()
 
   // check is companionId exist in params
