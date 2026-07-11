@@ -32,6 +32,7 @@ export default [
       "max-len": ["warn", { code: 130, ignoreUrls: true }],
       "import/newline-after-import": ["warn", { count: 1 }],
       "local-rules/no-export-const-classname": "warn",
+      "local-rules/no-localstorage-direct": "warn",
     },
   },
 ]
