@@ -6,23 +6,23 @@ export const runtime = "nodejs"
 export const maxDuration = 60
 
 export async function POST(req: Request) {
-  const result = await executeRateLimitRequest(req, (await req.json()) as API.RateLimitReq)
+  const response = await executeRateLimitRequest(req, (await req.json()) as API.RateLimitReq)
 
-  if (!result.success) {
+  if (!response.success) {
     return NextResponse.json(
-      { error: result.error } satisfies API.RateLimitErrorResp,
+      { error: response.error } satisfies API.RateLimitErrorResp,
       {
-        headers: result.retryAfter ? { "retry-after": `${result.retryAfter}` } : undefined,
-        status: result.status,
+        headers: response.retryAfter ? { "retry-after": `${response.retryAfter}` } : undefined,
+        status: response.status,
       },
     )
   }
 
   return NextResponse.json(
     {
-      remaining: result.remaining,
-      resetTime: result.resetTime,
-      resetIn: result.resetIn,
+      remaining: response.remaining,
+      resetTime: response.resetTime,
+      resetIn: response.resetIn,
     } satisfies API.RateLimitResp,
     { status: 200 },
   )

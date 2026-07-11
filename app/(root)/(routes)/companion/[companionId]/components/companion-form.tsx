@@ -217,8 +217,8 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
       })
 
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}))
-        toast({ variant: "destructive", description: data?.error || "Something went wrong" })
+        const catchResp = await response.json().catch(() => ({}))
+        toast({ variant: "destructive", description: catchResp?.error || "Something went wrong" })
         return
       }
 

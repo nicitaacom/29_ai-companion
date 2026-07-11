@@ -37,12 +37,12 @@ async function getChatRequestContext() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const visitor = await getChatVisitor(user)
+  const getChatVisitorResp = await getChatVisitor(user)
   const hasHumanVerification = await hasVerifiedHumanCookie()
 
   return {
     hasHumanVerification,
-    visitor,
+    visitor: getChatVisitorResp,
   }
 }
 
@@ -163,6 +163,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
       }
     }
 
+    // eslint-disable-next-line local-rules/response-variable-naming -- used throughout, renaming hurts readability
     const companion = await getCompanion(chatId)
 
     if (!companion) {
@@ -207,6 +208,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
       userId: visitor.participantId,
       modelName: "llama2-13b",
     }
+    // eslint-disable-next-line local-rules/response-variable-naming -- client instance used for several calls below
     const memoryManager = await MemoryManager.getInstance()
 
     const records = await memoryManager.readLatestHistory(companionKey)

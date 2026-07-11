@@ -29,16 +29,18 @@ export async function POST(req: Request) {
 
   if (!email || !password) return NextResponse.json({ error: "email or password missing" }, { status: 400 })
 
-  const existingProviders = await selectExistingUserProviders(email)
-  if (typeof existingProviders === "string") return NextResponse.json({ error: existingProviders }, { status: 400 })
+  const selectExistingUserProvidersResp = await selectExistingUserProviders(email)
+  if (typeof selectExistingUserProvidersResp === "string") {
+    return NextResponse.json({ error: selectExistingUserProvidersResp }, { status: 400 })
+  }
 
-  if (existingProviders) {
-    const providerList = existingProviders.join(", ") || "another provider"
-    const errorMessage = existingProviders.includes("credentials")
+  if (selectExistingUserProvidersResp) {
+    const providerList = selectExistingUserProvidersResp.join(", ") || "another provider"
+    const errorMessage = selectExistingUserProvidersResp.includes("credentials")
       ? "User with this email already exists"
       : `You already have an account with ${providerList}`
 
-    return NextResponse.json({ error: errorMessage, providers: existingProviders }, { status: 400 })
+    return NextResponse.json({ error: errorMessage, providers: selectExistingUserProvidersResp }, { status: 400 })
   }
 
   const requestUrl = new URL(req.url)

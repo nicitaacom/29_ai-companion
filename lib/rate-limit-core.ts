@@ -260,14 +260,14 @@ export async function executeRateLimitRequest(req: Request, payload: API.RateLim
     }
   }
 
-  const result = await safeRateLimit({
+  const response = await safeRateLimit({
     fullKey,
     limiterName,
     spec,
   })
 
-  if (!result.success) {
-    const retryAfter = Math.max(1, Math.floor((result.reset - Date.now()) / 1000))
+  if (!response.success) {
+    const retryAfter = Math.max(1, Math.floor((response.reset - Date.now()) / 1000))
 
     return {
       error: `Please try again in ${retryAfter} seconds`,
@@ -278,10 +278,10 @@ export async function executeRateLimitRequest(req: Request, payload: API.RateLim
   }
 
   return {
-    remaining: result.remaining,
-    reset: result.reset,
-    resetIn: formatResetIn(result.reset),
-    resetTime: formatReset(result.reset, userTimezone),
+    remaining: response.remaining,
+    reset: response.reset,
+    resetIn: formatResetIn(response.reset),
+    resetTime: formatReset(response.reset, userTimezone),
     success: true,
   }
 }

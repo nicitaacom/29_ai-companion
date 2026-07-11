@@ -35,13 +35,13 @@ export async function getChatVisitor(user: AuthLikeUser) {
     }
   }
 
-  const guestId = await getGuestVisitorId()
+  const getGuestVisitorIdResp = await getGuestVisitorId()
 
   return {
-    guestId,
+    guestId: getGuestVisitorIdResp,
     isAuthenticated: false,
     isFreeUser: true,
-    participantId: guestId ? buildGuestParticipantId(guestId) : "guest:anonymous",
+    participantId: getGuestVisitorIdResp ? buildGuestParticipantId(getGuestVisitorIdResp) : "guest:anonymous",
     userId: null,
   }
 }

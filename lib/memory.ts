@@ -94,8 +94,8 @@ export class MemoryManager {
     }
 
     try {
-      const result = await this.history.zadd(key, value)
-      return result
+      const response = await this.history.zadd(key, value)
+      return response
     } catch (error) {
       console.error("[MEMORY_WRITE_FALLBACK]", error)
       memorySortedSetAdd(key, value)
