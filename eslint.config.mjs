@@ -40,6 +40,7 @@ export default [
       "local-rules/sdk-method-naming": "warn",
       "local-rules/no-throwaway-alias": "warn",
       "local-rules/no-zustand-types-in-store-file": "warn",
+      "local-rules/input-value-naming": "warn",
     },
   },
 ]
