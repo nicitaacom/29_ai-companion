@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ companionId: string }> }) {
   const { companionId } = await params
-  const { src, name, description, instructions, seed, category_id } = await req.json()
+  const { src, name, description, prompt, seed, category_id } = await req.json()
   const supabase = await supabaseServer()
 
   // check is companionId exist in params
@@ -23,7 +23,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
   }
 
   // Check is all data passed to this route properly
-  if (!src || !name || !description || !instructions || !seed || !category_id) {
+  if (!src || !name || !description || !prompt || !seed || !category_id) {
     return new NextResponse("Missing required fields", { status: 400 })
   }
 
@@ -44,7 +44,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
         src,
         name,
         description,
-        instructions,
+        prompt,
         seed,
       })
       .eq("id", companionId)

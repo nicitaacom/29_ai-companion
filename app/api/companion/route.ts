@@ -5,7 +5,7 @@ import supabaseServer from "@/lib/supabase/supabaseServer"
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
-  const { src, name, description, instructions, seed, category_id } = await req.json()
+  const { src, name, description, prompt, seed, category_id } = await req.json()
   const supabase = await supabaseServer()
 
   const {
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     return new NextResponse("Unauthenticated", { status: 401 })
   }
   // Chec is all required data passesed to this API route
-  if (!src || !name || !description || !instructions || !seed || !category_id) {
+  if (!src || !name || !description || !prompt || !seed || !category_id) {
     return new NextResponse("Missing required fields", { status: 400 })
   }
 
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
       src,
       name,
       description,
-      instructions,
+      prompt,
       seed,
     })
     .select()

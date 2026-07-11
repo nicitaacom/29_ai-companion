@@ -24,7 +24,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
-          instructions: string
+          prompt: string
           name: string
           seed: string
           src: string
@@ -37,7 +37,7 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
-          instructions: string
+          prompt: string
           name: string
           seed: string
           src: string
@@ -50,7 +50,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
-          instructions?: string
+          prompt?: string
           name?: string
           seed?: string
           src?: string

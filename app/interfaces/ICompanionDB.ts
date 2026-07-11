@@ -3,7 +3,7 @@ export interface ICompanionDB {
   category_id: string
   created_at: string
   description: string
-  instructions: string
+  prompt: string
   name: string
   seed: string
   src: string

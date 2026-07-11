@@ -33,6 +33,7 @@ export default [
       "import/newline-after-import": ["warn", { count: 1 }],
       "local-rules/no-export-const-classname": "warn",
       "local-rules/no-localstorage-direct": "warn",
+      "local-rules/no-banned-words": "error",
     },
   },
 ]

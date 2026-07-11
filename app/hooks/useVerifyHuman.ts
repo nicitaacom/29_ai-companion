@@ -121,6 +121,7 @@ export const useVerifyHuman = (
           if (!cancelled) {
             setIsVerified(false)
             setStatus("error")
+            // eslint-disable-next-line local-rules/no-banned-words -- natural English user-facing copy, not a naming choice
             setErrorMessage("Cloudflare Turnstile could not load correctly. Please try again.")
           }
         },

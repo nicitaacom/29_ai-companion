@@ -60,8 +60,8 @@ const formSchema = z.object({
   description: z.string().min(1, {
     message: "Description is required",
   }),
-  instructions: z.string().min(200, {
-    message: "Instructions require at least 200 characters",
+  prompt: z.string().min(200, {
+    message: "Prompt requires at least 200 characters",
   }),
   seed: z.string().min(200, {
     message: "Seed require at least 200 characters",
@@ -182,7 +182,7 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
     defaultValues: {
       name: initialData?.name ?? "",
       description: initialData?.description ?? "",
-      instructions: initialData?.instructions ?? "",
+      prompt: initialData?.prompt ?? "",
       seed: initialData?.seed ?? "",
       src: initialData?.src ?? "",
       category_id: initialData?.category_id ?? "",
@@ -316,16 +316,16 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
           <div className="space-y-2 w-full">
             <div>
               <h3 className="text-xl font-medium">Configuration</h3>
-              <p className="text-sm text-muted-foreground">Detailed instructions for AI Behaviour</p>
+              <p className="text-sm text-muted-foreground">Detailed prompt for AI Behaviour</p>
             </div>
             <Separator className="bg-primary/10" />
           </div>
           <FormField
-            name="instructions"
+            name="prompt"
             control={form.control}
             render={({ field }) => (
               <FormItem className="col-span-2 md:col-span-1">
-                <FormLabel>Instructions</FormLabel>
+                <FormLabel>Prompt</FormLabel>
                 <FormControl>
                   <Textarea
                     className="bg-background resize-none"

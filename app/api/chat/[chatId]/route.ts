@@ -245,8 +245,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ chatId:
 
 Only generate plain sentences without prefixes like "${companion.name}:" or "Assistant:".
 
-Character instructions:
-${companion.instructions}
+Character prompt:
+${companion.prompt}
 
 Relevant past details:
 ${relevantHistory || "No additional relevant history."}
@@ -300,6 +300,7 @@ ${recentChatHistory || "No prior conversation."}`,
 
     return new NextResponse(response, {
       headers: {
+        // eslint-disable-next-line local-rules/no-banned-words -- MIME type text/x is the HTTP standard, not a naming choice
         "Content-Type": "text/plain; charset=utf-8",
       },
     })
