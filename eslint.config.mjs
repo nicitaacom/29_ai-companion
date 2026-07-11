@@ -63,6 +63,7 @@ export default [
       "local-rules/no-inner-component": "warn",
       "local-rules/arrow-parens-avoid": "warn",
       "local-rules/hook-naming-convention": "warn",
+      "local-rules/db-redis-verb-naming": "warn",
     },
   },
   {
