@@ -54,6 +54,7 @@ export default [
       "local-rules/console-log-line-number": "warn",
       "local-rules/no-redundant-return-parens": "warn",
       "local-rules/no-zustand-selector": "warn",
+      "local-rules/zustand-state-setter-pairing": "warn",
     },
   },
   {
