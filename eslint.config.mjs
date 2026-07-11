@@ -55,6 +55,7 @@ export default [
       "local-rules/no-redundant-return-parens": "warn",
       "local-rules/no-zustand-selector": "warn",
       "local-rules/zustand-state-setter-pairing": "warn",
+      "local-rules/prefer-inline-zustand-setter": "warn",
     },
   },
   {
