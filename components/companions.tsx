@@ -1,7 +1,8 @@
-import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import Image from "next/image"
 import Link from "next/link"
 import { MessagesSquare } from "lucide-react"
+
+import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 
 interface CompanionsProps {
   data: ICompanionDB[]

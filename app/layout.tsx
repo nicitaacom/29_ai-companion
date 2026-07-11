@@ -2,10 +2,10 @@ import "./globals.css"
 import type { Metadata } from "next"
 import Script from "next/script"
 
+import { getURL } from "@/app/utils/getURL"
+import { ProModal } from "@/components/pro-modal"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
-import { ProModal } from "@/components/pro-modal"
-import { getURL } from "@/app/utils/getURL"
 
 const siteUrl = new URL(getURL())
 const siteTitle = "jompanion.jokik.fi"

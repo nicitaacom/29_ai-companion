@@ -1,7 +1,8 @@
+import { NextRequest, NextResponse } from "next/server"
+
 import { checkSubscription } from "@/lib/subscription"
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import supabaseServer from "@/lib/supabase/supabaseServer"
-import { NextRequest, NextResponse } from "next/server"
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ companionId: string }> }) {
   const { companionId } = await params

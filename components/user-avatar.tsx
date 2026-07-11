@@ -1,7 +1,7 @@
 "use client"
 
-import { useUser } from "@/app/hooks/useUser"
 import { Avatar, AvatarImage } from "./ui/avatar"
+import { useUser } from "@/app/hooks/useUser"
 
 export function UserAvatar() {
   const { user } = useUser()

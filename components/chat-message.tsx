@@ -4,12 +4,13 @@ import { BeatLoader } from "react-spinners"
 import { twMerge } from "tailwind-merge"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { Copy } from "lucide-react"
+
+import { useTheme } from "./theme-provider"
 import { useToast } from "./ui/use-toast"
 import { BotAvatar } from "./bot-avatar"
-import { UserAvatar } from "./user-avatar"
 import { Button } from "./ui/button"
-import { Copy } from "lucide-react"
-import { useTheme } from "./theme-provider"
+import { UserAvatar } from "./user-avatar"
 
 export interface ChatMessageProps {
   id?: string

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { User } from "@supabase/supabase-js"
+
 import { ensureAppUser } from "@/lib/auth/ensureAppUser"
-import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
+import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 
 export type TAPIAuthRegister = {
   email: string

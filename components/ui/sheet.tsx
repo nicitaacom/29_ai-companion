@@ -6,9 +6,9 @@ import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
+import { cn } from "@/lib/utils"
 import { useMounted } from "@/app/hooks/use-mounted"
 import { SlotSafe } from "@/components/ui/slot-safe"
-import { cn } from "@/lib/utils"
 
 type SheetContextValue = {
   open: boolean

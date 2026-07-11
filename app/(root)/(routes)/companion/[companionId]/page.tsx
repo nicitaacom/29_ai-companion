@@ -1,8 +1,9 @@
-import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
-import { CompanionForm } from "./components/companion-form"
-import supabaseServer from "@/lib/supabase/supabaseServer"
 import { redirect } from "next/navigation"
+
+import { CompanionForm } from "./components/companion-form"
 import { checkSubscription } from "@/lib/subscription"
+import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
+import supabaseServer from "@/lib/supabase/supabaseServer"
 
 export const dynamic = "force-dynamic"
 

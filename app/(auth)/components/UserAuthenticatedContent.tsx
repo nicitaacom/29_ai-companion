@@ -1,12 +1,12 @@
 "use client"
 
-import { logout } from "@/app/functions/logout"
-import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 import { User } from "@supabase/supabase-js"
 import { ShieldCheck } from "lucide-react"
-import { useRouter } from "next/navigation"
 
 import { AuthModalShell } from "./AuthModalShell"
+import { logout } from "@/app/functions/logout"
+import { Button } from "@/components/ui/button"
 
 function getProviders(user: User) {
   return Array.from(new Set(user.identities?.map(identity => identity.provider).filter(Boolean) ?? ["credentials"]))

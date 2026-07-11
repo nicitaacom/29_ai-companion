@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
 
+import { rateLimitTurnstileVerification } from "@/lib/rate-limit"
+import { verifyTurnstileToken } from "@/lib/turnstile"
 import {
   TURNSTILE_VERIFIED_COOKIE_MAX_AGE,
   TURNSTILE_VERIFIED_COOKIE_NAME,
   TURNSTILE_VERIFIED_COOKIE_VALUE,
 } from "@/lib/chat-session"
-import { rateLimitTurnstileVerification } from "@/lib/rate-limit"
-import { verifyTurnstileToken } from "@/lib/turnstile"
 
 export const runtime = "nodejs"
 export const maxDuration = 60

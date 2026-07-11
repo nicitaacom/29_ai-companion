@@ -1,10 +1,10 @@
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 
 import type { Database } from "@/app/interfaces/types_db"
-import { GUEST_VISITOR_COOKIE_MAX_AGE, GUEST_VISITOR_COOKIE_NAME } from "@/lib/chat-session"
 import { assertProductionEnv } from "@/lib/env-validation"
-import type { NextRequest } from "next/server"
+import { GUEST_VISITOR_COOKIE_MAX_AGE, GUEST_VISITOR_COOKIE_NAME } from "@/lib/chat-session"
 
 export async function middleware(req: NextRequest) {
   assertProductionEnv()

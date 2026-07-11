@@ -1,11 +1,11 @@
 "use client"
 
+import { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef } from "react"
 import { ChatRequestOptions } from "ai"
 import { SendHorizonal } from "lucide-react"
-import { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef } from "react"
 
-import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
+import { Button } from "@/components/ui/button"
 
 interface ChatFormProps {
   input: string

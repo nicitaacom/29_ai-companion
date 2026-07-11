@@ -2,12 +2,12 @@
 
 import { useAuthOpen } from "@/app/hooks/use-auth-open"
 import { useMounted } from "@/app/hooks/use-mounted"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useProModal } from "@/app/hooks/use-pro-modal"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { useUser } from "@/app/hooks/useUser"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 
 export function ProModal() {
   const proModal = useProModal()

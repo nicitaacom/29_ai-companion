@@ -1,7 +1,7 @@
-import { Navbar } from "@/components/navbar"
-import { Sidebar } from "@/components/sidebar"
 import { checkSubscription } from "@/lib/subscription"
 import supabaseServer from "@/lib/supabase/supabaseServer"
+import { Navbar } from "@/components/navbar"
+import { Sidebar } from "@/components/sidebar"
 
 export const dynamic = "force-dynamic"
 

@@ -47,6 +47,7 @@ export default [
       "local-rules/ts-ignore-dynamic-table-only": "warn",
       "local-rules/type-naming-prefix": "warn",
       "local-rules/no-type-export-in-action-or-component": "warn",
+      "local-rules/imports-order": "warn",
     },
   },
   {

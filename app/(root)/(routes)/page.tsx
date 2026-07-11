@@ -1,7 +1,7 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 import { Categories } from "@/components/categories"
-import { SearchInput } from "@/components/search-input"
 import { Companions } from "@/components/companions"
+import { SearchInput } from "@/components/search-input"
 
 export const dynamic = "force-dynamic"
 

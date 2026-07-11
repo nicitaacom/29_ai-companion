@@ -1,10 +1,10 @@
 import Link from "next/link"
 
-import { ModeToggle } from "./mode-toggle"
 import { MobileSidebar } from "./mobile-sidebar"
-import { AuthModal } from "@/app/(auth)/AuthModal"
-import supabaseServer from "@/lib/supabase/supabaseServer"
+import { ModeToggle } from "./mode-toggle"
 import { UpgradeButton } from "./upgrade-button"
+import supabaseServer from "@/lib/supabase/supabaseServer"
+import { AuthModal } from "@/app/(auth)/AuthModal"
 
 export async function Navbar({ isPro }: { isPro: boolean }) {
   const supabase = await supabaseServer()

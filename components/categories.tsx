@@ -1,7 +1,7 @@
 "use client"
 
-import { twMerge } from "tailwind-merge"
 import { useRouter, useSearchParams } from "next/navigation"
+import { twMerge } from "tailwind-merge"
 import qs from "query-string"
 
 import { ICategoryDB } from "@/app/interfaces/ICategoryDB"

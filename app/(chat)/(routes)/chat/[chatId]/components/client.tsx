@@ -2,16 +2,16 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-
 import { useCompletion } from "@ai-sdk/react"
+
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { IMessage } from "@/app/interfaces/IMessageDB"
-import { ChatHeader } from "@/components/chat-header"
-import { ChatForm } from "@/components/chat-form"
-import { ChatMessages } from "@/components/chat-messages"
-import { ChatMessageProps } from "@/components/chat-message"
 import { useToast } from "@/components/ui/use-toast"
 import { useVerifyHuman } from "@/app/hooks/useVerifyHuman"
+import { ChatForm } from "@/components/chat-form"
+import { ChatHeader } from "@/components/chat-header"
+import { ChatMessageProps } from "@/components/chat-message"
+import { ChatMessages } from "@/components/chat-messages"
 import { FullscreenTurnstileGate } from "@/components/turnstile/fullscreen-turnstile-gate"
 
 interface ChatCompanion extends ICompanionDB {

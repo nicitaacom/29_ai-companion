@@ -1,6 +1,7 @@
-import { hasVerifiedHumanCookie } from "@/lib/chat-visitor"
 import { redirect } from "next/navigation"
+
 import { ChatClient } from "./components/client"
+import { hasVerifiedHumanCookie } from "@/lib/chat-visitor"
 
 export const dynamic = "force-dynamic"
 export const maxDuration = 60

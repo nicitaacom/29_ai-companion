@@ -1,8 +1,9 @@
 "use client"
 
+import { ElementRef, useEffect, useRef, useState } from "react"
+
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { ChatMessage, ChatMessageProps } from "./chat-message"
-import { ElementRef, useEffect, useRef, useState } from "react"
 
 interface ChatMessagesProps {
   messages: ChatMessageProps[]

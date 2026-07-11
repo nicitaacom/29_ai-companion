@@ -1,5 +1,5 @@
-import { useAccountModal } from "@/app/store/ui/accountModal"
 import { TAuthModalVariant } from "@/app/store/ui/types/TAuthModalVariant"
+import { useAccountModal } from "@/app/store/ui/accountModal"
 
 const AUTH_QUERY_KEY = "auth"
 const IFRAME_QUERY_KEY = "is_iframe"

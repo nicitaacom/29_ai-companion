@@ -1,8 +1,8 @@
 import { Redis } from "@upstash/redis"
 
-import { RATE_LIMITS } from "@/app/consts/RATE_LIMIT"
 import { TRateLimiterName } from "@/classes/RateLimit/types/TRateLimiterName"
 import { memoryFixedWindowGetRemaining, memoryFixedWindowLimit } from "@/lib/resilient-store"
+import { RATE_LIMITS } from "@/app/consts/RATE_LIMIT"
 
 type RateLimiterSpec = {
   maxAllowed: number

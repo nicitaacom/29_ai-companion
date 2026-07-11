@@ -1,18 +1,18 @@
 "use client"
 
+import { useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { User } from "@supabase/supabase-js"
 
-import { useAuthOpen } from "@/app/hooks/use-auth-open"
-import { useAccountModal } from "@/app/store/ui/accountModal"
-import { getRequestedAuthVariant } from "@/app/utils/auth"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { UserAuthenticatedContent } from "./components/UserAuthenticatedContent"
 import { UserNotAuthenticatedContent } from "./components/UserNotAuthenticatedContent"
+import { getRequestedAuthVariant } from "@/app/utils/auth"
+import { useAccountModal } from "@/app/store/ui/accountModal"
+import { useAuthOpen } from "@/app/hooks/use-auth-open"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 export function AuthModal({ user }: { user: User | null }) {
   const searchParams = useSearchParams()

@@ -1,16 +1,16 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { ChevronLeft, Edit, MessagesSquare, MoreVertical, Trash, Maximize2, Minimize2 } from "lucide-react"
+import { twMerge } from "tailwind-merge"
 
 import { ICompanionDB } from "@/app/interfaces/ICompanionDB"
 import { IMessage } from "@/app/interfaces/IMessageDB"
 import { Button, buttonVariants } from "./ui/button"
-import { useRouter } from "next/navigation"
-import { BotAvatar } from "@/components/bot-avatar"
-import { useUser } from "@/app/hooks/useUser"
-import { twMerge } from "tailwind-merge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { useChatHeaderHandlers } from "@/components/hooks/useChatHeaderHandlers"
+import { useUser } from "@/app/hooks/useUser"
+import { BotAvatar } from "@/components/bot-avatar"
 
 interface ChatHeaderProps {
   companion: ICompanionDB & {

@@ -1,9 +1,10 @@
 "use client"
 
-import { useProModal } from "@/app/hooks/use-pro-modal"
-import { Home, Plus, Settings } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
+import { Home, Plus, Settings } from "lucide-react"
 import { twMerge } from "tailwind-merge"
+
+import { useProModal } from "@/app/hooks/use-pro-modal"
 
 export function Sidebar({ isPro }: { isPro: boolean }) {
   const pathname = usePathname()

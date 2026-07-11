@@ -1,8 +1,9 @@
 "use client"
 
+import { useSearchParams } from "next/navigation"
+
 import { TAuthModalVariant } from "@/app/store/ui/types/TAuthModalVariant"
 import { buildAuthUrl, isIframeMode, openAuthModal } from "@/app/utils/auth"
-import { useSearchParams } from "next/navigation"
 
 export function useAuthOpen() {
   const searchParams = useSearchParams()

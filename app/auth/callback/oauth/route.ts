@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 
-import { TAppAuthProvider, ensureAppUser } from "@/lib/auth/ensureAppUser"
 import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
+import { TAppAuthProvider, ensureAppUser } from "@/lib/auth/ensureAppUser"
 
 function getSafeRedirectPath(nextPath: string | null) {
   if (!nextPath || !nextPath.startsWith("/")) return "/"

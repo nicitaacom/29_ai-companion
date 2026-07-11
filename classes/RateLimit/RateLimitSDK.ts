@@ -1,7 +1,7 @@
 import { TRateLimiterName } from "./types/TRateLimiterName"
-import { RATE_LIMITS } from "@/app/consts/RATE_LIMIT"
-import useUser from "@/store/useUser"
 import useUserTimezone from "@/widgets/TimezonePicker/useUserTimeZone"
+import useUser from "@/store/useUser"
+import { RATE_LIMITS } from "@/app/consts/RATE_LIMIT"
 
 type Action = API.RateLimitRequest["action"]
 

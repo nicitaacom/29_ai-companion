@@ -1,7 +1,7 @@
 "use client"
 
-import { CldUploadButton, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import Image from "next/image"
+import { CldUploadButton, CloudinaryUploadWidgetResults } from "next-cloudinary"
 import { twMerge } from "tailwind-merge"
 
 import { useMounted } from "@/app/hooks/use-mounted"
