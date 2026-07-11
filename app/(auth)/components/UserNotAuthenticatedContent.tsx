@@ -66,7 +66,7 @@ function getProviderHint(providers: Provider[] | null | undefined) {
 export function UserNotAuthenticatedContent({ initialVariant }: { initialVariant: TAuthModalVariant }) {
   const router = useRouter()
   const { toast } = useToast()
-  const closeModal = useAccountModal(state => state.closeModal)
+  const { closeModal } = useAccountModal()
   const [variant, setVariant] = useState<Variant>(initialVariant)
   const [responseMessage, setResponseMessage] = useState<string | null>(null)
   const [providerHint, setProviderHint] = useState<Provider[] | null>(null)

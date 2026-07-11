@@ -53,6 +53,7 @@ export default [
       "local-rules/function-body-own-line": "warn",
       "local-rules/console-log-line-number": "warn",
       "local-rules/no-redundant-return-parens": "warn",
+      "local-rules/no-zustand-selector": "warn",
     },
   },
   {
