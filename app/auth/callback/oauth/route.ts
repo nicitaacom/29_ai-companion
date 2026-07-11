@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-import { AppAuthProvider, ensureAppUser } from "@/lib/auth/ensureAppUser"
+import { TAppAuthProvider, ensureAppUser } from "@/lib/auth/ensureAppUser"
 import { getSupabaseRouteHandlerClient } from "@/lib/supabase/supabaseRoute"
 
 function getSafeRedirectPath(nextPath: string | null) {
@@ -17,7 +17,7 @@ function getErrorRedirect(requestUrl: URL) {
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get("code")
-  const provider = requestUrl.searchParams.get("provider") as AppAuthProvider | null
+  const provider = requestUrl.searchParams.get("provider") as TAppAuthProvider | null
 
   if (!code || !provider || !["google", "github"].includes(provider)) return NextResponse.redirect(getErrorRedirect(requestUrl))
 

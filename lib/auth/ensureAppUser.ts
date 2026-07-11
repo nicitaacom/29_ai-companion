@@ -2,7 +2,7 @@ import { User } from "@supabase/supabase-js"
 
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin"
 
-export type AppAuthProvider = "credentials" | "github" | "google"
+export type TAppAuthProvider = "credentials" | "github" | "google"
 
 function getAvatarUrl(user: Pick<User, "identities" | "user_metadata">) {
   const metadataAvatar =
@@ -25,7 +25,7 @@ function getUniqueProviders(providers: string[]) {
   return Array.from(new Set(providers.filter(Boolean)))
 }
 
-export async function ensureAppUser(user: User, provider: AppAuthProvider): Promise<string | null> {
+export async function ensureAppUser(user: User, provider: TAppAuthProvider): Promise<string | null> {
   if (!user.id || !user.email) return "Authenticated user is missing required fields"
 
   const { data: userById, error: userByIdError } = await supabaseAdmin

@@ -24,7 +24,7 @@ type RateLimitErrorResult = {
   success: false
 }
 
-export type RateLimitExecutionResult = RateLimitSuccessResult | RateLimitErrorResult
+export type TRateLimitExecutionResult = RateLimitSuccessResult | RateLimitErrorResult
 
 const limiterCache = new Map<TRateLimiterName, RateLimiterSpec>()
 const redis = Redis.fromEnv()
@@ -195,7 +195,7 @@ async function safeRateLimit({
   }
 }
 
-export async function executeRateLimitRequest(req: Request, payload: API.RateLimitRequest): Promise<RateLimitExecutionResult> {
+export async function executeRateLimitRequest(req: Request, payload: API.RateLimitRequest): Promise<TRateLimitExecutionResult> {
   const { limiterName, action, userTimezone } = payload
 
   if (!limiterName || !userTimezone) {

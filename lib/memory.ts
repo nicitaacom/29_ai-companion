@@ -8,7 +8,7 @@ import {
   memorySortedSetRangeByScore,
 } from "@/lib/resilient-store"
 
-export type CompanionKey = {
+export type TCompanionKey = {
   companionName: string
   modelName: string
   userId: string
@@ -54,7 +54,7 @@ export class MemoryManager {
     return MemoryManager.instance
   }
 
-  private generateRedisCompanionKey(companionKey: CompanionKey): string {
+  private generateRedisCompanionKey(companionKey: TCompanionKey): string {
     return `${companionKey.companionName}-${companionKey.modelName}-${companionKey.userId}`
   }
 
@@ -80,7 +80,7 @@ export class MemoryManager {
     return value
   }
 
-  public async writeToHistory(text: string, companionKey: CompanionKey) {
+  public async writeToHistory(text: string, companionKey: TCompanionKey) {
     if (!companionKey || typeof companionKey.userId == "undefined") {
       console.log("Companion key set incorrectly")
       return ""
@@ -102,7 +102,7 @@ export class MemoryManager {
     }
   }
 
-  public async readLatestHistory(companionKey: CompanionKey): Promise<string> {
+  public async readLatestHistory(companionKey: TCompanionKey): Promise<string> {
     if (!companionKey || typeof companionKey.userId == "undefined") {
       console.log("Companion key set incorrectly")
       return ""
@@ -125,7 +125,7 @@ export class MemoryManager {
     return recentChats
   }
 
-  public async seedChatHistory(seedContent: string, delimiter: string = "\n", companionKey: CompanionKey) {
+  public async seedChatHistory(seedContent: string, delimiter: string = "\n", companionKey: TCompanionKey) {
     const key = this.generateRedisCompanionKey(companionKey)
     try {
       if (await this.history.exists(key)) {
