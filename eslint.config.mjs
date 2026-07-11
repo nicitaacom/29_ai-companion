@@ -44,6 +44,7 @@ export default [
       "local-rules/handle-prefix-location": "warn",
       "local-rules/no-process-env-non-null-assertion": "warn",
       "local-rules/arrow-fn-only-for-hooks": "warn",
+      "local-rules/ts-ignore-dynamic-table-only": "warn",
     },
   },
 ]
