@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
-    "update-types": "pnpx supabase gen types typescript --project-id vahemcbozzowgcadavfm > app/interfaces/types_db.ts",
+    "update-types-do-not-run": "pnpx supabase gen types typescript --project-id vahemcbozzowgcadavfm > app/interfaces/types_db.ts",
     "cypress-dev": "pnpx cypress open --config watchForFileChanges=false",
     "cypress-prod": "pnpx cypress open --config watchForFileChanges=false  --config-file prod.config.ts"
   },
