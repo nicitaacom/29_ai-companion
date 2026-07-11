@@ -18,10 +18,321 @@ NoteBadge copy). Two `NoteBadge`s explain this and cross-sell the existing compa
 
 Two generation modes behind one UI, switched by a toggle:
 
-- **Image mode** - ~25 models (Nano Banana Pro/2, GPT Image 1/2, Seedream, Grok, Flux 2, Ideogram,
-  Recraft, Qwen Image, Krea 2, Microsoft MAI Image 2.5, etc.)
-- **Video mode** - ~28 models (Seedance, Kling, Sora 2, Veo 3.1, Runway, Wan, Luma, Minimax, PixVerse,
-  etc.), each with a resolution range, duration range, and whether audio is supported.
+- **Image mode** - **exactly 25 models**, no subset (full list in section 3).
+- **Video mode** - **exactly 26 models**, no subset (full list in section 3), each with a resolution
+  range, duration range, and whether audio is supported.
+
+**On "don't skip models" (confirmed):** section 3 below now transcribes the complete catalog as real
+`const` data, not a "~N, etc." summary - every model from the source list has its own entry, nothing
+trimmed for v1. That said, there are **two separate promises** being made here and only one of them is
+fully under this plan's control:
+
+1. **The UI shows all 51 models, unconditionally.** This is just static array data - guaranteed by
+   writing it out in full, which section 3 now does.
+2. **Every model actually generates real output when clicked.** This depends entirely on open question
+   7.1 (which provider/gateway backs this) - a single aggregator API may not literally offer all 51 of
+   these exact branded variants (some names here - "DaVinci Ultra," "Microsoft MAI Image 2.5," "Kling
+   O3 Omni," "HeyGen V3 Video Agent" - are unusual enough that they read like one specific aggregator's
+   own catalog naming, not a generic set every gateway carries). If the chosen gateway is missing any of
+   these, the honest fix is either finding a gateway that has the full set, or - if a handful are truly
+   unavailable anywhere - telling the user which ones and why, not quietly dropping them from the array
+   without saying so. Don't promise (2) is solved until question 7.1 is answered against a real gateway's
+   actual model list.
+
+All video models (UI MUST show these):
+
+Model Type
+Close
+
+Seedance 2.0 Fast
+FAST
+480p - 720p
+4 - 15”
+Audio
+From
+20
+
+Seedance 2.0
+TRENDING
+480p - 4K
+4 - 15”
+Audio
+From
+29
+
+Kling O3 Omni
+HOT
+720p - 4K
+3 - 15”
+Audio
+From
+18
+
+Gemini Omni Flash
+3 - 10”
+From
+28
+
+Sora 2
+720p
+4 - 20”
+Audio
+From
+30
+
+Grok
+LOW COST
+480p - 720p
+3 - 15”
+Audio
+From
+11
+
+Veo 3.1 Fast
+FAST
+720p - 1080p
+4 - 8”
+Audio
+From
+25
+
+Runway Gen 4.5
+2 - 10”
+Audio
+From
+23
+
+Kling O3 Edit
+720p - 1080p
+Audio
+From
+29
+
+Kling 3.0
+DISCOUNT
+720p - 4K
+3 - 15”
+Audio
+From
+19
+
+Sora 2 Pro
+720p - 1080p
+4 - 20”
+Audio
+From
+80
+
+Wan 2.7
+720p - 1080p
+10 - 15”
+From
+23
+
+Veo 3.1
+FEATURED
+720p - 1080p
+4 - 8”
+Audio
+From
+35
+
+Grok Video Edit
+480p - 720p
+Audio
+From
+13
+
+WAN 2.7 Edit
+720p - 1080p
+2 - 10”
+Audio
+From
+23
+
+Runway Aleph 2.0
+Audio
+From
+60
+
+Kling Motion 2.6
+720p - 1080p
+Audio
+From
+19
+
+Kling Motion 3.0
+720p - 1080p
+Audio
+From
+53
+
+Seedance 1.5 Pro
+480p - 1080p
+4 - 12”
+Audio
+From
+5
+
+Wan 2.6
+720p - 1080p
+5 - 15”
+Audio
+From
+23
+
+Kling 2.6
+5 - 10”
+Audio
+From
+15
+
+HeyGen V3 Video Agent
+From
+22
+
+Luma Ray v3.2
+720p - 1080p
+From
+13
+
+Luma Dream Machine
+720p - 1080p
+From
+13
+
+Minimax Hailuo 2.3
+720p - 1080p
+From
+10
+
+PixVerse V6
+720p - 1080p
+1 - 15”
+Audio
+From
+19
+
+All image models:
+Select Model
+
+Best for
+Close
+
+Nano Banana Pro
+DISCOUNT
+From
+25
+
+Nano Banana 2
+FAST
+From
+25
+
+Nano Banana
+From
+13
+
+GPT Image 2
+FEATURED
+From
+20
+
+Seedream 5.0
+From
+15
+
+Seedream 4.5
+TRENDING
+From
+13
+
+Grok Pro
+HOT
+From
+14
+
+DaVinci Ultra
+From
+15
+
+Grok
+From
+10
+
+Flux 2
+From
+12
+
+Flux 2 Turbo
+FAST
+LOW COST
+From
+9
+
+Ideogram 3.0
+From
+15
+
+Ideogram 4.0
+From
+15
+
+Recraft V4.1
+From
+15
+
+Recraft V3
+From
+13
+
+Recraft V4.1 Pro
+From
+20
+
+Seedream 4.0
+From
+15
+
+GPT Image 1
+From
+9
+
+Flux Pro Kontext
+From
+11
+
+Qwen Image
+From
+9
+
+Seedream 5.0 Pro
+TRENDING
+From
+20
+
+Krea 2
+From
+15
+
+Microsoft MAI Image 2.5
+From
+15
+
+Qwen Image 2 Pro
+From
+20
+
+Qwen Image 2
+From
+15
+Nano Banana Pro
+Photorealistic visuals ideal for ads and text
+
+Aspect Ratio
+
+1:1
+Use Model
 
 <br/>
 
@@ -68,24 +379,311 @@ stated feature, not a bug), it must be named `useGenerateImage`, not `useGenerat
 type TModelBadge = "DISCOUNT" | "FAST" | "FEATURED" | "TRENDING" | "HOT" | "LOW COST"
 
 type TGenerationModel = {
-  id: string                    // slug, e.g. "nano-banana-pro"
-  name: string                  // "Nano Banana Pro"
-  badges: TModelBadge[]         // can have more than one, e.g. Flux 2 Turbo has FAST + LOW COST
-  priceFromUsd: number          // real USD, e.g. 0.25 - NOT the raw screenshot numbers as-is, see
-                                 // the pricing-scale open question in section 7
+  id: string // slug, e.g. "nano-banana-pro"
+  name: string // "Nano Banana Pro"
+  badges: TModelBadge[] // can have more than one, e.g. Flux 2 Turbo has FAST + LOW COST
+  priceFromUsd: number // real USD, e.g. 0.25 - NOT the raw screenshot numbers as-is, see
+  // the pricing-scale open question in section 7
   kind: "image" | "video"
   // video-only fields:
-  resolutionRange?: string      // "480p - 4K"
-  durationRangeSec?: string     // "4 - 15" (the " character in the screenshots is a typographic
-                                 // quote for seconds, not a literal field name - store as a plain string)
+  resolutionRange?: string // "480p - 4K"
+  durationRangeSec?: string // "4 - 15" (the " character in the screenshots is a typographic
+  // quote for seconds, not a literal field name - store as a plain string)
   hasAudio?: boolean
 }
 ```
 
 Two arrays (`IMAGE_MODELS`, `VIDEO_MODELS`), each `as const satisfies TGenerationModel[]`, transcribed
-from the screenshots the user provided. This catalog will drift from whatever the real upstream
-provider(s) offer - treat it as a starting snapshot, not a source of truth to keep in sync by hand
-long-term (see open question in section 6 about where this list should actually live).
+below in full from the model list the user provided - **all 25 image + 26 video entries, none omitted**.
+This catalog will drift from whatever the real upstream provider(s) offer - treat it as a starting
+snapshot, not a source of truth to keep in sync by hand long-term (see open question in section 6 about
+where this list should actually live). `priceFromUsd` is copied verbatim as the raw number from the
+source list (9-80) - **not yet a confirmed USD amount**, see open question 7.5, don't treat these as
+final prices.
+
+```ts
+// consts/IMAGE_MODELS.ts - all 25, in source order
+export const IMAGE_MODELS = [
+  { id: "nano-banana-pro", name: "Nano Banana Pro", badges: ["DISCOUNT"], priceFromUsd: 25, kind: "image" },
+  { id: "nano-banana-2", name: "Nano Banana 2", badges: ["FAST"], priceFromUsd: 25, kind: "image" },
+  { id: "nano-banana", name: "Nano Banana", badges: [], priceFromUsd: 13, kind: "image" },
+  { id: "gpt-image-2", name: "GPT Image 2", badges: ["FEATURED"], priceFromUsd: 20, kind: "image" },
+  { id: "seedream-5-0", name: "Seedream 5.0", badges: [], priceFromUsd: 15, kind: "image" },
+  { id: "seedream-4-5", name: "Seedream 4.5", badges: ["TRENDING"], priceFromUsd: 13, kind: "image" },
+  { id: "grok-pro-image", name: "Grok Pro", badges: ["HOT"], priceFromUsd: 14, kind: "image" },
+  { id: "davinci-ultra", name: "DaVinci Ultra", badges: [], priceFromUsd: 15, kind: "image" },
+  { id: "grok-image", name: "Grok", badges: [], priceFromUsd: 10, kind: "image" },
+  { id: "flux-2", name: "Flux 2", badges: [], priceFromUsd: 12, kind: "image" },
+  { id: "flux-2-turbo", name: "Flux 2 Turbo", badges: ["FAST", "LOW COST"], priceFromUsd: 9, kind: "image" },
+  { id: "ideogram-3-0", name: "Ideogram 3.0", badges: [], priceFromUsd: 15, kind: "image" },
+  { id: "ideogram-4-0", name: "Ideogram 4.0", badges: [], priceFromUsd: 15, kind: "image" },
+  { id: "recraft-v4-1", name: "Recraft V4.1", badges: [], priceFromUsd: 15, kind: "image" },
+  { id: "recraft-v3", name: "Recraft V3", badges: [], priceFromUsd: 13, kind: "image" },
+  { id: "recraft-v4-1-pro", name: "Recraft V4.1 Pro", badges: [], priceFromUsd: 20, kind: "image" },
+  { id: "seedream-4-0", name: "Seedream 4.0", badges: [], priceFromUsd: 15, kind: "image" },
+  { id: "gpt-image-1", name: "GPT Image 1", badges: [], priceFromUsd: 9, kind: "image" },
+  { id: "flux-pro-kontext", name: "Flux Pro Kontext", badges: [], priceFromUsd: 11, kind: "image" },
+  { id: "qwen-image", name: "Qwen Image", badges: [], priceFromUsd: 9, kind: "image" },
+  { id: "seedream-5-0-pro", name: "Seedream 5.0 Pro", badges: ["TRENDING"], priceFromUsd: 20, kind: "image" },
+  { id: "krea-2", name: "Krea 2", badges: [], priceFromUsd: 15, kind: "image" },
+  { id: "microsoft-mai-image-2-5", name: "Microsoft MAI Image 2.5", badges: [], priceFromUsd: 15, kind: "image" },
+  { id: "qwen-image-2-pro", name: "Qwen Image 2 Pro", badges: [], priceFromUsd: 20, kind: "image" },
+  { id: "qwen-image-2", name: "Qwen Image 2", badges: [], priceFromUsd: 15, kind: "image" },
+] as const satisfies TGenerationModel[]
+
+// consts/VIDEO_MODELS.ts - all 26, in source order. Fields left out below (no resolutionRange /
+// durationRangeSec / hasAudio) mean the source list didn't show that field for that row - confirm
+// against the real provider before shipping, don't guess a value to fill the gap.
+export const VIDEO_MODELS = [
+  {
+    id: "seedance-2-0-fast",
+    name: "Seedance 2.0 Fast",
+    badges: ["FAST"],
+    priceFromUsd: 20,
+    kind: "video",
+    resolutionRange: "480p - 720p",
+    durationRangeSec: "4 - 15",
+    hasAudio: true,
+  },
+  {
+    id: "seedance-2-0",
+    name: "Seedance 2.0",
+    badges: ["TRENDING"],
+    priceFromUsd: 29,
+    kind: "video",
+    resolutionRange: "480p - 4K",
+    durationRangeSec: "4 - 15",
+    hasAudio: true,
+  },
+  {
+    id: "kling-o3-omni",
+    name: "Kling O3 Omni",
+    badges: ["HOT"],
+    priceFromUsd: 18,
+    kind: "video",
+    resolutionRange: "720p - 4K",
+    durationRangeSec: "3 - 15",
+    hasAudio: true,
+  },
+  {
+    id: "gemini-omni-flash",
+    name: "Gemini Omni Flash",
+    badges: [],
+    priceFromUsd: 28,
+    kind: "video",
+    durationRangeSec: "3 - 10",
+    hasAudio: false,
+  },
+  {
+    id: "sora-2",
+    name: "Sora 2",
+    badges: [],
+    priceFromUsd: 30,
+    kind: "video",
+    resolutionRange: "720p",
+    durationRangeSec: "4 - 20",
+    hasAudio: true,
+  },
+  {
+    id: "grok-video",
+    name: "Grok",
+    badges: ["LOW COST"],
+    priceFromUsd: 11,
+    kind: "video",
+    resolutionRange: "480p - 720p",
+    durationRangeSec: "3 - 15",
+    hasAudio: true,
+  },
+  {
+    id: "veo-3-1-fast",
+    name: "Veo 3.1 Fast",
+    badges: ["FAST"],
+    priceFromUsd: 25,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    durationRangeSec: "4 - 8",
+    hasAudio: true,
+  },
+  {
+    id: "runway-gen-4-5",
+    name: "Runway Gen 4.5",
+    badges: [],
+    priceFromUsd: 23,
+    kind: "video",
+    durationRangeSec: "2 - 10",
+    hasAudio: true,
+  },
+  {
+    id: "kling-o3-edit",
+    name: "Kling O3 Edit",
+    badges: [],
+    priceFromUsd: 29,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    hasAudio: true,
+  },
+  {
+    id: "kling-3-0",
+    name: "Kling 3.0",
+    badges: ["DISCOUNT"],
+    priceFromUsd: 19,
+    kind: "video",
+    resolutionRange: "720p - 4K",
+    durationRangeSec: "3 - 15",
+    hasAudio: true,
+  },
+  {
+    id: "sora-2-pro",
+    name: "Sora 2 Pro",
+    badges: [],
+    priceFromUsd: 80,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    durationRangeSec: "4 - 20",
+    hasAudio: true,
+  },
+  {
+    id: "wan-2-7",
+    name: "Wan 2.7",
+    badges: [],
+    priceFromUsd: 23,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    durationRangeSec: "10 - 15",
+    hasAudio: false,
+  },
+  {
+    id: "veo-3-1",
+    name: "Veo 3.1",
+    badges: ["FEATURED"],
+    priceFromUsd: 35,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    durationRangeSec: "4 - 8",
+    hasAudio: true,
+  },
+  {
+    id: "grok-video-edit",
+    name: "Grok Video Edit",
+    badges: [],
+    priceFromUsd: 13,
+    kind: "video",
+    resolutionRange: "480p - 720p",
+    hasAudio: true,
+  },
+  {
+    id: "wan-2-7-edit",
+    name: "WAN 2.7 Edit",
+    badges: [],
+    priceFromUsd: 23,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    durationRangeSec: "2 - 10",
+    hasAudio: true,
+  },
+  { id: "runway-aleph-2-0", name: "Runway Aleph 2.0", badges: [], priceFromUsd: 60, kind: "video", hasAudio: true },
+  {
+    id: "kling-motion-2-6",
+    name: "Kling Motion 2.6",
+    badges: [],
+    priceFromUsd: 19,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    hasAudio: true,
+  },
+  {
+    id: "kling-motion-3-0",
+    name: "Kling Motion 3.0",
+    badges: [],
+    priceFromUsd: 53,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    hasAudio: true,
+  },
+  {
+    id: "seedance-1-5-pro",
+    name: "Seedance 1.5 Pro",
+    badges: [],
+    priceFromUsd: 5,
+    kind: "video",
+    resolutionRange: "480p - 1080p",
+    durationRangeSec: "4 - 12",
+    hasAudio: true,
+  },
+  {
+    id: "wan-2-6",
+    name: "Wan 2.6",
+    badges: [],
+    priceFromUsd: 23,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    durationRangeSec: "5 - 15",
+    hasAudio: true,
+  },
+  {
+    id: "kling-2-6",
+    name: "Kling 2.6",
+    badges: [],
+    priceFromUsd: 15,
+    kind: "video",
+    durationRangeSec: "5 - 10",
+    hasAudio: true,
+  },
+  { id: "heygen-v3-video-agent", name: "HeyGen V3 Video Agent", badges: [], priceFromUsd: 22, kind: "video" },
+  {
+    id: "luma-ray-v3-2",
+    name: "Luma Ray v3.2",
+    badges: [],
+    priceFromUsd: 13,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    hasAudio: false,
+  },
+  {
+    id: "luma-dream-machine",
+    name: "Luma Dream Machine",
+    badges: [],
+    priceFromUsd: 13,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    hasAudio: false,
+  },
+  {
+    id: "minimax-hailuo-2-3",
+    name: "Minimax Hailuo 2.3",
+    badges: [],
+    priceFromUsd: 10,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    hasAudio: false,
+  },
+  {
+    id: "pixverse-v6",
+    name: "PixVerse V6",
+    badges: [],
+    priceFromUsd: 19,
+    kind: "video",
+    resolutionRange: "720p - 1080p",
+    durationRangeSec: "1 - 15",
+    hasAudio: true,
+  },
+] as const satisfies TGenerationModel[]
+```
+
+**Rows with a missing `resolutionRange`/`durationRangeSec` above** (Gemini Omni Flash's resolution,
+Runway Gen 4.5's resolution, Kling O3 Edit's duration, Grok Video Edit's duration, Runway Aleph 2.0's
+resolution+duration, Kling Motion 2.6/3.0's duration, Kling 2.6's resolution, HeyGen V3 Video Agent's
+resolution+duration) reflect exactly what was and wasn't present in the source list for that row - don't
+backfill a guessed range to make the table look complete. Confirm the real values with the user or the
+provider's own docs before `GenerationForm` (section 4) tries to render/parse a field that's actually
+`undefined` for these models.
+
+**Two `Grok`-named entries exist** (`grok-pro-image`/`grok-image` in the image list, `grok-video` in the
+video list) - the source list itself reuses the bare name "Grok" for both an image model and a video
+model with no further disambiguation. The `id` slugs above disambiguate them for code purposes; the
+`name` shown in the UI should probably stay exactly "Grok"/"Grok Pro" as given, since `ModelCard`s are
+already segmented by mode (image grid vs. video grid) so the duplicate display name isn't actually
+ambiguous to a user looking at one grid at a time.
 
 <br/>
 
@@ -140,8 +738,8 @@ already says as much - this badge just makes that existing, already-true status 
 
 Important to get right in the copy/placement so it doesn't contradict section 5: PRO subscription
 status being free is a **separate concept** from the real USD balance a user spends per generation -
-one is "which tier are you on" (always PRO, always free), the other is "how much does *this specific
-generation* cost" (real money, per the balance system). Placing the "PRO" badge directly next to the
+one is "which tier are you on" (always PRO, always free), the other is "how much does _this specific
+generation_ cost" (real money, per the balance system). Placing the "PRO" badge directly next to the
 balance chip (e.g. `PRO  ·  Balance: $12.34 · Top up`) makes both facts visible together instead of
 one implying the other.
 
@@ -229,12 +827,12 @@ these lines:
 > "You can do this for free in ChatGPT. If you'd still like to try it here, go ahead - we don't
 > reduce your image's resolution like others do."
 
-This is informational, not a blocker - the toast doesn't prevent the action, it's shown *and* the
+This is informational, not a blocker - the toast doesn't prevent the action, it's shown _and_ the
 preset still runs (prefills the generation flow for that operation, doesn't require a second click to
 confirm). Two implementation details this implies that aren't obvious from "3 buttons":
 
 - These are **image-edit operations** (background removal, upscaling, enhancement), not
-  text-to-image generation from an empty prompt - they need a *source* image to operate on. If the
+  text-to-image generation from an empty prompt - they need a _source_ image to operate on. If the
   user hasn't generated or uploaded one yet in this session, clicking a preset should prompt for an
   upload first (reuse the `ImageUpload`/Cloudinary pattern already in `components/image-upload.tsx`,
   used by `companion-form.tsx`) rather than silently no-op.
@@ -271,7 +869,7 @@ notes above - different topic, different place on the page). Two points in one b
 both about the same underlying stance (money isn't the point):
 
 1. **No markup** - the platform charges exactly what the provider API call costs, nothing added on
-   top (this is the detail from section 5 - that section explains *why* it matters for the business
+   top (this is the detail from section 5 - that section explains _why_ it matters for the business
    logic, this badge is where the user actually reads about it).
 2. **No checkout-time charity nag.** Stripe and Temu (among others) prompt you at checkout to
    contribute a fraction of your payment to carbon removal or plant a tree. This product deliberately
@@ -282,7 +880,7 @@ both about the same underlying stance (money isn't the point):
    > "You may have seen Stripe or Temu ask you to chip in for carbon removal or a tree at checkout.
    > I support causes like that too - but I value your freedom more than your money, so I won't ask
    > you to add anything here. If you'd like to say thanks, either book a free call with me for more
-   > value, or donate directly to whoever *you* feel deserves it."
+   > value, or donate directly to whoever _you_ feel deserves it."
 
    Same "book a free call" mechanism as section 5 (linking to `linkedin.com/in/nicitaacom`) - don't
    introduce a second, different contact method for the same offer.
@@ -295,7 +893,7 @@ Unlike the placeholder assumption in an earlier draft of this doc, pricing here 
 decoration - generating actually costs money (the underlying provider charges per call), so a user
 needs a topped-up balance before they can generate. The differentiator to make visible in the UI:
 **no markup** - the platform charges exactly what the provider API call costs, nothing added on top.
-If a user wants to say thanks for that, the ask is explicitly *not* a tip or a fee - it's an invite to
+If a user wants to say thanks for that, the ask is explicitly _not_ a tip or a fee - it's an invite to
 a free 30-minute chat (their choice of topic) over Google Meet, booked via
 `linkedin.com/in/nicitaacom`. This lives in its own `NoteBadge` near the balance/top-up UI (see
 section 4's "Billing transparency note" subsection for the actual copy) - not buried in the privacy
@@ -326,7 +924,7 @@ This changes the scope of what needs building considerably versus a display-only
   minimum/default-settings estimate; for video models where duration/resolution affect provider cost,
   compute and show the actual cost for the user's current selection before they hit generate, and
   charge that real number, not the catalog's static "From $N".
-- **Deduction/refund edge case** - decide what happens if the provider call fails *after* it already
+- **Deduction/refund edge case** - decide what happens if the provider call fails _after_ it already
   billed you (many providers charge on submission, not on success) - if so, the user's balance still
   needs to be deducted even on a failed generation, or this platform eats the cost. Confirm this with
   whichever provider gets picked (open question 1 below) before finalizing the deduction logic.
@@ -419,10 +1017,10 @@ in section 5: it's real, at-cost, backed by `29_user_balance`/`29_balance_transa
    already has a guest-visitor pattern for chat (`lib/chat-visitor.ts`, `lib/guest-chat-store.ts`) -
    but a guest has no `29_user_balance` row to charge, so generation almost certainly requires a real
    account. Confirm before building - don't build a guest path for this by default.
-3. **Is video generation in scope for v1, or ship image-only first and add video after?** The two
-   modes share a lot of UI (`ModeSwitch`, `ModelSelectorDialog`, `ModelCard`) but video adds
-   duration/resolution/audio fields images don't have - shipping image-only first is a reasonable way
-   to de-risk the provider-integration question before doubling the model catalog.
+3. ~~Is video generation in scope for v1, or ship image-only first?~~ **Resolved: both, full catalog,
+   v1.** The user explicitly confirmed both modes and all 51 models (25 image + 26 video, section 3)
+   ship together - don't stage this behind an image-only v1. This raises the bar on question 1: whatever
+   gateway is picked needs to cover both modes across the full catalog, not just image models.
 4. **Exact route path** - `/generate-image` was named in the request, but if video is in scope too,
    confirm whether it should be `/generate-image` with an in-page mode switch (as described above) or
    two separate routes (`/generate-image`, `/generate-video`) sharing components.
@@ -457,7 +1055,7 @@ end; **errors** - i.e. `no-banned-words` - must be fixed immediately, since they
    `createAICompanion`/`newChatMessage` (same `key()` function signature, same `windowSec`/
    `maxAllowed` field names).
 4. **`api.d.ts`**: add all five new types from section 6 in one pass, `Req`/`Resp` suffixed per
-   `api-type-req-resp-suffix` (never `Request`/`Response`). Do this *before* writing any route -
+   `api-type-req-resp-suffix` (never `Request`/`Response`). Do this _before_ writing any route -
    writing the contract first and the implementation against it prevents the route's actual response
    shape from silently drifting from what's documented.
 5. **`consts/IMAGE_MODELS.ts` / `VIDEO_MODELS.ts` / `GENERATION_PRESETS.ts`**: `TGenerationModel`/
@@ -563,13 +1161,13 @@ codebase, not introduced here, and need a decision before assuming an architectu
   default. Whether these three need rewriting depends on which adapter is used and whether their
   Node-specific code (if any) has a Workers-compatible equivalent.
 - `stripe` (^14.18.0), `@langchain/openai`, `@langchain/pinecone`, and `@pinecone-database/pinecone`
-  are already dependencies of the *existing* chat/companion features (not this new one) - these are
+  are already dependencies of the _existing_ chat/companion features (not this new one) - these are
   substantial, Node-API-oriented packages and are far more likely to blow a full-app bundle past
   3 MiB than anything built for `/generate-image` itself.
 - No `wrangler.toml` or Cloudflare Pages config exists in this repo yet - Cloudflare deployment isn't
   set up at all currently.
 
-**Open question this raises (in addition to section 7's list): is the goal to deploy the *entire*
+**Open question this raises (in addition to section 7's list): is the goal to deploy the _entire_
 Next.js app to Cloudflare (including the existing langchain/pinecone-backed chat), or just this new
 `/generate-image` feature as its own lightweight surface** (e.g. a separate Worker/Pages project,
 linked from or proxied by the main app)? These are very different amounts of work - the first means
