@@ -37,7 +37,13 @@ type SelectProps = {
   disabled?: boolean
 }
 
-const Select = ({ children, value: controlledValue, defaultValue = "", onValueChange, disabled = false }: SelectProps) => {
+const Select = ({
+  children,
+  value: controlledValue,
+  defaultValue = "",
+  onValueChange,
+  disabled = false,
+}: SelectProps) => {
   const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue)
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<Record<string, string>>({})
@@ -102,7 +108,7 @@ type SelectValueProps = {
 
 const SelectValue = ({ placeholder, className }: SelectValueProps) => {
   const { value, items } = useSelectContext()
-  const selectedLabel = value ? (items[value] ?? value) : ""
+  const selectedLabel = value ? items[value] ?? value : ""
   const text = selectedLabel || placeholder || ""
 
   return (
@@ -121,7 +127,9 @@ const SelectTrigger = forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<H
     return (
       <button
         className={twMerge(
-          "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          `flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm
+           ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring
+           focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`,
           className,
         )}
         ref={ref}
@@ -161,7 +169,8 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
     return (
       <div
         className={twMerge(
-          "absolute left-0 top-[calc(100%+0.25rem)] z-50 max-h-96 w-full overflow-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
+          `absolute left-0 top-[calc(100%+0.25rem)] z-50 max-h-96 w-full overflow-auto rounded-md border bg-popover p-1
+           text-popover-foreground shadow-md`,
           "transition duration-150 ease-out",
           open ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0",
           className,
@@ -176,11 +185,9 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
 )
 SelectContent.displayName = "SelectContent"
 
-const SelectLabel = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div className={twMerge("py-1.5 pl-8 pr-2 text-sm font-semibold", className)} ref={ref} {...props} />
-  ),
-)
+const SelectLabel = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+  <div className={twMerge("py-1.5 pl-8 pr-2 text-sm font-semibold", className)} ref={ref} {...props} />
+))
 SelectLabel.displayName = "SelectLabel"
 
 type SelectItemProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -236,7 +243,10 @@ SelectSeparator.displayName = "SelectSeparator"
 
 const SelectScrollUpButton = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div className={twMerge("flex items-center justify-center py-1 text-muted-foreground", className)} ref={ref} {...props}>
+    <div
+      className={twMerge("flex items-center justify-center py-1 text-muted-foreground", className)}
+      ref={ref}
+      {...props}>
       <ChevronUp className="h-4 w-4" />
     </div>
   ),
@@ -245,7 +255,10 @@ SelectScrollUpButton.displayName = "SelectScrollUpButton"
 
 const SelectScrollDownButton = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div className={twMerge("flex items-center justify-center py-1 text-muted-foreground", className)} ref={ref} {...props}>
+    <div
+      className={twMerge("flex items-center justify-center py-1 text-muted-foreground", className)}
+      ref={ref}
+      {...props}>
       <ChevronDown className="h-4 w-4" />
     </div>
   ),

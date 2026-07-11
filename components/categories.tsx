@@ -28,7 +28,8 @@ export function Categories({ data }: CategoriesProps) {
     <div className="w-full overflow-x-auto space-x-2 flex p-1" data-test="categories-tabs">
       <button
         className={twMerge(
-          "flex items-center text-center text-xs md:text-sm px-2 md:px-4 py-2 md:py-3 rounded-md bg-primary/10 hover:opacity-75 transition",
+          `flex items-center text-center text-xs md:text-sm px-2 md:px-4 py-2 md:py-3 rounded-md bg-primary/10
+           hover:opacity-75 transition`,
           !categoryId ? "bg-primary/25" : "bg-primary/10",
         )}
         onClick={() => onClick(undefined)}>
@@ -37,7 +38,8 @@ export function Categories({ data }: CategoriesProps) {
       {data.map(item => (
         <button
           className={twMerge(
-            "flex items-center text-center text-xs md:text-sm px-2 md:px-4 py-2 md:py-3 rounded-md bg-primary/10 hover:opacity-75 transition",
+            `flex items-center text-center text-xs md:text-sm px-2 md:px-4 py-2 md:py-3 rounded-md bg-primary/10
+           hover:opacity-75 transition`,
             item.id === categoryId ? "bg-primary/25" : "bg-primary/10",
           )}
           onClick={() => onClick(item.id)}

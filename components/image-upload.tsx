@@ -27,7 +27,8 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
         }}>
         <div
           className={twMerge(
-            "p-4 border-4 border-dashed border-primary/10 rounded-lg hover:opacity-75 transition flex flex-col space-y-2 justify-center items-center",
+            `p-4 border-4 border-dashed border-primary/10 rounded-lg hover:opacity-75 transition flex flex-col
+             space-y-2 justify-center items-center`,
             disabled ? "opacity-50 pointer-events-none" : undefined,
           )}>
           <div className="relative w-40 h-40">

@@ -35,6 +35,7 @@ type CreateCategoryResponse = {
   error?: string
 }
 
+/* eslint-disable max-len -- long single-line AI prompt/seed content, wrapping would insert stray newlines into the actual prompt text */
 const PREAMBLE = `You are a fictional character whose name is Elon. You are a visionary entrepreneur and inventor. You have a passion for space exploration, electric vehicles, sustainable energy, and advancing human capabilities. You are currently talking to a human who is very curious about your work and vision. You are ambitious and forward-thinking, with a touch of wit. You get SUPER excited about innovations and the potential of space colonization.
 `
 
@@ -50,6 +51,7 @@ Elon: Absolutely! Sustainable energy is crucial both on Earth and for our future
 Human: It's fascinating to see your vision unfold. Any new projects or innovations you're excited about?
 Elon: Always! But right now, I'm particularly excited about Neuralink. It has the potential to revolutionize how we interface with technology and even heal neurological conditions.
 `
+/* eslint-enable max-len */
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -125,7 +127,9 @@ function CategoryCreatePanel({ hasCategories, isLoading, onCategoryReady }: Cate
     <div className="space-y-2 rounded-xl border border-primary/10 bg-primary/5 p-3">
       <p className="text-xs font-medium text-muted-foreground">Create a category</p>
       {!hasCategories ? (
-        <p className="text-sm text-muted-foreground">No categories yet. Create one below and we will select it automatically.</p>
+        <p className="text-sm text-muted-foreground">
+          No categories yet. Create one below and we will select it automatically.
+        </p>
       ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
         <Input
@@ -206,14 +210,11 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const res = await fetch(
-        initialData ? `/api/companion/${initialData.id}` : "/api/companion",
-        {
-          method: initialData ? "PATCH" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
-        },
-      )
+      const res = await fetch(initialData ? `/api/companion/${initialData.id}` : "/api/companion", {
+        method: initialData ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      })
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -286,10 +287,7 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
                 return (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select
-                      value={field.value ?? ""}
-                      onValueChange={field.onChange}
-                      disabled={isLoading}>
+                    <Select value={field.value ?? ""} onValueChange={field.onChange} disabled={isLoading}>
                       <FormControl>
                         <SelectTrigger className="bg-background">
                           <SelectValue placeholder="Select a category" />
@@ -304,7 +302,11 @@ export function CompanionForm({ initialData, categories }: CompanionFormProps) {
                       </SelectContent>
                     </Select>
                     <FormDescription>Select a category for your AI</FormDescription>
-                    <CategoryCreatePanel hasCategories={hasCategories} isLoading={isLoading} onCategoryReady={onCategoryReady} />
+                    <CategoryCreatePanel
+                      hasCategories={hasCategories}
+                      isLoading={isLoading}
+                      onCategoryReady={onCategoryReady}
+                    />
                     <FormMessage />
                   </FormItem>
                 )

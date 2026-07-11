@@ -56,7 +56,9 @@ export function ChatHeader({
   }
 
   return (
-    <div className="shrink-0 flex w-full items-center justify-between rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 px-4 py-3 shadow-lg">
+    <div
+      className="shrink-0 flex w-full items-center justify-between rounded-2xl bg-white/5 backdrop-blur-md border
+                 border-white/10 px-4 py-3 shadow-lg">
       <div className="flex items-center gap-x-3">
         <Button size="icon" variant="ghost" onClick={handleBack} className="rounded-xl hover:bg-white/10">
           <ChevronLeft className="w-5 h-5" />
@@ -113,7 +115,9 @@ export function ChatHeader({
               aria-label="Open actions">
               <MoreVertical className="h-4 w-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl border-white/10 bg-zinc-900/80 backdrop-blur-md z-50">
+            <DropdownMenuContent
+              align="end"
+              className="rounded-xl border-white/10 bg-zinc-900/80 backdrop-blur-md z-50">
               <DropdownMenuItem onClick={handleEdit} className="rounded-lg">
                 <Edit className="w-4 h-4 mr-2" />
                 Edit

@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js"
 
 const supabaseClient = createClient(
   "https://vahemcbozzowgcadavfm.supabase.co",
+  // eslint-disable-next-line max-len -- unbreakable JWT literal
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhaGVtY2Jvenpvd2djYWRhdmZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY5Nzc4MDIsImV4cCI6MjAyMjU1MzgwMn0.NbhCKZEig0m6arLOR7RvljTOmO0pPiPLKmkjzn89AFE",
 )
 

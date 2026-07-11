@@ -104,12 +104,17 @@ const DropdownMenuContent = React.forwardRef<
   if (!isOpen) return null
 
   const alignClassName =
-    align === "end" ? "right-0 origin-top-right" : align === "start" ? "left-0 origin-top-left" : "left-1/2 -translate-x-1/2 origin-top"
+    align === "end"
+      ? "right-0 origin-top-right"
+      : align === "start"
+        ? "left-0 origin-top-left"
+        : "left-1/2 -translate-x-1/2 origin-top"
 
   return (
     <div
       className={cn(
-        "absolute top-full z-50 mt-1 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2",
+        `absolute top-full z-50 mt-1 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground
+         shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2`,
         alignClassName,
         className,
       )}
@@ -139,7 +144,8 @@ const DropdownMenuItem = React.forwardRef<
   return (
     <button
       className={cn(
-        "relative flex w-full select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50",
+        `relative flex w-full select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors
+         hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50`,
         inset && "pl-8",
         className,
       )}
@@ -158,7 +164,9 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   React.ButtonHTMLAttributes<HTMLButtonElement> & { checked?: boolean }
 >(({ className, children, checked, ...props }, ref) => (
   <DropdownMenuItem className={cn("pl-8 pr-2", className)} ref={ref} {...props}>
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">{checked ? <Check className="h-4 w-4" /> : null}</span>
+    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      {checked ? <Check className="h-4 w-4" /> : null}
+    </span>
     {children}
   </DropdownMenuItem>
 ))
@@ -196,11 +204,13 @@ DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
 const DropdownMenuGroup = ({ children }: { children: React.ReactNode }) => <>{children}</>
 const DropdownMenuPortal = ({ children }: { children: React.ReactNode }) => <>{children}</>
 const DropdownMenuSub = ({ children }: { children: React.ReactNode }) => <>{children}</>
-const DropdownMenuSubContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ children, ...props }, ref) => (
-  <div ref={ref} {...props}>
-    {children}
-  </div>
-))
+const DropdownMenuSubContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ children, ...props }, ref) => (
+    <div ref={ref} {...props}>
+      {children}
+    </div>
+  ),
+)
 DropdownMenuSubContent.displayName = "DropdownMenuSubContent"
 
 const DropdownMenuSubTrigger = React.forwardRef<

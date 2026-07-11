@@ -72,7 +72,8 @@ export const ThemeProvider = ({ children, defaultTheme = "system", enableSystem 
 
   const systemTheme = useSyncExternalStore(subscribeToSystemTheme, getSystemTheme, (): ResolvedTheme => "light")
 
-  const resolvedTheme = storedTheme === "system" ? (enableSystem ? systemTheme : "light") : resolveTheme(storedTheme, enableSystem)
+  const resolvedTheme =
+    storedTheme === "system" ? (enableSystem ? systemTheme : "light") : resolveTheme(storedTheme, enableSystem)
 
   useEffect(() => {
     const root = document.documentElement

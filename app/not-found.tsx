@@ -14,8 +14,12 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6 py-16">
-      <div className="w-full max-w-lg rounded-[28px] border border-white/10 bg-[#111317] p-8 text-center text-zinc-100 shadow-[0_30px_100px_rgba(0,0,0,0.65)]">
-        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] text-white">
+      <div
+        className="w-full max-w-lg rounded-[28px] border border-white/10 bg-[#111317] p-8 text-center text-zinc-100
+                   shadow-[0_30px_100px_rgba(0,0,0,0.65)]">
+        <div
+          className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10
+                     bg-white/[0.06] text-white">
           <Sparkles className="h-6 w-6" />
         </div>
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/[0.45]">404</p>

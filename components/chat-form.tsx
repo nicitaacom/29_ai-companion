@@ -59,7 +59,11 @@ export function ChatForm({ input, handleInputChange, isHumanVerified, onSubmit, 
 
   return (
     <form ref={formRef} onSubmit={handleFormSubmit} className="shrink-0 border-t border-primary/10 pt-4">
-      <div className="flex items-end gap-3 rounded-[28px] border border-white/10 bg-zinc-800/95 px-3 py-3 shadow-[0_16px_40px_-30px_rgba(0,0,0,0.85)] transition duration-200 hover:border-white/20 hover:bg-zinc-800 focus-within:border-sky-400/50 focus-within:bg-zinc-800 focus-within:shadow-[0_0_0_4px_rgba(56,189,248,0.12),0_16px_40px_-30px_rgba(0,0,0,0.85)]">
+      <div
+        className="flex items-end gap-3 rounded-[28px] border border-white/10 bg-zinc-800/95 px-3 py-3
+                   shadow-[0_16px_40px_-30px_rgba(0,0,0,0.85)] transition duration-200 hover:border-white/20
+                   hover:bg-zinc-800 focus-within:border-sky-400/50 focus-within:bg-zinc-800
+                   focus-within:shadow-[0_0_0_4px_rgba(56,189,248,0.12),0_16px_40px_-30px_rgba(0,0,0,0.85)]">
         <textarea
           ref={textareaRef}
           autoFocus
@@ -69,10 +73,13 @@ export function ChatForm({ input, handleInputChange, isHumanVerified, onSubmit, 
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="Message your companion..."
-          className="min-h-[56px] max-h-40 w-full resize-none border-0 bg-transparent px-4 py-4 text-base text-zinc-100 placeholder:text-zinc-400 focus:outline-none leading-relaxed"
+          className="min-h-[56px] max-h-40 w-full resize-none border-0 bg-transparent px-4 py-4 text-base text-zinc-100
+                     placeholder:text-zinc-400 focus:outline-none leading-relaxed"
         />
         <div className="flex shrink-0 items-center gap-2 pb-1.5">
-          <kbd className="rounded-lg bg-white/8 border border-white/10 px-1.5 py-1 font-mono text-[10px] text-zinc-500 leading-none select-none">
+          <kbd
+            className="rounded-lg bg-white/8 border border-white/10 px-1.5 py-1 font-mono text-[10px] text-zinc-500
+                       leading-none select-none">
             Ctrl+↵
           </kbd>
           <Button disabled={isLoading || !isHumanVerified} type="submit" className="h-12 rounded-full px-5">

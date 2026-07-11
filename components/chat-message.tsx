@@ -67,7 +67,12 @@ export function ChatMessage({ role, content, isLoading, src, fontSize }: ChatMes
         {isLoading ? (
           <BeatLoader size={5} color={resolvedTheme === "light" ? "#555" : "#aaa"} />
         ) : (
-          <div className="break-words prose dark:prose-invert max-w-none prose-p:my-1 prose-pre:my-2 prose-pre:rounded-xl prose-pre:bg-black/30 prose-pre:p-4 prose-code:before:content-none prose-code:after:content-none prose-code:bg-black/20 prose-code:rounded prose-code:px-1 prose-code:py-0.5 prose-code:text-[0.85em]" style={{ fontSize: "inherit" }}>
+          <div
+            className="break-words prose dark:prose-invert max-w-none prose-p:my-1 prose-pre:my-2 prose-pre:rounded-xl
+                       prose-pre:bg-black/30 prose-pre:p-4 prose-code:before:content-none prose-code:after:content-none
+                       prose-code:bg-black/20 prose-code:rounded prose-code:px-1 prose-code:py-0.5
+                       prose-code:text-[0.85em]"
+            style={{ fontSize: "inherit" }}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
           </div>
         )}

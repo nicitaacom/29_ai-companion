@@ -29,6 +29,7 @@ export default [
         { args: "all", argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
       ],
       "unicorn/catch-error-name": "warn",
+      "max-len": ["warn", { code: 130, ignoreUrls: true }],
     },
   },
 ]

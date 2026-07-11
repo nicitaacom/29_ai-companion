@@ -63,6 +63,7 @@ export function AuthInput({
       required: "This field is required",
       pattern: {
         value:
+          // eslint-disable-next-line max-len -- unbreakable regex literal
           /^(?:(?:\+|00)([1-9]\d{0,2}))?[-. ()]*(?:\d{1,4}[-. ()]*){0,2}(?:\d{2,5}[-. ()]*){1,2}\d{2,5}$|^(?:https?:\/\/)?t\.me\/[a-z0-9-]{5,32}$/i,
         message: "Enter your telegram or phone number",
       },
