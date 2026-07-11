@@ -3,7 +3,7 @@ import useUserTimezone from "@/widgets/TimezonePicker/useUserTimeZone"
 import useUser from "@/store/useUser"
 import { RATE_LIMITS } from "@/app/consts/RATE_LIMIT"
 
-type Action = API.RateLimitRequest["action"]
+type Action = API.RateLimitReq["action"]
 
 function validateRequiredScope(limiterName: TRateLimiterName) {
   const { userId } = useUser.getState()
@@ -14,15 +14,15 @@ function validateRequiredScope(limiterName: TRateLimiterName) {
 }
 
 export class RateLimitSDK {
-  async rateLimit(limiterName: TRateLimiterName): Promise<API.RateLimitResponse> {
+  async rateLimit(limiterName: TRateLimiterName): Promise<API.RateLimitResp> {
     return this.requestFn("rateLimit", limiterName)
   }
 
-  async getRemaining(limiterName: TRateLimiterName): Promise<API.RateLimitResponse> {
+  async getRemaining(limiterName: TRateLimiterName): Promise<API.RateLimitResp> {
     return this.requestFn("getRemaining", limiterName)
   }
 
-  private async requestFn(action: Action, limiterName: TRateLimiterName): Promise<API.RateLimitResponse> {
+  private async requestFn(action: Action, limiterName: TRateLimiterName): Promise<API.RateLimitResp> {
     const { userId } = useUser.getState()
     const { userTimezone } = useUserTimezone.getState()
 
@@ -34,12 +34,12 @@ export class RateLimitSDK {
         limiterName,
         userTimezone,
         userId,
-      } satisfies API.RateLimitRequest),
+      } satisfies API.RateLimitReq),
       headers: { "Content-Type": "application/json" },
       method: "POST",
     })
 
-    const data = (await response.json()) as API.RateLimitRouteResponse
+    const data = (await response.json()) as API.RateLimitRouteResp
 
     if (response.status === 429) {
       throw new Error("Rate limit exceeded")

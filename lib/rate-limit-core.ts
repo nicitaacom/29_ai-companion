@@ -100,7 +100,7 @@ function getRateLimiter(limiterName: TRateLimiterName) {
   return limiter
 }
 
-function getRateLimitKey(payload: API.RateLimitRequest) {
+function getRateLimitKey(payload: API.RateLimitReq) {
   return RATE_LIMITS[payload.limiterName as TRateLimiterName].key({
     userId: payload.userId ?? undefined,
   })
@@ -195,7 +195,7 @@ async function safeRateLimit({
   }
 }
 
-export async function executeRateLimitRequest(req: Request, payload: API.RateLimitRequest): Promise<TRateLimitExecutionResult> {
+export async function executeRateLimitRequest(req: Request, payload: API.RateLimitReq): Promise<TRateLimitExecutionResult> {
   const { limiterName, action, userTimezone } = payload
 
   if (!limiterName || !userTimezone) {

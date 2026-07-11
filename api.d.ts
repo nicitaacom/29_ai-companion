@@ -1,23 +1,23 @@
 declare global {
   namespace API {
-    type RateLimitRequest = {
+    type RateLimitReq = {
       limiterName: string
       action: "getRemaining" | "rateLimit"
       userId: string | null
       userTimezone: string
     }
 
-    type RateLimitResponse = {
+    type RateLimitResp = {
       remaining: number
       resetTime: string
       resetIn: string
     }
 
-    type RateLimitErrorResponse = {
+    type RateLimitErrorResp = {
       error: string
     }
 
-    type RateLimitRouteResponse = RateLimitResponse | RateLimitErrorResponse
+    type RateLimitRouteResp = RateLimitResp | RateLimitErrorResp
   }
 }
 
