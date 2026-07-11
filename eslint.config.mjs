@@ -42,6 +42,7 @@ export default [
       "local-rules/no-zustand-types-in-store-file": "warn",
       "local-rules/input-value-naming": "warn",
       "local-rules/handle-prefix-location": "warn",
+      "local-rules/no-process-env-non-null-assertion": "warn",
     },
   },
 ]
