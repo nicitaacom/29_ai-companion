@@ -16,6 +16,15 @@ this repo's ESLint (`eslint.config.mjs`) fully enforces its conventions (T/I typ
 hook naming, `imports-order`, `response-variable-naming`, `api-folder-requires-api-namespace`, etc.);
 code that doesn't follow them will fail `pnpm lint` / `pnpm build`.
 
+**If you want NSFW content:** just use [davinci.ai](https://davinci.ai/app/explore) and save yourself time and money
+
+### What models for NSFW I tried
+
+DaVinci - the best but has no API - https://davinci.ai/app/explore
+Seedream 3.0 L and 4.5 - no NSFW support - https://ai.byteplus.com/lumina/en/model/image?mode=image
+GPT Image 2 - very hard and strict rules when it comes even close to NSFW (e.g kiss or BH or only panties)
+Flux - NSFW not supported
+
 <br/>
 
 ## 1. What this feature is
