@@ -17,12 +17,4 @@ export const RATE_LIMITS = {
       return `chat:new-message:${userId}`
     },
   },
-  generateMedia: {
-    windowSec: 3600,
-    maxAllowed: 10,
-    key: ({ userId }: RateLimitKeyParams) => {
-      if (!userId) throw new Error("userId is required for generateMedia")
-      return `generate:media:${userId}`
-    },
-  },
 } as const
