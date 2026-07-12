@@ -7,7 +7,7 @@
 > 1. **Focus.** Focus on one project at a time. Don't spread attention across 500 model integrations.
 > 2. **No API key for most models.** "DaVinci Ultra" and most others are proprietary models with no public API key — they're their own thing (NSFW, research, etc.).
 > 3. **Time + Cost.** Building integrations for 51 models would waste enormous time and tokens for a feature only the developer will ever use. This website has zero users — no need to reinvent the wheel.
-> 4. **Impractical registration.** Supporting all image/video models would require registering on 100+ websites and topping up minimal balances on each. Makes no sense.
+> 4. **Impractical registration.** Supporting all image/video models would require registering on 100500+ websites and topping up minimal balances on each. Makes no sense.
 >
 > **Bottom line:** FOCUS and TIME are the biggest reasons. This plan is now scoped to **one working model** (OpenAI / DALL-E via the user's API key). All other models remain listed in the UI but are marked as "request within 24h" (not yet available). The rest of this document is historical — the implementation follows the simplified scope below.
 
